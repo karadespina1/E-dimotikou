@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ψηφιακοί Πράκτορες — Μάθημα 12: Ψηφιοποίηση Κειμένου</title>
+<style>
+  :root{
+    --paper:#F3ECD9;
+    --paper-dark:#E7DCBE;
+    --card:#FFFDF7;
+    --ink:#1F3C63;
+    --ink-soft:#3C5A85;
+    --gold:#C98A2B;
+    --gold-soft:#E7C583;
+    --good:#3F7A4E;
+    --good-bg:#E1F0E3;
+    --bad:#B8483D;
+    --bad-bg:#F7E2DF;
+    --line:#D8CBAA;
+    --shadow: 0 6px 0 rgba(31,60,99,0.08);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(circle at 10% 8%, rgba(201,138,43,0.08), transparent 40%),
+      radial-gradient(circle at 90% 90%, rgba(31,60,99,0.06), transparent 40%),
+      var(--paper);
+    color:#2B2A28;
+    font-family: "Trebuchet MS", "Segoe UI", Verdana, sans-serif;
+    padding: 20px 14px 60px;
+  }
+  .wrap{max-width: 920px; margin:0 auto;}
+
+  header{
+    display:flex; align-items:center; gap:16px;
+    padding: 18px 22px;
+    background: var(--ink);
+    color: var(--paper);
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+    position:relative;
+    overflow:hidden;
+  }
+  header::after{
+    content:"";
+    position:absolute; right:-40px; top:-40px;
+    width:160px; height:160px; border-radius:50%;
+    background: radial-gradient(circle, rgba(231,197,131,0.35), transparent 70%);
+  }
+  .badge{
+    flex:0 0 auto;
+    width:54px;height:54px;border-radius:50%;
+    background: var(--gold);
+    display:flex;align-items:center;justify-content:center;
+    font-size:26px; font-weight:bold; color:var(--ink);
+    border: 3px solid var(--paper);
+  }
+  header h1{margin:0; font-size: clamp(20px,4vw,28px); letter-spacing:0.3px;}
+  header p{margin:4px 0 0; opacity:0.85; font-size:14px;}
+
+  nav.tabs{
+    display:flex; gap:8px; margin: 20px 0 4px; flex-wrap:wrap;
+  }
+  .tab-btn{
+    flex:1 1 220px;
+    padding:12px 14px;
+    border-radius: 10px 10px 0 0;
+    border: 2px solid var(--line);
+    border-bottom:none;
+    background: var(--paper-dark);
+    color: var(--ink-soft);
+    font-family:inherit; font-size:14.5px; font-weight:bold;
+    cursor:pointer;
+    text-align:left;
+    transition: background .15s, color .15s;
+  }
+  .tab-btn .num{
+    display:inline-block; width:20px;height:20px; line-height:20px;
+    background: var(--ink-soft); color:var(--paper);
+    border-radius:50%; text-align:center; font-size:12px; margin-right:8px;
+  }
+  .tab-btn.active{
+    background: var(--card); color: var(--ink);
+    border-color: var(--gold);
+  }
+  .tab-btn.active .num{ background: var(--gold); color:var(--ink);}
+
+  section.panel{
+    display:none;
+    background: var(--card);
+    border: 2px solid var(--gold);
+    border-radius: 0 12px 12px 12px;
+    padding: 22px;
+    box-shadow: var(--shadow);
+  }
+  section.panel.active{display:block;}
+
+  h2.mission-title{margin-top:0; color:var(--ink); font-size:20px;}
+  .goal{
+    background: var(--paper-dark);
+    border-left: 4px solid var(--gold);
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-size: 14px;
+    color: var(--ink-soft);
+    margin-bottom: 18px;
+  }
+
+  .controls-row{display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin: 12px 0 18px;}
+  button.action{
+    font-family:inherit;
+    background: var(--ink);
+    color: var(--paper);
+    border:none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight:bold;
+    cursor:pointer;
+    box-shadow: 0 3px 0 rgba(0,0,0,0.15);
+  }
+  button.action:hover{background:var(--ink-soft);}
+  button.action:active{transform: translateY(2px); box-shadow:none;}
+  button.secondary{
+    background: transparent;
+    color: var(--ink);
+    border: 2px solid var(--ink);
+    box-shadow:none;
+  }
+  button.secondary:hover{background: var(--paper-dark);}
+
+  .score-pill{
+    margin-left:auto;
+    background: var(--gold-soft);
+    color:#4A340B;
+    padding:6px 14px;
+    border-radius: 999px;
+    font-weight:bold;
+    font-size: 14px;
+  }
+
+  /* reference table */
+  details.reftable{
+    margin-top: 22px;
+    border: 2px dashed var(--line);
+    border-radius: 10px;
+    padding: 10px 14px;
+    background: #FBF7EC;
+  }
+  details.reftable summary{
+    cursor:pointer; font-weight:bold; color: var(--ink);
+    font-size: 14px;
+  }
+  table.codes{
+    width:100%; border-collapse: collapse; margin-top:10px; font-size: 13px;
+  }
+  table.codes td, table.codes th{
+    text-align:center; padding:5px 3px; border-bottom:1px solid var(--line);
+  }
+  table.codes th{color:var(--ink-soft); font-size:12px;}
+  table.codes td.letter{font-weight:bold; color:var(--ink); font-size:15px;}
+  table.codes td.bin{font-family: Consolas, "Courier New", monospace; letter-spacing:1px; color:var(--gold);}
+
+  /* Mission 1: encode */
+  .word-strip{display:flex; gap:10px; flex-wrap:wrap; margin-bottom:18px;}
+  .letter-slot{
+    text-align:center;
+  }
+  .letter-slot .glyph{
+    width:48px;height:48px; line-height:48px;
+    background: var(--ink); color: var(--paper);
+    border-radius: 8px; font-size:22px; font-weight:bold;
+    margin-bottom:6px;
+  }
+  .letter-slot input{
+    width:64px; text-align:center;
+    font-family: Consolas, "Courier New", monospace;
+    font-size:16px; letter-spacing:2px;
+    padding:8px 2px;
+    border-radius:6px;
+    border: 2px solid var(--line);
+    background:#fff;
+  }
+  .letter-slot input.correct{border-color:var(--good); background:var(--good-bg);}
+  .letter-slot input.wrong{border-color:var(--bad); background:var(--bad-bg); animation: shake .3s;}
+  @keyframes shake{
+    0%,100%{transform:translateX(0);} 25%{transform:translateX(-4px);} 75%{transform:translateX(4px);}
+  }
+  .feedback{margin-top:10px; font-size:14px; font-weight:bold; min-height:20px;}
+  .feedback.good{color:var(--good);}
+  .feedback.bad{color:var(--bad);}
+
+  /* Mission 2: decode */
+  .binary-display{
+    font-family: Consolas, "Courier New", monospace;
+    font-size: clamp(16px,3vw,22px);
+    letter-spacing:2px;
+    background: var(--ink);
+    color: var(--gold-soft);
+    padding: 16px;
+    border-radius:10px;
+    display:flex; gap:18px; flex-wrap:wrap; justify-content:center;
+    margin-bottom:20px;
+  }
+  .binary-group{padding:4px 8px; border-radius:6px;}
+  .binary-group.hint{background: rgba(255,255,255,0.12);}
+  .answer-strip{display:flex; gap:8px; flex-wrap:wrap; justify-content:center; margin-bottom:14px;}
+  .answer-strip input{
+    width:44px;height:48px; text-align:center; text-transform:uppercase;
+    font-size:20px; font-weight:bold; color:var(--ink);
+    border-radius:8px; border:2px solid var(--line); background:#fff;
+  }
+  .answer-strip input.correct{border-color:var(--good); background:var(--good-bg);}
+  .answer-strip input.wrong{border-color:var(--bad); background:var(--bad-bg);}
+
+  /* Mission 3: matching game */
+  .stats-row{display:flex; gap:18px; margin-bottom:16px; font-size:14px; color:var(--ink-soft); flex-wrap:wrap;}
+  .stats-row b{color:var(--ink);}
+  .match-grid{
+    display:grid;
+    grid-template-columns: repeat(auto-fill, minmax(78px,1fr));
+    gap:10px;
+  }
+  .match-card{
+    aspect-ratio: 1/0.7;
+    display:flex; align-items:center; justify-content:center;
+    background: var(--ink);
+    color: var(--paper);
+    border-radius:10px;
+    font-weight:bold; cursor:pointer; user-select:none;
+    font-size: 16px;
+    border: 2px solid transparent;
+    transition: transform .1s;
+  }
+  .match-card.bin{font-family: Consolas, "Courier New", monospace; font-size:13px; letter-spacing:1px;}
+  .match-card:hover{transform: translateY(-2px);}
+  .match-card.selected{border-color: var(--gold); background: var(--ink-soft);}
+  .match-card.solved{background: var(--good-bg); color:var(--good); cursor:default; opacity:0.85;}
+  .match-card.wrongflash{background: var(--bad-bg); color:var(--bad);}
+  .win-banner{
+    margin-top:16px; padding:14px; border-radius:10px;
+    background: var(--good-bg); color:var(--good); font-weight:bold; text-align:center;
+    display:none;
+  }
+  .win-banner.show{display:block;}
+
+  footer{
+    text-align:center; font-size:12px; color:var(--ink-soft); margin-top:26px; opacity:0.7;
+  }
+  @media (max-width:520px){
+    .tab-btn{font-size:13px; padding:10px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="badge">12</div>
+    <div>
+      <h1>Ψηφιακοί Πράκτορες</h1>
+      <p>Μάθημα 12ο · Ψηφιοποίηση κειμένου — Ε΄ Δημοτικού</p>
+    </div>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab-btn active" data-tab="m1"><span class="num">1</span>Κωδικοποίησε το μήνυμα</button>
+    <button class="tab-btn" data-tab="m2"><span class="num">2</span>Αποκωδικοποίησε το μήνυμα</button>
+    <button class="tab-btn" data-tab="m3"><span class="num">3</span>Παιχνίδι ταιριάσματος</button>
+  </nav>
+
+  <!-- MISSION 1: ENCODE -->
+  <section class="panel active" id="m1">
+    <h2 class="mission-title">Αποστολή 1 — Γίνε κωδικοποιητής</h2>
+    <div class="goal">Δες τη λέξη γράμμα-γράμμα. Για κάθε γράμμα, βρες στον πίνακα τα 5 δυαδικά ψηφία (0 και 1) και γράψε τα στο κουτάκι από κάτω.</div>
+
+    <div class="controls-row">
+      <button class="action" id="m1-new">🔄 Νέα λέξη</button>
+      <button class="action secondary" id="m1-check">✅ Έλεγχος</button>
+      <span class="score-pill" id="m1-score">Σωστά: 0/0</span>
+    </div>
+
+    <div class="word-strip" id="m1-strip"></div>
+    <div class="feedback" id="m1-feedback"></div>
+
+    <details class="reftable">
+      <summary>📖 Πίνακας ψηφιοποίησης (πάτα για να τον δεις)</summary>
+      <div id="m1-table"></div>
+    </details>
+  </section>
+
+  <!-- MISSION 2: DECODE -->
+  <section class="panel" id="m2">
+    <h2 class="mission-title">Αποστολή 2 — Γίνε αποκωδικοποιητής</h2>
+    <div class="goal">Ένα μυστικό μήνυμα έφτασε σε δυαδικό κώδικα! Χρησιμοποίησε τον πίνακα για να βρεις ποιο γράμμα κρύβει κάθε ομάδα των 5 ψηφίων, και γράψε τη λέξη.</div>
+
+    <div class="controls-row">
+      <button class="action" id="m2-new">🔄 Νέο μήνυμα</button>
+      <button class="action secondary" id="m2-check">✅ Έλεγχος</button>
+      <span class="score-pill" id="m2-score">Σωστά: 0/0</span>
+    </div>
+
+    <div class="binary-display" id="m2-binary"></div>
+    <div class="answer-strip" id="m2-answer"></div>
+    <div class="feedback" id="m2-feedback"></div>
+
+    <details class="reftable">
+      <summary>📖 Πίνακας ψηφιοποίησης (πάτα για να τον δεις)</summary>
+      <div id="m2-table"></div>
+    </details>
+  </section>
+
+  <!-- MISSION 3: MATCHING GAME -->
+  <section class="panel" id="m3">
+    <h2 class="mission-title">Αποστολή 3 — Ταίριαξε γράμμα με κωδικό</h2>
+    <div class="goal">Βρες τα ζευγάρια: πάτα ένα γράμμα και μετά τον δυαδικό κωδικό που ταιριάζει. Αν ταιριάζουν, μένουν πράσινα. Πόσο γρήγορα θα τα βρεις όλα;</div>
+
+    <div class="controls-row">
+      <button class="action" id="m3-new">🔄 Νέο παιχνίδι</button>
+      <span class="score-pill" id="m3-timer">⏱️ 00:00</span>
+    </div>
+    <div class="stats-row">
+      <span>Προσπάθειες: <b id="m3-moves">0</b></span>
+      <span>Ζευγάρια: <b id="m3-pairs">0</b>/8</span>
+    </div>
+
+    <div class="match-grid" id="m3-grid"></div>
+    <div class="win-banner" id="m3-win">🎉 Μπράβο, πράκτορα! Βρήκες όλα τα ζευγάρια!</div>
+  </section>
+
+  <footer>Φτιάχτηκε για το μάθημα «Ψηφιοποίηση κειμένου» — Πληροφορική Ε΄ Δημοτικού</footer>
+</div>
+
+<script>
+// ---- shared data: the digitization table from the textbook ----
+const TABLE = [
+  ["Α","00001"],["Β","00010"],["Γ","00011"],["Δ","00100"],
+  ["Ε","00101"],["Ζ","00110"],["Η","00111"],["Θ","01000"],
+  ["Ι","01001"],["Κ","01010"],["Λ","01011"],["Μ","01100"],
+  ["Ν","01101"],["Ξ","01110"],["Ο","01111"],["Π","10000"],
+  ["Ρ","10001"],["Σ","10010"],["Τ","10011"],["Υ","10100"],
+  ["Φ","10101"],["Χ","10110"],["Ψ","10111"],["Ω","11000"]
+];
+const LETTER_TO_BIN = Object.fromEntries(TABLE);
+const BIN_TO_LETTER = Object.fromEntries(TABLE.map(([l,b])=>[b,l]));
+
+function normalize(ch){
+  // treat final sigma as sigma, strip accents just in case
+  const map = {"ς":"Σ"};
+  const up = ch.toUpperCase();
+  return map[ch] || up;
+}
+
+function buildTableHTML(){
+  let rows = "";
+  for(let i=0;i<8;i++){
+    rows += "<tr>";
+    for(let c=0;c<3;c++){
+      const idx = i + c*8;
+      const [l,b] = TABLE[idx];
+      rows += `<td class="letter">${l}</td><td class="bin">${b}</td>`;
+    }
+    rows += "</tr>";
+  }
+  return `<table class="codes"><thead><tr><th>Γράμμα</th><th>Κωδικός</th><th>Γράμμα</th><th>Κωδικός</th><th>Γράμμα</th><th>Κωδικός</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+document.getElementById("m1-table").innerHTML = buildTableHTML();
+document.getElementById("m2-table").innerHTML = buildTableHTML();
+
+// ---- tabs ----
+document.querySelectorAll(".tab-btn").forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
+    document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
+    btn.classList.add("active");
+    document.getElementById(btn.dataset.tab).classList.add("active");
+  });
+});
+
+// =========================================================
+// MISSION 1 — ENCODE
+// =========================================================
+const WORDS = ["ΗΛΙΟΣ","ΓΑΤΑ","ΦΙΛΟΣ","ΒΙΒΛΙΟ","ΚΩΔΙΚΑΣ","ΣΧΟΛΕΙΟ","ΔΑΣΟΣ","ΨΑΡΙ","ΠΑΙΧΝΙΔΙ","ΟΥΡΑΝΟΣ"];
+let m1_word = "";
+let m1_score = {correct:0, total:0};
+
+function m1_newWord(){
+  m1_word = WORDS[Math.floor(Math.random()*WORDS.length)];
+  const strip = document.getElementById("m1-strip");
+  strip.innerHTML = "";
+  [...m1_word].forEach((ch,i)=>{
+    const div = document.createElement("div");
+    div.className = "letter-slot";
+    div.innerHTML = `<div class="glyph">${ch}</div><input type="text" maxlength="5" inputmode="numeric" data-i="${i}" placeholder="_____">`;
+    strip.appendChild(div);
+  });
+  document.getElementById("m1-feedback").textContent = "";
+  document.getElementById("m1-feedback").className = "feedback";
+  strip.querySelectorAll("input").forEach(inp=>{
+    inp.addEventListener("input", ()=>{
+      inp.value = inp.value.replace(/[^01]/g,"").slice(0,5);
+      inp.classList.remove("correct","wrong");
+    });
+  });
+}
+
+document.getElementById("m1-new").addEventListener("click", m1_newWord);
+document.getElementById("m1-check").addEventListener("click", ()=>{
+  const inputs = document.querySelectorAll("#m1-strip input");
+  let correctCount = 0;
+  inputs.forEach(inp=>{
+    const i = +inp.dataset.i;
+    const ch = m1_word[i];
+    const expected = LETTER_TO_BIN[normalize(ch)];
+    inp.classList.remove("correct","wrong");
+    if(inp.value === expected){
+      inp.classList.add("correct");
+      correctCount++;
+    } else {
+      inp.classList.add("wrong");
+    }
+  });
+  m1_score.total++;
+  if(correctCount === m1_word.length) m1_score.correct++;
+  document.getElementById("m1-score").textContent = `Σωστά: ${m1_score.correct}/${m1_score.total}`;
+  const fb = document.getElementById("m1-feedback");
+  if(correctCount === m1_word.length){
+    fb.textContent = "🎉 Τέλεια! Κωδικοποίησες σωστά όλη τη λέξη!";
+    fb.className = "feedback good";
+  } else {
+    fb.textContent = `Βρήκες ${correctCount}/${m1_word.length} γράμματα σωστά. Ξαναδοκίμασε τα κόκκινα κουτάκια!`;
+    fb.className = "feedback bad";
+  }
+});
+m1_newWord();
+
+// =========================================================
+// MISSION 2 — DECODE
+// =========================================================
+let m2_word = "";
+let m2_score = {correct:0, total:0};
+
+function m2_newWord(){
+  m2_word = WORDS[Math.floor(Math.random()*WORDS.length)];
+  const bin = document.getElementById("m2-binary");
+  bin.innerHTML = [...m2_word].map(ch=>`<span class="binary-group">${LETTER_TO_BIN[normalize(ch)]}</span>`).join("");
+  const ans = document.getElementById("m2-answer");
+  ans.innerHTML = "";
+  for(let i=0;i<m2_word.length;i++){
+    const inp = document.createElement("input");
+    inp.maxLength = 1;
+    inp.dataset.i = i;
+    inp.addEventListener("input", ()=>{
+      inp.value = inp.value.toUpperCase().replace(/[^Α-ΩΆ-Ώα-ωΣς]/g,"").slice(0,1);
+      inp.classList.remove("correct","wrong");
+    });
+    ans.appendChild(inp);
+  }
+  document.getElementById("m2-feedback").textContent = "";
+  document.getElementById("m2-feedback").className = "feedback";
+}
+
+document.getElementById("m2-new").addEventListener("click", m2_newWord);
+document.getElementById("m2-check").addEventListener("click", ()=>{
+  const inputs = document.querySelectorAll("#m2-answer input");
+  let correctCount = 0;
+  inputs.forEach(inp=>{
+    const i = +inp.dataset.i;
+    const expected = normalize(m2_word[i]);
+    inp.classList.remove("correct","wrong");
+    if(normalize(inp.value) === expected){
+      inp.classList.add("correct");
+      correctCount++;
+    } else {
+      inp.classList.add("wrong");
+    }
+  });
+  m2_score.total++;
+  if(correctCount === m2_word.length) m2_score.correct++;
+  document.getElementById("m2-score").textContent = `Σωστά: ${m2_score.correct}/${m2_score.total}`;
+  const fb = document.getElementById("m2-feedback");
+  if(correctCount === m2_word.length){
+    fb.textContent = `🎉 Το αποκωδικοποιημένο μήνυμα είναι: ${m2_word}!`;
+    fb.className = "feedback good";
+  } else {
+    fb.textContent = `Βρήκες ${correctCount}/${m2_word.length} γράμματα σωστά. Ξαναδοκίμασε τα κόκκινα κουτάκια!`;
+    fb.className = "feedback bad";
+  }
+});
+m2_newWord();
+
+// =========================================================
+// MISSION 3 — MATCHING GAME
+// =========================================================
+let m3_selected = [];
+let m3_pairsFound = 0;
+let m3_moves = 0;
+let m3_timer = null;
+let m3_seconds = 0;
+
+function m3_pickLetters(){
+  const shuffled = [...TABLE].sort(()=>Math.random()-0.5);
+  return shuffled.slice(0,8);
+}
+
+function m3_format(sec){
+  const m = String(Math.floor(sec/60)).padStart(2,"0");
+  const s = String(sec%60).padStart(2,"0");
+  return `⏱️ ${m}:${s}`;
+}
+
+function m3_newGame(){
+  clearInterval(m3_timer);
+  m3_seconds = 0;
+  m3_moves = 0;
+  m3_pairsFound = 0;
+  m3_selected = [];
+  document.getElementById("m3-timer").textContent = m3_format(0);
+  document.getElementById("m3-moves").textContent = "0";
+  document.getElementById("m3-pairs").textContent = "0";
+  document.getElementById("m3-win").classList.remove("show");
+
+  const pairs = m3_pickLetters();
+  let cards = [];
+  pairs.forEach(([l,b],idx)=>{
+    cards.push({type:"letter", value:l, pair:idx});
+    cards.push({type:"bin", value:b, pair:idx});
+  });
+  cards.sort(()=>Math.random()-0.5);
+
+  const grid = document.getElementById("m3-grid");
+  grid.innerHTML = "";
+  cards.forEach((c,i)=>{
+    const div = document.createElement("div");
+    div.className = "match-card" + (c.type==="bin" ? " bin" : "");
+    div.textContent = c.value;
+    div.dataset.pair = c.pair;
+    div.dataset.type = c.type;
+    div.dataset.idx = i;
+    div.addEventListener("click", ()=>m3_onCardClick(div));
+    grid.appendChild(div);
+  });
+
+  m3_timer = setInterval(()=>{
+    m3_seconds++;
+    document.getElementById("m3-timer").textContent = m3_format(m3_seconds);
+  },1000);
+}
+
+function m3_onCardClick(div){
+  if(div.classList.contains("solved") || div.classList.contains("selected")) return;
+  if(m3_selected.length === 2) return;
+
+  div.classList.add("selected");
+  m3_selected.push(div);
+
+  if(m3_selected.length === 2){
+    m3_moves++;
+    document.getElementById("m3-moves").textContent = m3_moves;
+    const [a,b] = m3_selected;
+    const isMatch = a.dataset.pair === b.dataset.pair && a.dataset.type !== b.dataset.type;
+    if(isMatch){
+      a.classList.add("solved");
+      b.classList.add("solved");
+      a.classList.remove("selected");
+      b.classList.remove("selected");
+      m3_pairsFound++;
+      document.getElementById("m3-pairs").textContent = m3_pairsFound;
+      m3_selected = [];
+      if(m3_pairsFound === 8){
+        clearInterval(m3_timer);
+        document.getElementById("m3-win").textContent =
+          `🎉 Μπράβο, πράκτορα! Βρήκες όλα τα ζευγάρια σε ${m3_format(m3_seconds).replace("⏱️ ","")} με ${m3_moves} προσπάθειες!`;
+        document.getElementById("m3-win").classList.add("show");
+      }
+    } else {
+      a.classList.add("wrongflash");
+      b.classList.add("wrongflash");
+      setTimeout(()=>{
+        a.classList.remove("selected","wrongflash");
+        b.classList.remove("selected","wrongflash");
+        m3_selected = [];
+      },600);
+    }
+  }
+}
+
+document.getElementById("m3-new").addEventListener("click", m3_newGame);
+m3_newGame();
+</script>
+</body>
+</html>
