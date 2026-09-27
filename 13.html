@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Μάθημα 13: Το υλικό και οι χρήστες του υπολογιστή - Ε΄ Δημοτικού</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .selected-chip {
+      transform: scale(1.05);
+      box-shadow: 0 0 0 3px #3b82f6;
+    }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen pb-16">
+
+  <!-- Header -->
+  <header class="bg-gradient-to-r from-blue-700 via-indigo-600 to-sky-600 text-white shadow-lg sticky top-0 z-50">
+    <div class="max-w-5xl mx-auto px-4 py-4 flex flex-col md:flex-row items-center justify-between gap-2">
+      <div class="flex items-center space-x-3">
+        <span class="text-3xl">💻</span>
+        <div>
+          <h1 class="text-xl md:text-2xl font-black tracking-wide">Πληροφορική Ε΄ Δημοτικού</h1>
+          <p class="text-blue-100 text-xs md:text-sm">Μάθημα 13: Το υλικό και οι χρήστες του υπολογιστή</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <div class="bg-white/20 backdrop-blur px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5">
+          <i class="fa-solid fa-star text-yellow-300"></i>
+          <span>Σκορ: <strong id="total-score" class="text-white text-sm">0</strong> / 6</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="max-w-5xl mx-auto px-4 mt-8 space-y-10">
+
+    <!-- Εισαγωγή -->
+    <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 flex flex-col md:flex-row items-center gap-5">
+      <div class="text-5xl md:text-6xl text-blue-600 bg-blue-50 p-4 rounded-2xl">
+        <i class="fa-solid fa-microchip"></i>
+      </div>
+      <div>
+        <h2 class="text-xl font-bold text-slate-800 mb-1">Καλωσόρισες στις 6 Διαδραστικές Αποστολές!</h2>
+        <p class="text-slate-600 text-sm md:text-base leading-relaxed">
+          Μέσα από αυτές τις 6 δραστηριότητες θα μάθεις για τις <strong>συσκευές εισόδου - εξόδου</strong>, τα <strong>μέσα αποθήκευσης</strong>, τα <strong>3 βασικά εξαρτήματα υλικού</strong> (επεξεργαστή, μνήμη, δίσκο), το πώς εκτελείται ένα πρόγραμμα και τα <strong>δικαιώματα των χρηστών</strong>.
+        </p>
+      </div>
+    </div>
+
+    <!-- 1. ΣΥΣΚΕΥΕΣ ΕΙΣΟΔΟΥ & ΕΞΟΔΟΥ -->
+    <section class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden" id="section-act-1">
+      <div class="bg-blue-600 text-white px-6 py-4 flex justify-between items-center">
+        <div class="flex items-center space-x-3">
+          <span class="w-8 h-8 rounded-full bg-white text-blue-600 font-bold flex items-center justify-center text-lg">1</span>
+          <h2 class="text-lg md:text-xl font-bold">Συσκευές Εισόδου και Εξόδου</h2>
+        </div>
+        <span class="text-xs bg-blue-700 font-bold px-3 py-1 rounded-full uppercase">Ταξινόμηση</span>
+      </div>
+      <div class="p-6">
+        <p class="text-slate-600 text-sm md:text-base mb-4">
+          👉 <strong>Οδηγία:</strong> Επίλεξε μία συσκευή από το καλάθι και κάνε κλικ στο σωστό πλαίσιο (<strong>Εισόδου</strong> ή <strong>Εξόδου</strong>) για να την τοποθετήσεις!
+        </p>
+
+        <!-- Pool -->
+        <div class="bg-slate-50 border-2 border-dashed border-slate-300 rounded-xl p-4 mb-4">
+          <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Διαθέσιμες συσκευές (κάνε κλικ για επιλογή):</div>
+          <div id="act1-pool" class="flex flex-wrap gap-2 min-h-[46px] items-center"></div>
+        </div>
+
+        <!-- Bins -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div id="bin-input" onclick="placeDevice('input')" class="border-2 border-emerald-300 bg-emerald-50/50 rounded-xl p-4 min-h-[140px] hover:border-emerald-500 cursor-pointer transition flex flex-col justify-between">
+            <div>
+              <div class="font-bold text-emerald-800 flex items-center gap-2 mb-2">
+                <i class="fa-solid fa-right-to-bracket"></i> Συσκευές Εισόδου (Δίνουν δεδομένα στον Η/Υ)
+              </div>
+              <div id="act1-input-items" class="flex flex-wrap gap-2"></div>
+            </div>
+            <span class="text-xs text-emerald-600 mt-2 italic font-semibold">Κάνε κλικ εδώ για τοποθέτηση</span>
+          </div>
+
+          <div id="bin-output" onclick="placeDevice('output')" class="border-2 border-amber-300 bg-amber-50/50 rounded-xl p-4 min-h-[140px] hover:border-amber-500 cursor-pointer transition flex flex-col justify-between">
+            <div>
+              <div class="font-bold text-amber-800 flex items-center gap-2 mb-2">
+                <i class="fa-solid fa-right-from-bracket"></i> Συσκευές Εξόδου (Μας δείχνουν πληροφορίες)
+              </div>
+              <div id="act1-output-items" class="flex flex-wrap gap-2"></div>
+            </div>
+            <span class="text-xs text-amber-600 mt-2 italic font-semibold">Κάνε κλικ εδώ για τοποθέτηση</span>
+          </div>
+        </div>
+
+        <div class="mt-5 flex items-center justify-between">
+          <button onclick="checkAct1()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-2.5 rounded-xl shadow transition">
+            <i class="fa-solid fa-check mr-1"></i> Έλεγχος
+          </button>
+          <button onclick="resetAct1()" class="text-slate-500 hover:text-slate-700 text-sm font-semibold">
+            <i class="fa-solid fa-rotate-left mr-1"></i> Επαναφορά
+          </button>
+        </div>
+        <div id="act1-feedback" class="mt-3 text-sm font-bold hidden"></div>
+      </div>
+    </section>
+
+    <!-- 2. ΜΕΣΑ ΑΠΟΘΗΚΕΥΣΗΣ -->
+    <section class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden" id="section-act-2">
+      <div class="bg-purple-600 text-white px-6 py-4 flex justify-between items-center">
+        <div class="flex items-center space-x-3">
+          <span class="w-8 h-8 rounded-full bg-white text-purple-600 font-bold flex items-center justify-center text-lg">2</span>
+          <h2 class="text-lg md:text-xl font-bold">Μέσα & Συσκευές Αποθήκευσης</h2>
+        </div>
+        <span class="text-xs bg-purple-700 font-bold px-3 py-1 rounded-full uppercase">Αντιστοίχιση</span>
+      </div>
+      <div class="p-6">
+        <p class="text-slate-600 text-sm md:text-base mb-6">
+          👉 <strong>Οδηγία:</strong> Διάβασε την περιγραφή και διάλεξε το κατάλληλο μέσο αποθήκευσης από το αναπτυσσόμενο μενού!
+        </p>
+
+        <div class="space-y-4" id="act2-list"></div>
+
+        <div class="mt-6 flex items-center justify-between">
+          <button onclick="checkAct2()" class="bg-purple-600 hover:bg-purple-700 text-white font-bold px-6 py-2.5 rounded-xl shadow transition">
+            <i class="fa-solid fa-check mr-1"></i> Έλεγχος Απαντήσεων
+          </button>
+          <div id="act2-feedback" class="text-sm font-bold hidden"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. ΤΑ 3 ΒΑΣΙΚΑ ΕΞΑΡΤΗΜΑΤΑ ΥΛΙΚΟΥ -->
+    <section class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden" id="section-act-3">
+      <div class="bg-indigo-600 text-white px-6 py-4 flex justify-between items-center">
+        <div class="flex items-center space-x-3">
+          <span class="w-8 h-8 rounded-full bg-white text-indigo-600 font-bold flex items-center justify-center text-lg">3</span>
+          <h2 class="text-lg md:text-xl font-bold">Τα 3 Κύρια Εξαρτήματα Υλικού</h2>
+        </div>
+        <span class="text-xs bg-indigo-700 font-bold px-3 py-1 rounded-full uppercase">Ρόλοι Υλικού (σελ. 50)</span>
+      </div>
+      <div class="p-6">
+        <p class="text-slate-600 text-sm md:text-base mb-6">
+          👉 <strong>Οδηγία:</strong> Διάλεξε το σωστό εξάρτημα (<strong>Επεξεργαστής</strong>, <strong>Μνήμη</strong>, <strong>Δίσκος αποθήκευσης</strong>) για κάθε περιγραφή:
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5" id="act3-cards"></div>
+
+        <div class="mt-6 flex items-center justify-between">
+          <button onclick="checkAct3()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-6 py-2.5 rounded-xl shadow transition">
+            <i class="fa-solid fa-check mr-1"></i> Έλεγχος Ρόλων
+          </button>
+          <div id="act3-feedback" class="text-sm font-bold hidden"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. ΤΟ ΤΑΞΙΔΙ ΜΙΑΣ ΕΦΑΡΜΟΓΗΣ (ΧΡΟΝΙΚΗ ΣΕΙΡΑ) -->
+    <section class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden" id="section-act-4">
+      <div class="bg-cyan-600 text-white px-6 py-4 flex justify-between items-center">
+        <div class="flex items-center space-x-3">
+          <span class="w-8 h-8 rounded-full bg-white text-cyan-600 font-bold flex items-center justify-center text-lg">4</span>
+          <h2 class="text-lg md:text-xl font-bold">Πώς λειτουργεί το Υλικό: Το Ταξίδι της Εφαρμογής</h2>
+        </div>
+        <span class="text-xs bg-cyan-700 font-bold px-3 py-1 rounded-full uppercase">Σωστή Σειρά (σελ. 51-52)</span>
+      </div>
+      <div class="p-6">
+        <p class="text-slate-600 text-sm md:text-base mb-4">
+          👉 <strong>Οδηγία:</strong> Όταν κάνουμε διπλό κλικ σε ένα πρόγραμμα, τι γίνεται μέσα στον Η/Υ; Βάλε τα 4 βήματα στη <strong>σωστή χρονική σειρά</strong> (από το 1ο έως το 4ο) χρησιμοποιώντας τα κουμπιά 🔼 και 🔽!
+        </p>
+
+        <div class="space-y-2.5 max-w-2xl mx-auto" id="act4-list"></div>
+
+        <div class="mt-6 flex items-center justify-between">
+          <button onclick="checkAct4()" class="bg-cyan-600 hover:bg-cyan-700 text-white font-bold px-6 py-2.5 rounded-xl shadow transition">
+            <i class="fa-solid fa-check mr-1"></i> Έλεγχος Σειράς
+          </button>
+          <div id="act4-feedback" class="text-sm font-bold hidden"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. ΧΡΗΣΤΕΣ ΚΑΙ ΔΙΚΑΙΩΜΑΤΑ ΠΡΟΣΒΑΣΗΣ -->
+    <section class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden" id="section-act-5">
+      <div class="bg-rose-500 text-white px-6 py-4 flex justify-between items-center">
+        <div class="flex items-center space-x-3">
+          <span class="w-8 h-8 rounded-full bg-white text-rose-500 font-bold flex items-center justify-center text-lg">5</span>
+          <h2 class="text-lg md:text-xl font-bold">Χρήστες και Δικαιώματα Πρόσβασης</h2>
+        </div>
+        <span class="text-xs bg-rose-600 font-bold px-3 py-1 rounded-full uppercase">Σενάριο Σχολείου (σελ. 53-54)</span>
+      </div>
+      <div class="p-6">
+        <div class="bg-rose-50 border-l-4 border-rose-400 p-4 rounded-r-xl mb-6">
+          <div class="font-bold text-rose-900 mb-1">📖 Το Σενάριο του Βιβλίου:</div>
+          <p class="text-sm text-rose-800 leading-relaxed">
+            Στον υπολογιστή του εργαστηρίου συνδέονται με ξεχωριστό λογαριασμό ο <strong>Ήρωνας</strong> και η <strong>Υπατία</strong>. Στον σκληρό δίσκο υπάρχουν 3 φάκελοι:
+            <span class="inline-block bg-white px-2 py-0.5 rounded font-mono text-xs shadow-sm font-bold mx-1">📁 ΗΡΩΝΑΣ</span>,
+            <span class="inline-block bg-white px-2 py-0.5 rounded font-mono text-xs shadow-sm font-bold mx-1">📁 ΥΠΑΤΙΑ</span> και
+            <span class="inline-block bg-white px-2 py-0.5 rounded font-mono text-xs shadow-sm font-bold mx-1">📁 ΚΟΙΝΟΧΡΗΣΤΑ</span>.
+          </p>
+        </div>
+
+        <div class="space-y-4" id="act5-questions"></div>
+
+        <div class="mt-6 flex items-center justify-between">
+          <button onclick="checkAct5()" class="bg-rose-500 hover:bg-rose-600 text-white font-bold px-6 py-2.5 rounded-xl shadow transition">
+            <i class="fa-solid fa-check mr-1"></i> Έλεγχος Δικαιωμάτων
+          </button>
+          <div id="act5-feedback" class="text-sm font-bold hidden"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. ΤΟ ΜΕΓΑΛΟ ΚΟΥΙΖ ΤΟΥ ΜΑΘΗΜΑΤΟΣ -->
+    <section class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden" id="section-act-6">
+      <div class="bg-amber-500 text-white px-6 py-4 flex justify-between items-center">
+        <div class="flex items-center space-x-3">
+          <span class="w-8 h-8 rounded-full bg-white text-amber-600 font-bold flex items-center justify-center text-lg">6</span>
+          <h2 class="text-lg md:text-xl font-bold">Το Μεγάλο Κουίζ του Μαθήματος 13</h2>
+        </div>
+        <span class="text-xs bg-amber-600 font-bold px-3 py-1 rounded-full uppercase">Τελικό Τεστ</span>
+      </div>
+      <div class="p-6">
+        <p class="text-slate-600 text-sm md:text-base mb-6">
+          👉 <strong>Οδηγία:</strong> Διάλεξε τη σωστή απάντηση στις ερωτήσεις για να κερδίσεις το <strong>Ψηφιακό Σήμα Ειδικού Υλικού</strong>!
+        </p>
+
+        <div class="space-y-6" id="act6-quiz"></div>
+
+        <div class="mt-8 flex items-center justify-between">
+          <button onclick="checkAct6()" class="bg-amber-500 hover:bg-amber-600 text-white font-bold px-6 py-2.5 rounded-xl shadow transition">
+            <i class="fa-solid fa-award mr-1"></i> Υποβολή Κουίζ
+          </button>
+          <div id="act6-feedback" class="text-sm font-bold hidden"></div>
+        </div>
+
+        <!-- Reward Badge -->
+        <div id="badge-reward" class="hidden mt-8 p-6 bg-gradient-to-r from-amber-100 via-yellow-100 to-orange-100 rounded-2xl border-2 border-yellow-400 text-center">
+          <div class="text-5xl mb-2">🏆🌟💻</div>
+          <h3 class="text-2xl font-bold text-amber-900">Συγχαρητήρια!</h3>
+          <p class="text-amber-800 text-sm max-w-md mx-auto mt-2">
+            Έγινες <strong>Master του Υλικού και των Χρηστών</strong>! Ολοκλήρωσες με επιτυχία όλες τις αποστολές του Μαθήματος 13!
+          </p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="text-center text-xs text-slate-500 mt-12 py-6 border-t border-slate-200">
+    Πληροφορική Ε΄ Δημοτικού • Μάθημα 13: Το υλικό και οι χρήστες του υπολογιστή • Διαδραστικές Δραστηριότητες
+  </footer>
+
+  <!-- JavaScript Logic -->
+  <script>
+    let scores = { act1: 0, act2: 0, act3: 0, act4: 0, act5: 0, act6: 0 };
+
+    function updateTotal() {
+      const sum = Object.values(scores).reduce((a, b) => a + b, 0);
+      document.getElementById('total-score').innerText = sum;
+    }
+
+    /* ---------------- ACT 1: ΣΥΣΚΕΥΕΣ ΕΙΣΟΔΟΥ / ΕΞΟΔΟΥ ---------------- */
+    const initialDevices = [
+      { id: 'd1', name: '🖱️ Ποντίκι', type: 'input' },
+      { id: 'd2', name: '⌨️ Πληκτρολόγιο', type: 'input' },
+      { id: 'd3', name: '📷 Κάμερα (Webcam)', type: 'input' },
+      { id: 'd4', name: '🎤 Μικρόφωνο', type: 'input' },
+      { id: 'd5', name: '🖥️ Οθόνη', type: 'output' },
+      { id: 'd6', name: '🔊 Ηχεία', type: 'output' },
+      { id: 'd7', name: '🖨️ Εκτυπωτής', type: 'output' }
+    ];
+
+    let currentDevices = [...initialDevices];
+    let selectedDeviceId = null;
+    let placedDevices = { input: [], output: [] };
+
+    function renderAct1() {
+      const pool = document.getElementById('act1-pool');
+      pool.innerHTML = '';
+      currentDevices.forEach(d => {
+        const btn = document.createElement('button');
+        btn.className = `px-3 py-1.5 rounded-lg text-xs md:text-sm font-semibold transition border border-slate-300 bg-white hover:bg-slate-50 ${selectedDeviceId === d.id ? 'selected-chip bg-blue-100 border-blue-500' : ''}`;
+        btn.innerText = d.name;
+        btn.onclick = (e) => {
+          e.stopPropagation();
+          selectedDeviceId = d.id;
+          renderAct1();
+        };
+        pool.appendChild(btn);
+      });
+
+      const inDiv = document.getElementById('act1-input-items');
+      inDiv.innerHTML = '';
+      placedDevices.input.forEach(d => {
+        const span = document.createElement('span');
+        span.className = 'px-3 py-1 bg-white border border-emerald-300 text-emerald-900 rounded-lg text-xs font-semibold shadow-sm inline-flex items-center gap-1';
+        span.innerHTML = `${d.name} <i class="fa-solid fa-xmark text-slate-400 hover:text-red-500 cursor-pointer ml-1" onclick="removeDevice('${d.id}', 'input', event)"></i>`;
+        inDiv.appendChild(span);
+      });
+
+      const outDiv = document.getElementById('act1-output-items');
+      outDiv.innerHTML = '';
+      placedDevices.output.forEach(d => {
+        const span = document.createElement('span');
+        span.className = 'px-3 py-1 bg-white border border-amber-300 text-amber-900 rounded-lg text-xs font-semibold shadow-sm inline-flex items-center gap-1';
+        span.innerHTML = `${d.name} <i class="fa-solid fa-xmark text-slate-400 hover:text-red-500 cursor-pointer ml-1" onclick="removeDevice('${d.id}', 'output', event)"></i>`;
+        outDiv.appendChild(span);
+      });
+    }
+
+    function placeDevice(target) {
+      if (!selectedDeviceId) return;
+      const idx = currentDevices.findIndex(d => d.id === selectedDeviceId);
+      if (idx !== -1) {
+        const item = currentDevices.splice(idx, 1)[0];
+        placedDevices[target].push(item);
+        selectedDeviceId = null;
+        renderAct1();
+      }
+    }
+
+    function removeDevice(id, fromBin, e) {
+      e.stopPropagation();
+      const idx = placedDevices[fromBin].findIndex(d => d.id === id);
+      if (idx !== -1) {
+        const item = placedDevices[fromBin].splice(idx, 1)[0];
+        currentDevices.push(item);
+        renderAct1();
+      }
+    }
+
+    function resetAct1() {
+      currentDevices = [...initialDevices];
+      placedDevices = { input: [], output: [] };
+      selectedDeviceId = null;
+      document.getElementById('act1-feedback').className = 'mt-3 text-sm font-bold hidden';
+      scores.act1 = 0;
+      updateTotal();
+      renderAct1();
+    }
+
+    function checkAct1() {
+      const fb = document.getElementById('act1-feedback');
+      fb.classList.remove('hidden');
+
+      if (currentDevices.length > 0) {
+        fb.className = 'mt-3 text-sm font-bold text-amber-600';
+        fb.innerHTML = '⚠️ Τοποθέτησε πρώτα όλες τις συσκευές από το καλάθι!';
+        return;
+      }
+
+      let errors = 0;
+      placedDevices.input.forEach(d => { if (d.type !== 'input') errors++; });
+      placedDevices.output.forEach(d => { if (d.type !== 'output') errors++; });
+
+      if (errors === 0) {
+        fb.className = 'mt-3 text-sm font-bold text-emerald-600';
+        fb.innerHTML = '🎉 Μπράβο! Όλες οι συσκευές εισόδου και εξόδου ταξινομήθηκαν σωστά!';
+        scores.act1 = 1;
+      } else {
+        fb.className = 'mt-3 text-sm font-bold text-rose-600';
+        fb.innerHTML = `❌ Υπάρχουν ${errors} λάθος τοποθετημένες συσκευές. Δοκίμασε ξανά!`;
+        scores.act1 = 0;
+      }
+      updateTotal();
+    }
+
+    /* ---------------- ACT 2: ΜΕΣΑ ΑΠΟΘΗΚΕΥΣΗΣ ---------------- */
+    const act2Data = [
+      {
+        q: '1. Ο Ήρωνας θέλει να πάρει την εργασία του από το σπίτι στο σχολείο μέσα στην τσάντα του.',
+        ans: 'usb',
+        options: [
+          { val: '', text: '-- Επίλεξε μέσο --' },
+          { val: 'ram', text: 'Μνήμη RAM' },
+          { val: 'usb', text: 'Φλασάκι USB (Flash Drive)' },
+          { val: 'dvd', text: 'Δισκέτα παλιάς εποχής' }
+        ]
+      },
+      {
+        q: '2. Ο υπολογιστής αποθηκεύει μόνιμα το λειτουργικό σύστημα και όλα τα εγκατεστημένα προγράμματα.',
+        ans: 'hdd',
+        options: [
+          { val: '', text: '-- Επίλεξε μέσο --' },
+          { val: 'hdd', text: 'Σκληρός Δίσκος (ή SSD)' },
+          { val: 'ram', text: 'Μνήμη RAM' },
+          { val: 'mouse', text: 'Ποντίκι' }
+        ]
+      },
+      {
+        q: '3. Όσο παίζουμε ένα παιχνίδι, οι πόντοι μας κρατούνται εκεί, αλλά σβήνονται μόλις κλείσει ο Η/Υ.',
+        ans: 'ram',
+        options: [
+          { val: '', text: '-- Επίλεξε μέσο --' },
+          { val: 'hdd', text: 'Σκληρός Δίσκος' },
+          { val: 'ram', text: 'Μνήμη RAM (Προσωρινή)' },
+          { val: 'usb', text: 'USB Flash' }
+        ]
+      }
+    ];
+
+    function renderAct2() {
+      const container = document.getElementById('act2-list');
+      container.innerHTML = '';
+      act2Data.forEach((item, idx) => {
+        const div = document.createElement('div');
+        div.className = 'p-3 bg-slate-50 border border-slate-200 rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-3';
+        div.innerHTML = `
+          <span class="text-sm font-medium text-slate-700">${item.q}</span>
+          <select id="act2-sel-${idx}" class="text-xs md:text-sm font-semibold p-2 rounded-lg border border-slate-300 bg-white focus:ring-2 focus:ring-purple-400 outline-none">
+            ${item.options.map(opt => `<option value="${opt.val}">${opt.text}</option>`).join('')}
+          </select>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function checkAct2() {
+      let correct = 0;
+      act2Data.forEach((item, idx) => {
+        const val = document.getElementById(`act2-sel-${idx}`).value;
+        if (val === item.ans) correct++;
+      });
+
+      const fb = document.getElementById('act2-feedback');
+      fb.classList.remove('hidden');
+      if (correct === act2Data.length) {
+        fb.className = 'text-sm font-bold text-emerald-600';
+        fb.innerHTML = '🎉 Άριστα! Γνωρίζεις ακριβώς πού αποθηκεύεται κάθε πληροφορία!';
+        scores.act2 = 1;
+      } else {
+        fb.className = 'text-sm font-bold text-rose-600';
+        fb.innerHTML = `⚠️ Έχεις ${correct} στις ${act2Data.length} σωστές. Ξανασκέψου ποια μέσα είναι μόνιμα και ποια προσωρινά!`;
+        scores.act2 = 0;
+      }
+      updateTotal();
+    }
+
+    /* ---------------- ACT 3: ΤΑ 3 ΒΑΣΙΚΑ ΕΞΑΡΤΗΜΑΤΑ ---------------- */
+    const act3Data = [
+      {
+        title: 'Το «Μυαλό» του Η/Υ',
+        desc: 'Κάνει αριθμητικές πράξεις, συγκρίσεις και ελέγχει τη συνεργασία όλων των εξαρτημάτων.',
+        ans: 'cpu'
+      },
+      {
+        title: 'Προσωρινή Αποθήκευση',
+        desc: 'Συνεργάζεται με τον επεξεργαστή και σβήνεται αμέσως μόλις τερματιστεί η λειτουργία του Η/Υ.',
+        ans: 'ram'
+      },
+      {
+        title: 'Μόνιμη Αποθήκευση',
+        desc: 'Αποθηκεύει με ασφάλεια το λογισμικό και τα αρχεία μας. Είναι πιο αργός από τη μνήμη.',
+        ans: 'disk'
+      }
+    ];
+
+    function renderAct3() {
+      const container = document.getElementById('act3-cards');
+      container.innerHTML = '';
+      act3Data.forEach((card, idx) => {
+        const div = document.createElement('div');
+        div.className = 'bg-slate-50 border border-slate-200 rounded-xl p-4 flex flex-col justify-between';
+        div.innerHTML = `
+          <div>
+            <div class="text-xs uppercase font-bold text-indigo-600 mb-1">${card.title}</div>
+            <p class="text-slate-600 text-xs md:text-sm leading-relaxed mb-4">${card.desc}</p>
+          </div>
+          <select id="act3-sel-${idx}" class="text-xs md:text-sm font-semibold p-2 border border-slate-300 rounded-lg bg-white focus:ring-2 focus:ring-indigo-400 outline-none">
+            <option value="">-- Επίλεξε Εξάρτημα --</option>
+            <option value="cpu">Επεξεργαστής (Processor)</option>
+            <option value="ram">Μνήμη (Memory / RAM)</option>
+            <option value="disk">Δίσκος αποθήκευσης (Storage)</option>
+          </select>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function checkAct3() {
+      let correct = 0;
+      act3Data.forEach((c, idx) => {
+        const val = document.getElementById(`act3-sel-${idx}`).value;
+        if (val === c.ans) correct++;
+      });
+      const fb = document.getElementById('act3-feedback');
+      fb.classList.remove('hidden');
+      if (correct === act3Data.length) {
+        fb.className = 'text-sm font-bold text-emerald-600';
+        fb.innerHTML = '🎉 Συγχαρητήρια! Αντιστοίχισες τέλεια τα 3 βασικά εξαρτήματα!';
+        scores.act3 = 1;
+      } else {
+        fb.className = 'text-sm font-bold text-rose-600';
+        fb.innerHTML = `⚠️ Έχεις ${correct} στα 3 σωστά. Συμβουλέψου τη σελίδα 50 του βιβλίου!`;
+        scores.act3 = 0;
+      }
+      updateTotal();
+    }
+
+    /* ---------------- ACT 4: ΤΟ ΤΑΞΙΔΙ ΜΙΑΣ ΕΦΑΡΜΟΓΗΣ (ΣΕΙΡΑ) ---------------- */
+    let act4Steps = [
+      { id: 3, text: 'Ο επεξεργαστής ακολουθεί και εκτελεί τις εντολές του προγράμματος.' },
+      { id: 1, text: 'Κάνουμε διπλό κλικ με το ποντίκι στο εικονίδιο της εφαρμογής.' },
+      { id: 4, text: 'Το αποτέλεσμα και τα γραφικά εμφανίζονται στην οθόνη του υπολογιστή.' },
+      { id: 2, text: 'Ο υπολογιστής αναζητά την εφαρμογή στον δίσκο και τη μεταφέρει στη μνήμη (RAM).' }
+    ];
+
+    function renderAct4() {
+      const container = document.getElementById('act4-list');
+      container.innerHTML = '';
+      act4Steps.forEach((st, idx) => {
+        const div = document.createElement('div');
+        div.className = 'flex items-center justify-between p-3 bg-white border border-slate-200 rounded-xl shadow-xs';
+        div.innerHTML = `
+          <div class="flex items-center gap-3">
+            <span class="w-6 h-6 rounded-full bg-cyan-100 text-cyan-800 text-xs font-bold flex items-center justify-center">${idx + 1}</span>
+            <span class="text-xs md:text-sm text-slate-700 font-medium">${st.text}</span>
+          </div>
+          <div class="flex items-center gap-1">
+            <button onclick="moveStep(${idx}, -1)" ${idx === 0 ? 'disabled class="opacity-20 cursor-not-allowed px-2 py-1"' : 'class="px-2 py-1 text-slate-600 hover:text-cyan-600 font-bold"'} title="Πάνω">🔼</button>
+            <button onclick="moveStep(${idx}, 1)" ${idx === act4Steps.length - 1 ? 'disabled class="opacity-20 cursor-not-allowed px-2 py-1"' : 'class="px-2 py-1 text-slate-600 hover:text-cyan-600 font-bold"'} title="Κάτω">🔽</button>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function moveStep(idx, dir) {
+      const target = idx + dir;
+      if (target < 0 || target >= act4Steps.length) return;
+      const tmp = act4Steps[idx];
+      act4Steps[idx] = act4Steps[target];
+      act4Steps[target] = tmp;
+      renderAct4();
+    }
+
+    function checkAct4() {
+      const isCorrect = act4Steps.every((st, idx) => st.id === idx + 1);
+      const fb = document.getElementById('act4-feedback');
+      fb.classList.remove('hidden');
+      if (isCorrect) {
+        fb.className = 'text-sm font-bold text-emerald-600';
+        fb.innerHTML = '🎉 Μπράβο! Αυτή είναι η ακριβής σειρά λειτουργίας του υλικού (σελ. 51-52)!';
+        scores.act4 = 1;
+      } else {
+        fb.className = 'text-sm font-bold text-rose-600';
+        fb.innerHTML = '❌ Η σειρά δεν είναι ακόμη σωστή. Σκέψου: Τι κάνουμε πρώτα και πού φορτώνονται οι εντολές;';
+        scores.act4 = 0;
+      }
+      updateTotal();
+    }
+
+    /* ---------------- ACT 5: ΧΡΗΣΤΕΣ & ΔΙΚΑΙΩΜΑΤΑ ---------------- */
+    const act5Data = [
+      {
+        q: '1. Ποιος έχει δικαίωμα να ανοίξει το αρχείο «ΟΝΟΜΑΤΑ ΜΑΘΗΤΩΝ» που βρίσκεται στον φάκελο ΚΟΙΝΟΧΡΗΣΤΑ;',
+        options: ['Μόνο ο Ήρωνας', 'Μόνο η Υπατία', 'Και τα δύο παιδιά', 'Κανένα από τα δύο'],
+        ans: 2
+      },
+      {
+        q: '2. Αν ο Ήρωνας αποθηκεύσει ένα προσωπικό σχέδιο στον φάκελό του (📁 ΗΡΩΝΑΣ), μπορεί η Υπατία να το δει από τον δικό της λογαριασμό;',
+        options: ['Ναι, γιατί είναι στον ίδιο υπολογιστή', 'Όχι, δικαίωμα πρόσβασης έχει μόνο ο Ήρωνας', 'Ναι, αν ξέρει το όνομα του αρχείου'],
+        ans: 1
+      },
+      {
+        q: '3. Ποιο βασικό λογισμικό ρυθμίζει τους χρήστες και τα δικαιώματα πρόσβασης;',
+        options: ['Ο φυλλομετρητής (browser)', 'Το λειτουργικό σύστημα', 'Το πρόγραμμα ζωγραφικής'],
+        ans: 1
+      }
+    ];
+
+    function renderAct5() {
+      const container = document.getElementById('act5-questions');
+      container.innerHTML = '';
+      act5Data.forEach((qItem, qIdx) => {
+        const div = document.createElement('div');
+        div.className = 'p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-2';
+        div.innerHTML = `
+          <div class="text-xs md:text-sm font-bold text-slate-800">${qItem.q}</div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
+            ${qItem.options.map((opt, optIdx) => `
+              <label class="flex items-center gap-2 p-2 bg-white rounded-lg border border-slate-200 cursor-pointer hover:bg-rose-50 text-xs md:text-sm">
+                <input type="radio" name="act5-q-${qIdx}" value="${optIdx}" class="text-rose-500 focus:ring-rose-400">
+                <span>${opt}</span>
+              </label>
+            `).join('')}
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function checkAct5() {
+      let correct = 0;
+      act5Data.forEach((qItem, qIdx) => {
+        const sel = document.querySelector(`input[name="act5-q-${qIdx}"]:checked`);
+        if (sel && parseInt(sel.value) === qItem.ans) correct++;
+      });
+      const fb = document.getElementById('act5-feedback');
+      fb.classList.remove('hidden');
+      if (correct === act5Data.length) {
+        fb.className = 'text-sm font-bold text-emerald-600';
+        fb.innerHTML = '🎉 Εξαιρετικά! Κατάλαβες πλήρως τη σημασία των δικαιωμάτων πρόσβασης!';
+        scores.act5 = 1;
+      } else {
+        fb.className = 'text-sm font-bold text-rose-600';
+        fb.innerHTML = `⚠️ Απάντησες σωστά σε ${correct} από τις ${act5Data.length} ερωτήσεις. Ξαναδιάβασε το σενάριο!`;
+        scores.act5 = 0;
+      }
+      updateTotal();
+    }
+
+    /* ---------------- ACT 6: ΜΕΓΑΛΟ ΚΟΥΙΖ ---------------- */
+    const act6Data = [
+      {
+        q: '1. Τι συμβαίνει στα περιεχόμενα της μνήμης (RAM) όταν κλείσουμε τον υπολογιστή;',
+        options: ['Παραμένουν αποθηκευμένα για πάντα', 'Σβήνονται αμέσως', 'Μεταφέρονται αυτόματα στο διαδίκτυο'],
+        ans: 1
+      },
+      {
+        q: '2. Ποιο εξάρτημα είναι υπεύθυνο για τις αριθμητικές πράξεις και τον συντονισμό του υπολογιστή;',
+        options: ['Ο σκληρός δίσκος', 'Η οθόνη', 'Ο επεξεργαστής (CPU)'],
+        ans: 2
+      },
+      {
+        q: '3. Στα κινητά τηλέφωνα και τις ταμπλέτες (tablets), τα περιφερειακά και τα εξαρτήματα υλικού:',
+        options: ['Είναι όλα ενσωματωμένα σε μία συσκευή', 'Δεν έχουν καθόλου επεξεργαστή', 'Χρειάζονται πάντα εξωτερικό ποντίκι'],
+        ans: 0
+      },
+      {
+        q: '4. Γιατί κάθε χρήστης έχει ξεχωριστό κωδικό πρόσβασης;',
+        options: ['Για να τρέχει πιο γρήγορα ο υπολογιστής', 'Για να προστατεύονται τα αρχεία του από μη εξουσιοδοτημένη πρόσβαση', 'Για να μην χρειάζεται οθόνη'],
+        ans: 1
+      }
+    ];
+
+    function renderAct6() {
+      const container = document.getElementById('act6-quiz');
+      container.innerHTML = '';
+      act6Data.forEach((qItem, qIdx) => {
+        const div = document.createElement('div');
+        div.className = 'p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-2';
+        div.innerHTML = `
+          <div class="text-xs md:text-sm font-bold text-slate-800">${qItem.q}</div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
+            ${qItem.options.map((opt, optIdx) => `
+              <label class="flex items-center gap-2 p-2 bg-white rounded-lg border border-slate-200 cursor-pointer hover:bg-amber-50 text-xs md:text-sm">
+                <input type="radio" name="act6-q-${qIdx}" value="${optIdx}" class="text-amber-500 focus:ring-amber-400">
+                <span>${opt}</span>
+              </label>
+            `).join('')}
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function checkAct6() {
+      let correct = 0;
+      act6Data.forEach((qItem, qIdx) => {
+        const sel = document.querySelector(`input[name="act6-q-${qIdx}"]:checked`);
+        if (sel && parseInt(sel.value) === qItem.ans) correct++;
+      });
+      const fb = document.getElementById('act6-feedback');
+      fb.classList.remove('hidden');
+      const badge = document.getElementById('badge-reward');
+
+      if (correct === act6Data.length) {
+        fb.className = 'text-sm font-bold text-emerald-600';
+        fb.innerHTML = '🎉 4/4 Σωστά! Είσαι πλέον αυθεντία στο υλικό του υπολογιστή!';
+        badge.classList.remove('hidden');
+        scores.act6 = 1;
+      } else {
+        fb.className = 'text-sm font-bold text-rose-600';
+        fb.innerHTML = `Έχεις ${correct} στις ${act6Data.length} σωστές. Προσπάθησε άλλη μια φορά για να ξεκλειδώσεις το σήμα!`;
+        badge.classList.add('hidden');
+        scores.act6 = 0;
+      }
+      updateTotal();
+    }
+
+    // Initialize all
+    window.addEventListener('DOMContentLoaded', () => {
+      renderAct1();
+      renderAct2();
+      renderAct3();
+      renderAct4();
+      renderAct5();
+      renderAct6();
+    });
+  </script>
+</body>
+</html>
