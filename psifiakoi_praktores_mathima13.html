@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ψηφιακοί Πράκτορες — Μάθημα 13: Το υλικό και οι χρήστες του υπολογιστή</title>
+<style>
+  :root{
+    --paper:#F3ECD9; --card:#FFFDF7; --ink:#1F3C63; --ink-soft:#3C5A85;
+    --gold:#C98A2B; --gold-soft:#E7C583; --good:#3F7A4E; --good-bg:#E1F0E3;
+    --bad:#B8483D; --bad-bg:#F7E2DF; --line:#D8CBAA;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; background:var(--paper); color:#2B2A28; font-family:"Trebuchet MS","Segoe UI",Verdana,sans-serif; padding:18px 14px 50px;}
+  .wrap{max-width:920px; margin:0 auto;}
+  header{display:flex; align-items:center; gap:16px; padding:18px 22px; background:var(--ink); color:var(--paper); border-radius:14px;}
+  .badge{width:54px;height:54px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:bold;color:var(--ink);border:3px solid var(--paper); flex:0 0 auto;}
+  header h1{margin:0; font-size:clamp(18px,4vw,26px);}
+  header p{margin:4px 0 0; opacity:.85; font-size:13.5px;}
+
+  #home{display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:14px; margin-top:20px;}
+  .mcard{background:var(--card); border:2px solid var(--line); border-radius:12px; padding:16px; cursor:pointer; transition:.15s;}
+  .mcard:hover{border-color:var(--gold); transform:translateY(-2px);}
+  .mcard .n{display:inline-block; width:26px;height:26px;line-height:26px;text-align:center;background:var(--ink);color:var(--paper);border-radius:50%;font-size:13px;font-weight:bold;margin-bottom:8px;}
+  .mcard h3{margin:0 0 4px; font-size:15px; color:var(--ink);}
+  .mcard p{margin:0; font-size:12.5px; color:var(--ink-soft);}
+
+  #view{display:none; background:var(--card); border:2px solid var(--gold); border-radius:12px; padding:22px; margin-top:20px;}
+  #view.active{display:block;}
+  .back{background:none;border:2px solid var(--ink);color:var(--ink);padding:6px 14px;border-radius:8px;font-weight:bold;cursor:pointer;font-family:inherit;margin-bottom:14px;}
+  h2.mt{margin:0 0 6px; color:var(--ink); font-size:19px;}
+  .goal{background:#FBF7EC;border-left:4px solid var(--gold);padding:8px 12px;border-radius:6px;font-size:13.5px;color:var(--ink-soft);margin-bottom:16px;}
+
+  button.action{font-family:inherit;background:var(--ink);color:var(--paper);border:none;padding:9px 16px;border-radius:8px;font-size:13.5px;font-weight:bold;cursor:pointer;}
+  button.action:hover{background:var(--ink-soft);}
+
+  .item-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:16px;}
+  .chip{padding:10px 16px;border-radius:8px;background:#FBFAF6;border:2px solid var(--line);cursor:pointer;font-weight:bold;font-size:14px;}
+  .chip.done-a{border-color:var(--good);background:var(--good-bg);}
+  .chip.done-b{border-color:var(--ink-soft);background:#E4E9F0;}
+  .buckets{display:flex;gap:16px;flex-wrap:wrap;margin-top:14px;}
+  .bucket{flex:1 1 220px;min-height:70px;border:2px dashed var(--line);border-radius:10px;padding:10px;background:#FBF7EC;}
+  .bucket h4{margin:0 0 8px;color:var(--ink);font-size:14px;}
+  .bucket .placed{display:inline-block;background:var(--gold-soft);border-radius:6px;padding:5px 10px;margin:3px;font-size:13px;}
+
+  .qa{margin-bottom:20px; padding-bottom:16px; border-bottom:1px solid var(--line);}
+  .qa:last-child{border:none;}
+  .qtext{font-weight:bold; margin-bottom:8px; font-size:14.5px;}
+  .opts{display:flex;gap:8px;flex-wrap:wrap;}
+  .opt{padding:8px 14px;border-radius:8px;border:2px solid var(--line);background:#FBFAF6;cursor:pointer;font-size:13.5px;}
+  .opt.correct{border-color:var(--good);background:var(--good-bg);}
+  .opt.wrong{border-color:var(--bad);background:var(--bad-bg);}
+  .expl{margin-top:8px;font-size:13px;color:var(--ink-soft);display:none;}
+  .expl.show{display:block;}
+
+  .match-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;}
+  .match-card{aspect-ratio:1/0.6;display:flex;align-items:center;justify-content:center;text-align:center;background:var(--ink);color:var(--paper);border-radius:10px;font-weight:bold;cursor:pointer;font-size:13px;padding:6px;border:2px solid transparent;}
+  .match-card.selected{border-color:var(--gold);background:var(--ink-soft);}
+  .match-card.solved{background:var(--good-bg);color:var(--good);cursor:default;}
+
+  .order-list{display:flex;flex-direction:column;gap:8px;}
+  .order-item{background:#FBFAF6;border:2px solid var(--line);border-radius:8px;padding:10px 14px;cursor:pointer;font-size:14px;}
+  .order-item .num{display:inline-block;width:24px;height:24px;line-height:24px;text-align:center;border-radius:50%;background:var(--gold-soft);font-weight:bold;font-size:12px;margin-right:8px;}
+
+  .blank-row{margin-bottom:14px;}
+  .blank-row .sent{font-size:14px;margin-bottom:6px;}
+  .blank-row input{width:100%;max-width:320px;padding:8px 10px;border-radius:8px;border:2px solid var(--line);font-size:14px;}
+  .blank-row input.correct{border-color:var(--good);background:var(--good-bg);}
+  .blank-row input.wrong{border-color:var(--bad);background:var(--bad-bg);}
+
+  .score-pill{background:var(--gold-soft);color:#4A340B;padding:6px 14px;border-radius:999px;font-weight:bold;font-size:13.5px;margin-left:auto;}
+  .feedback{margin-top:10px;font-weight:bold;font-size:14px;min-height:18px;}
+  .feedback.good{color:var(--good);} .feedback.bad{color:var(--bad);}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="badge">13</div>
+    <div><h1>Ψηφιακοί Πράκτορες</h1><p>Μάθημα 13ο · Το υλικό και οι χρήστες του υπολογιστή — Ε΄ Δημοτικού</p></div>
+  </header>
+
+  <div id="home"></div>
+  <div id="view">
+    <button class="back" onclick="goHome()">← Πίσω στις αποστολές</button>
+    <div id="viewBody"></div>
+  </div>
+</div>
+
+<script>
+const MISSIONS = [
+  {id:"m1", title:"Είσοδος ή Έξοδος;", desc:"Ταξινόμησε τις συσκευές.", type:"sort2",
+    data:{bucketA:"Είσοδος", bucketB:"Έξοδος",
+      items:[["Ποντίκι","A"],["Πληκτρολόγιο","A"],["Κάμερα","A"],["Μικρόφωνο","A"],["Οθόνη","B"],["Ηχεία","B"]]}},
+  {id:"m2", title:"Ταίριαξε τα εξαρτήματα", desc:"Επεξεργαστής, μνήμη, δίσκος.", type:"match",
+    data:[["Επεξεργαστής","Το «μυαλό» — εκτελεί τις εντολές"],
+          ["Μνήμη","Προσωρινή· σβήνει όταν κλείνει ο υπολογιστής"],
+          ["Δίσκος","Μόνιμη αποθήκευση λογισμικού και αρχείων"]]},
+  {id:"m3", title:"Σωστό ή Λάθος;", desc:"Δοκίμασε τις γνώσεις σου.", type:"quiz",
+    data:[
+      {q:"Η μνήμη αποθηκεύει μόνιμα τα αρχεία μας.", opts:["Σωστό","Λάθος"], c:1, e:"Η μνήμη είναι προσωρινή· ο δίσκος αποθηκεύει μόνιμα."},
+      {q:"Ο επεξεργαστής είναι το πιο σημαντικό εξάρτημα του υπολογιστή.", opts:["Σωστό","Λάθος"], c:0, e:"Σωστά! Είναι το «μυαλό» του υπολογιστή."},
+      {q:"Όταν κλείνουμε τον υπολογιστή, σβήνεται το περιεχόμενο της μνήμης.", opts:["Σωστό","Λάθος"], c:0, e:"Σωστά, γι' αυτό αποθηκεύουμε τα αρχεία μας στον δίσκο."},
+      {q:"Στο φορητό υπολογιστή τα εξαρτήματα βρίσκονται σε ξεχωριστές συσκευές.", opts:["Σωστό","Λάθος"], c:1, e:"Είναι όλα ενσωματωμένα σε μία συσκευή."},
+      {q:"Ο δίσκος αποθήκευσης είναι πιο γρήγορος από τη μνήμη.", opts:["Σωστό","Λάθος"], c:1, e:"Αντίθετα, η μνήμη είναι πιο γρήγορη από τον δίσκο."}
+    ]},
+  {id:"m4", title:"Βάλε τα σε σειρά", desc:"Τι γίνεται όταν ανοίγουμε μια εφαρμογή;", type:"order",
+    data:["Ο υπολογιστής αναζητά την εφαρμογή στον δίσκο αποθήκευσης.",
+          "Μεταφέρει τις εντολές του προγράμματος στη μνήμη.",
+          "Ο επεξεργαστής ακολουθεί τις εντολές που βρίσκονται στη μνήμη."]},
+  {id:"m5", title:"Συμπλήρωσε το κείμενο", desc:"Βρίσκουμε την πρόγνωση καιρού στο διαδίκτυο.", type:"blank",
+    data:[
+      {sent:"Κάνω διπλό κλικ στον ...", opts:["Φυλλομετρητή","Δίσκο","Επεξεργαστή"], c:0},
+      {sent:"Με το πληκτρολόγιο γράφω τη ... της ιστοσελίδας.", opts:["μνήμη","διεύθυνση","κάμερα"], c:1},
+      {sent:"Ο υπολογιστής βρίσκει το πρόγραμμα στον ...", opts:["δίσκο αποθήκευσης","φάκελο χρήστη","επεξεργαστή"], c:0},
+      {sent:"Ο επεξεργαστής εμφανίζει στην ... την ιστοσελίδα.", opts:["μνήμη","κάμερα","οθόνη"], c:2}
+    ]},
+  {id:"m6", title:"Ποιος έχει δικαίωμα;", desc:"Η Υπατία, ο Ήρωνας και οι φάκελοί τους.", type:"quiz",
+    data:[
+      {q:"Ένα αρχείο βρίσκεται στον φάκελο ΚΟΙΝΟΧΡΗΣΤΑ. Ποιος μπορεί να το ανοίξει;", opts:["Μόνο η Υπατία","Μόνο ο Ήρωνας","Κανένα από τα δύο παιδιά","Και τα δύο παιδιά"], c:3, e:"Ο κοινόχρηστος φάκελος είναι προσβάσιμος από όλους τους χρήστες."},
+      {q:"Ένα αρχείο βρίσκεται στον προσωπικό φάκελο ΥΠΑΤΙΑ. Ποιος μπορεί να το ανοίξει;", opts:["Μόνο η Υπατία","Μόνο ο Ήρωνας","Και οι δύο","Κανένας"], c:0, e:"Ο προσωπικός φάκελος είναι προσβάσιμος μόνο από τον ιδιοκτήτη του."},
+      {q:"Από πού μπορούμε να προσθέσουμε νέο χρήστη σε έναν υπολογιστή;", opts:["Από τον δίσκο αποθήκευσης","Από τις ρυθμίσεις του λειτουργικού συστήματος","Από την οθόνη","Από το ποντίκι"], c:1, e:"Οι χρήστες διαχειρίζονται μέσα από τις ρυθμίσεις του λειτουργικού συστήματος."}
+    ]},
+  {id:"m7", title:"Προσωπικός ή Κοινόχρηστος;", desc:"Πού ανήκει κάθε αρχείο;", type:"sort2",
+    data:{bucketA:"Προσωπικός φάκελος", bucketB:"Κοινόχρηστος φάκελος",
+      items:[["Φωτογραφίες γενεθλίων του Ήρωνα","A"],["Ονόματα μαθητών τάξης","B"],["Εργασία της Υπατίας για το μάθημα","A"],["Πρόγραμμα μαθημάτων της τάξης","B"]]}},
+  {id:"m8", title:"Τελικό κουίζ", desc:"Ό,τι έμαθες στο Μάθημα 13.", type:"quiz",
+    data:[
+      {q:"Ποιο εξάρτημα λέγεται το «μυαλό» του υπολογιστή;", opts:["Η μνήμη","Ο επεξεργαστής","Ο δίσκος","Η οθόνη"], c:1, e:"Ο επεξεργαστής επεξεργάζεται τα δεδομένα και ελέγχει τα υπόλοιπα εξαρτήματα."},
+      {q:"Ποια από τις παρακάτω είναι συσκευή εισόδου;", opts:["Ηχεία","Οθόνη","Μικρόφωνο","Εκτυπωτής"], c:2, e:"Το μικρόφωνο δίνει ήχο ΣΤΟΝ υπολογιστή, άρα είναι είσοδος."},
+      {q:"Πού βρίσκονται τα εξαρτήματα σε έναν φορητό υπολογιστή;", opts:["Σε ξεχωριστές συσκευές","Όλα ενσωματωμένα σε μία συσκευή","Δεν υπάρχουν","Μόνο στην οθόνη"], c:1, e:"Στον φορητό υπολογιστή όλα είναι ενσωματωμένα σε μία συσκευή."},
+      {q:"Ποιος είναι ο «χρήστης» του υπολογιστή;", opts:["Ο επεξεργαστής","Ο άνθρωπος","Η μνήμη","Ο δίσκος"], c:1, e:"Ο άνθρωπος που χρησιμοποιεί τον υπολογιστή είναι ο χρήστης."},
+      {q:"Τι χρειάζεται κάθε χρήστης για να συνδεθεί στον υπολογιστή;", opts:["Όνομα και κωδικό","Μόνο όνομα","Τίποτα","Μόνο κωδικό"], c:0, e:"Κάθε χρήστης συνδέεται με όνομα και κωδικό."}
+    ]}
+];
+
+const home = document.getElementById("home");
+MISSIONS.forEach((m,i)=>{
+  const c = document.createElement("div");
+  c.className = "mcard";
+  c.innerHTML = `<span class="n">${i+1}</span><h3>${m.title}</h3><p>${m.desc}</p>`;
+  c.onclick = () => openMission(m);
+  home.appendChild(c);
+});
+
+function goHome(){
+  document.getElementById("view").classList.remove("active");
+}
+
+function openMission(m){
+  document.getElementById("view").classList.add("active");
+  const body = document.getElementById("viewBody");
+  body.innerHTML = `<h2 class="mt">${m.title}</h2><div class="goal">${m.desc}</div><div id="mbody"></div>`;
+  const mbody = document.getElementById("mbody");
+  if(m.type==="sort2") renderSort2(mbody, m.data);
+  if(m.type==="match") renderMatch(mbody, m.data);
+  if(m.type==="quiz") renderQuiz(mbody, m.data);
+  if(m.type==="order") renderOrder(mbody, m.data);
+  if(m.type==="blank") renderBlank(mbody, m.data);
+}
+
+// ---------- SORT INTO 2 BUCKETS ----------
+function renderSort2(el, data){
+  let placed = {};
+  el.innerHTML = `
+    <div class="item-row" id="chips"></div>
+    <div class="buckets">
+      <div class="bucket"><h4>${data.bucketA}</h4><div id="bucketA"></div></div>
+      <div class="bucket"><h4>${data.bucketB}</h4><div id="bucketB"></div></div>
+    </div>
+    <div class="feedback" id="fb"></div>
+    <button class="action" style="margin-top:12px" id="chk">✅ Έλεγχος</button>
+  `;
+  const chips = el.querySelector("#chips");
+  data.items.forEach(([label,ans],idx)=>{
+    const chip = document.createElement("div");
+    chip.className="chip"; chip.textContent=label; chip.dataset.ans=ans; chip.dataset.idx=idx;
+    chip.onclick=()=>{
+      if(placed[idx]) return;
+      const target = ans==="A" ? "bucketA":"bucketB";
+      placed[idx]=true;
+      const tag = document.createElement("span");
+      tag.className="placed"; tag.textContent=label; tag.dataset.ans=ans;
+      el.querySelector("#"+target).appendChild(tag);
+      chip.style.display="none";
+    };
+    chips.appendChild(chip);
+  });
+  el.querySelector("#chk").onclick=()=>{
+    let correctCount=0, total=data.items.length;
+    ["bucketA","bucketB"].forEach(bid=>{
+      el.querySelectorAll("#"+bid+" .placed").forEach(tag=>{
+        const shouldBe = bid==="bucketA" ? "A":"B";
+        if(tag.dataset.ans===shouldBe){ tag.style.background="var(--good-bg)"; correctCount++; }
+        else{ tag.style.background="var(--bad-bg)"; }
+      });
+    });
+    const fb = el.querySelector("#fb");
+    if(correctCount===total){ fb.textContent="🎉 Όλα σωστά, μπράβο!"; fb.className="feedback good"; }
+    else{ fb.textContent=`Σωστά ${correctCount}/${total}. Δες τα κόκκινα και ξαναδοκίμασε!`; fb.className="feedback bad"; }
+  };
+}
+
+// ---------- MATCHING GAME ----------
+function renderMatch(el, pairs){
+  el.innerHTML = `<div class="match-grid" id="grid"></div><div class="feedback" id="fb"></div>`;
+  let cards=[];
+  pairs.forEach((p,i)=>{ cards.push({t:"a",v:p[0],pair:i}); cards.push({t:"b",v:p[1],pair:i}); });
+  cards.sort(()=>Math.random()-0.5);
+  const grid = el.querySelector("#grid");
+  let selected=[], solved=0;
+  cards.forEach(c=>{
+    const div=document.createElement("div");
+    div.className="match-card"; div.textContent=c.v;
+    div.dataset.pair=c.pair; div.dataset.t=c.t;
+    div.onclick=()=>{
+      if(div.classList.contains("solved")||div.classList.contains("selected")||selected.length===2) return;
+      div.classList.add("selected"); selected.push(div);
+      if(selected.length===2){
+        const [a,b]=selected;
+        if(a.dataset.pair===b.dataset.pair && a.dataset.t!==b.dataset.t){
+          a.classList.add("solved"); b.classList.add("solved");
+          a.classList.remove("selected"); b.classList.remove("selected");
+          solved++; selected=[];
+          if(solved===pairs.length){ el.querySelector("#fb").textContent="🎉 Βρήκες όλα τα ζευγάρια!"; el.querySelector("#fb").className="feedback good"; }
+        } else {
+          setTimeout(()=>{ a.classList.remove("selected"); b.classList.remove("selected"); selected=[]; },600);
+        }
+      }
+    };
+    grid.appendChild(div);
+  });
+}
+
+// ---------- QUIZ (multiple choice, works for T/F and scenarios) ----------
+function renderQuiz(el, questions){
+  let score=0;
+  el.innerHTML = `<div class="item-row"><span class="score-pill" id="score">Σωστά: 0/${questions.length}</span></div>`;
+  questions.forEach((q,qi)=>{
+    const div=document.createElement("div"); div.className="qa";
+    div.innerHTML = `<div class="qtext">${qi+1}. ${q.q}</div>
+      <div class="opts">${q.opts.map((o,oi)=>`<div class="opt" data-oi="${oi}">${o}</div>`).join("")}</div>
+      <div class="expl">${q.e}</div>`;
+    div.querySelectorAll(".opt").forEach(opt=>{
+      opt.onclick=()=>{
+        if(div.dataset.answered) return;
+        div.dataset.answered="1";
+        const oi=+opt.dataset.oi;
+        div.querySelectorAll(".opt").forEach(o=>{
+          if(+o.dataset.oi===q.c) o.classList.add("correct");
+        });
+        if(oi!==q.c) opt.classList.add("wrong"); else score++;
+        div.querySelector(".expl").classList.add("show");
+        el.querySelector("#score").textContent = `Σωστά: ${score}/${questions.length}`;
+      };
+    });
+    el.appendChild(div);
+  });
+}
+
+// ---------- ORDER STEPS ----------
+function renderOrder(el, steps){
+  let shuffled = [...steps].sort(()=>Math.random()-0.5);
+  let chosen = [];
+  el.innerHTML = `<div class="order-list" id="pool"></div>
+    <h4 style="margin:16px 0 6px;color:var(--ink)">Η σειρά σου:</h4>
+    <div class="order-list" id="result"></div>
+    <div class="feedback" id="fb"></div>
+    <button class="action" style="margin-top:10px" id="chk">✅ Έλεγχος</button>
+    <button class="action" style="margin-top:10px;background:var(--ink-soft)" id="rst">↺ Επανεκκίνηση</button>`;
+  function draw(){
+    const pool = el.querySelector("#pool"); pool.innerHTML="";
+    shuffled.forEach(s=>{
+      if(chosen.includes(s)) return;
+      const d=document.createElement("div"); d.className="order-item"; d.textContent=s;
+      d.onclick=()=>{ chosen.push(s); draw(); };
+      pool.appendChild(d);
+    });
+    const res = el.querySelector("#result"); res.innerHTML="";
+    chosen.forEach((s,i)=>{
+      const d=document.createElement("div"); d.className="order-item";
+      d.innerHTML=`<span class="num">${i+1}</span>${s}`;
+      res.appendChild(d);
+    });
+  }
+  draw();
+  el.querySelector("#rst").onclick=()=>{ chosen=[]; el.querySelector("#fb").textContent=""; draw(); };
+  el.querySelector("#chk").onclick=()=>{
+    const fb = el.querySelector("#fb");
+    const ok = chosen.length===steps.length && chosen.every((s,i)=>s===steps[i]);
+    if(ok){ fb.textContent="🎉 Σωστή σειρά! Έτσι λειτουργεί ο υπολογιστής."; fb.className="feedback good"; }
+    else{ fb.textContent="Δεν είναι ακόμα σωστή η σειρά. Ξαναδοκίμασε!"; fb.className="feedback bad"; }
+  };
+}
+
+// ---------- FILL IN THE BLANK (word-choice buttons) ----------
+function renderBlank(el, items){
+  el.innerHTML = items.map((it,i)=>`
+    <div class="blank-row">
+      <div class="sent">${i+1}. ${it.sent}</div>
+      <div class="opts" data-i="${i}">
+        ${it.opts.map((o,oi)=>`<div class="opt" data-oi="${oi}">${o}</div>`).join("")}
+      </div>
+    </div>`).join("") + `<div class="feedback" id="fb"></div><button class="action" id="chk">✅ Έλεγχος</button>`;
+
+  const chosen = new Array(items.length).fill(null);
+  el.querySelectorAll(".opts").forEach(group=>{
+    const i = +group.dataset.i;
+    group.querySelectorAll(".opt").forEach(opt=>{
+      opt.onclick=()=>{
+        group.querySelectorAll(".opt").forEach(o=>o.classList.remove("correct","wrong","selected"));
+        opt.style.borderColor="var(--gold)";
+        chosen[i]=+opt.dataset.oi;
+      };
+    });
+  });
+
+  el.querySelector("#chk").onclick=()=>{
+    let correct=0;
+    items.forEach((it,i)=>{
+      const group = el.querySelector(`.opts[data-i="${i}"]`);
+      group.querySelectorAll(".opt").forEach((opt,oi)=>{
+        opt.style.borderColor="";
+        if(oi===it.c) opt.classList.add("correct");
+        else if(oi===chosen[i]) opt.classList.add("wrong");
+      });
+      if(chosen[i]===it.c) correct++;
+    });
+    const fb = el.querySelector("#fb");
+    if(correct===items.length){ fb.textContent="🎉 Τέλεια! Κατάλαβες πώς λειτουργεί ο υπολογιστής."; fb.className="feedback good"; }
+    else{ fb.textContent=`Σωστά ${correct}/${items.length}. Δες τα κόκκινα και ξαναδοκίμασε!`; fb.className="feedback bad"; }
+  };
+}
+</script>
+</body>
+</html>
