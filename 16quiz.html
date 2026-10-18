@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Κουίζ Πληροφορικής Ε΄ Δημοτικού - Μάθημα 16</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@700&family=Fredoka:wght@400;600;700&display=swap');
+    body {
+      font-family: 'Fredoka', sans-serif;
+      background: linear-gradient(135deg, #e0f2fe 0%, #ecfdf5 50%, #fef3c7 100%);
+    }
+    .font-heading {
+      font-family: 'Comfortaa', cursive;
+    }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(12px);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+  <!-- Main Container -->
+  <div class="max-w-2xl w-full glass-card rounded-3xl shadow-2xl border-4 border-sky-200 overflow-hidden flex flex-col my-6">
+
+    <!-- Top Header -->
+    <header class="bg-gradient-to-r from-sky-500 via-blue-600 to-indigo-600 text-white p-6 relative">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+          <div class="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center text-2xl shadow-inner">
+            📊
+          </div>
+          <div>
+            <span class="text-xs uppercase tracking-wider text-sky-200 font-bold block">Πληροφορική Ε΄ Δημοτικού</span>
+            <h1 class="text-lg md:text-xl font-bold font-heading">Μάθημα 16: Δεδομένα & Αρχεία</h1>
+          </div>
+        </div>
+        <!-- Sound Toggle -->
+        <button id="sound-toggle" onclick="toggleMute()" class="w-10 h-10 rounded-xl bg-white/10 hover:bg-white/20 flex items-center justify-center text-lg transition" title="Ενεργοποίηση/Απενεργοποίηση Ήχου">
+          <i class="fa-solid fa-volume-high"></i>
+        </button>
+      </div>
+
+      <!-- Stats Bar (Question number & Score) -->
+      <div id="stats-bar" class="mt-4 flex items-center justify-between text-xs font-bold text-sky-100 hidden">
+        <span>Ερώτηση: <span id="q-curr" class="text-white text-sm">1</span> / 10</span>
+        <span class="bg-white/20 px-3 py-1 rounded-full text-white">
+          <i class="fa-solid fa-star text-amber-300 mr-1"></i> Σκορ: <span id="score-val">0</span>
+        </span>
+      </div>
+
+      <!-- Progress Bar -->
+      <div id="progress-container" class="w-full bg-white/20 rounded-full h-2.5 mt-3 overflow-hidden hidden">
+        <div id="progress-fill" class="bg-amber-400 h-full rounded-full transition-all duration-300" style="width: 10%;"></div>
+      </div>
+    </header>
+
+    <!-- Card Content Area -->
+    <main class="p-6 md:p-8 flex-grow flex flex-col justify-between">
+
+      <!-- 1. START SCREEN -->
+      <div id="screen-start" class="text-center space-y-6 py-6">
+        <div class="w-24 h-24 mx-auto bg-sky-100 rounded-3xl flex items-center justify-center text-5xl shadow-md border-2 border-sky-300">
+          🎯
+        </div>
+        <div class="space-y-2">
+          <h2 class="text-2xl md:text-3xl font-extrabold text-slate-800 font-heading">
+            Ώρα για Κουίζ!
+          </h2>
+          <p class="text-slate-600 text-sm md:text-base max-w-md mx-auto leading-relaxed">
+            Βοήθησε τον <strong>Ήρωνα</strong> και την <strong>Υπατία</strong> να απαντήσουν σε <strong>10 ερωτήσεις</strong> για τα δεδομένα, τα υπολογιστικά φύλλα και τις ιδιότητες των αρχείων!
+          </p>
+        </div>
+
+        <div class="bg-blue-50 border border-blue-200 rounded-2xl p-4 text-xs md:text-sm text-blue-900 max-w-md mx-auto text-left space-y-1.5">
+          <div class="flex items-center gap-2 font-bold"><i class="fa-solid fa-check text-blue-600"></i> 10 πόντοι για κάθε σωστή απάντηση</div>
+          <div class="flex items-center gap-2 font-bold"><i class="fa-solid fa-bolt text-amber-500"></i> Άμεση επεξήγηση σε κάθε ερώτηση</div>
+          <div class="flex items-center gap-2 font-bold"><i class="fa-solid fa-trophy text-emerald-600"></i> Έπαινος και confetti στο τέλος!</div>
+        </div>
+
+        <div>
+          <button onclick="startQuiz()" class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-extrabold px-8 py-3.5 rounded-2xl text-lg shadow-lg transform hover:-translate-y-0.5 transition flex items-center gap-3 mx-auto">
+            <span>Ξεκίνα το Κουίζ</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- 2. QUIZ SCREEN -->
+      <div id="screen-quiz" class="space-y-6 hidden">
+        <!-- Question Text -->
+        <div>
+          <span id="q-category" class="text-[11px] font-bold text-sky-600 uppercase tracking-widest block mb-1">ΘΕΜΑΤΙΚΗ</span>
+          <h2 id="q-text" class="text-base md:text-xl font-bold text-slate-800 leading-snug">
+            Ερώτηση...
+          </h2>
+        </div>
+
+        <!-- Options Container -->
+        <div id="options-container" class="space-y-3">
+          <!-- Populated by JS -->
+        </div>
+
+        <!-- Explanation Feedback Box -->
+        <div id="explanation-box" class="p-4 rounded-2xl text-xs md:text-sm leading-relaxed hidden transition-all">
+          <div class="font-bold mb-1 flex items-center gap-2" id="explanation-title"></div>
+          <p id="explanation-text" class="text-slate-700"></p>
+        </div>
+
+        <!-- Next Button -->
+        <div class="pt-4 border-t border-slate-100 flex justify-end">
+          <button id="next-btn" onclick="nextQuestion()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-2.5 rounded-2xl shadow transition flex items-center gap-2 opacity-50 cursor-not-allowed" disabled>
+            <span>Επόμενη Ερώτηση</span>
+            <i class="fa-solid fa-arrow-right text-xs"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- 3. RESULT SCREEN -->
+      <div id="screen-result" class="text-center space-y-6 py-6 hidden">
+        <div id="result-icon" class="text-6xl animate-bounce">
+          🏆
+        </div>
+
+        <div class="space-y-2">
+          <span class="text-xs uppercase font-bold text-slate-400 tracking-wider">Αποτέλεσμα</span>
+          <h2 id="result-title" class="text-2xl md:text-3xl font-extrabold font-heading text-slate-800">
+            Συγχαρητήρια!
+          </h2>
+          <p id="result-msg" class="text-slate-600 text-sm md:text-base max-w-md mx-auto"></p>
+        </div>
+
+        <!-- Score Badge -->
+        <div class="bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-300 rounded-3xl p-6 max-w-sm mx-auto shadow-inner">
+          <div class="text-xs font-bold text-amber-700 uppercase">Τελικό Σκορ</div>
+          <div class="text-4xl md:text-5xl font-black text-amber-900 font-heading my-1">
+            <span id="final-score">0</span> <span class="text-xl text-amber-600 font-bold">/ 100</span>
+          </div>
+          <div class="text-xs font-semibold text-amber-800" id="final-correct">
+            0 στις 10 σωστές απαντήσεις
+          </div>
+        </div>
+
+        <!-- Restart Button -->
+        <div class="pt-2">
+          <button onclick="startQuiz()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-8 py-3 rounded-2xl shadow-lg transition flex items-center gap-2 mx-auto">
+            <i class="fa-solid fa-rotate-left"></i>
+            <span>Παίξε Ξανά</span>
+          </button>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-50 border-t border-slate-100 px-6 py-3 text-center text-xs text-slate-400">
+      Πληροφορική Ε΄ Δημοτικού • Μάθημα 16: Δεδομένα & Υπολογιστικό Φύλλο
+    </footer>
+
+  </div>
+
+  <!-- Audio Synthesizer & Quiz Logic -->
+  <script>
+    /* =========================================================
+       1. SOUND EFFECTS (Web Audio API - No External Files)
+       ========================================================= */
+    class SoundEngine {
+      constructor() {
+        this.ctx = null;
+        this.muted = false;
+      }
+      init() {
+        if (!this.ctx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          if (AudioContext) this.ctx = new AudioContext();
+        }
+      }
+      playTone(freq, type = 'sine', duration = 0.15, gainVal = 0.15) {
+        if (this.muted) return;
+        this.init();
+        if (!this.ctx) return;
+        try {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = type;
+          osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+          gain.gain.setValueAtTime(gainVal, this.ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + duration);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start();
+          osc.stop(this.ctx.currentTime + duration);
+        } catch(e) {}
+      }
+      click() {
+        this.playTone(450, 'sine', 0.06, 0.1);
+      }
+      correct() {
+        if (this.muted) return;
+        this.init();
+        this.playTone(523.25, 'triangle', 0.1, 0.2); // C5
+        setTimeout(() => this.playTone(659.25, 'triangle', 0.12, 0.2), 90); // E5
+        setTimeout(() => this.playTone(783.99, 'triangle', 0.2, 0.25), 180); // G5
+      }
+      wrong() {
+        if (this.muted) return;
+        this.init();
+        this.playTone(280, 'sawtooth', 0.15, 0.18);
+        setTimeout(() => this.playTone(200, 'sawtooth', 0.2, 0.2), 110);
+      }
+      fanfare() {
+        if (this.muted) return;
+        this.init();
+        const notes = [523.25, 659.25, 783.99, 1046.50];
+        notes.forEach((freq, idx) => {
+          setTimeout(() => this.playTone(freq, 'triangle', 0.25, 0.25), idx * 110);
+        });
+      }
+    }
+
+    const sound = new SoundEngine();
+
+    function toggleMute() {
+      sound.muted = !sound.muted;
+      const btn = document.getElementById('sound-toggle');
+      if (sound.muted) {
+        btn.innerHTML = '<i class="fa-solid fa-volume-xmark text-rose-300"></i>';
+      } else {
+        btn.innerHTML = '<i class="fa-solid fa-volume-high text-white"></i>';
+        sound.click();
+      }
+    }
+
+    /* =========================================================
+       2. QUIZ DATA (10 QUESTIONS - LESSON 16)
+       ========================================================= */
+    const quizData = [
+      {
+        category: "Συλλογή Δεδομένων (σελ. 60)",
+        question: "Ποια από τις παρακάτω πηγές αποτελεί παράδειγμα επίσημων δημοσιευμένων δεδομένων;",
+        options: [
+          "Τα στατιστικά στοιχεία της ΕΛΣΤΑΤ και της Eurostat για τον πληθυσμό",
+          "Οι σημειώσεις που κρατάμε κρυφά στο τετράδιό μας",
+          "Η γνώμη ενός φίλου μας στο διάλειμμα"
+        ],
+        answer: 0,
+        explanation: "Η ΕΛΣΤΑΤ (Ελληνική Στατιστική Αρχή) και η Eurostat δημοσιεύουν επίσημα, αξιόπιστα στατιστικά στοιχεία για τη χώρα και την Ευρώπη."
+      },
+      {
+        category: "Συλλογή Δεδομένων (σελ. 60)",
+        question: "Όταν καταγράφουμε τι χρώμα παπούτσια φοράνε σήμερα τα παιδιά της τάξης μας, ποια μέθοδο συλλογής χρησιμοποιούμε;",
+        options: [
+          "Αναζήτηση σε βιβλίο ιστορίας",
+          "Άμεση παρατήρηση και καταγραφή",
+          "Επίσημη έρευνα με εκλογές"
+        ],
+        answer: 1,
+        explanation: "Μπορούμε να συλλέξουμε δικά μας δεδομένα παρατηρώντας προσεκτικά αυτό που συμβαίνει γύρω μας και καταγράφοντάς το."
+      },
+      {
+        category: "Υπολογιστικό Φύλλο (σελ. 64)",
+        question: "Πώς σχηματίζεται το όνομα ενός κελιού στο υπολογιστικό φύλλο (π.χ. B3);",
+        options: [
+          "Από το όνομα του υπολογιστή και την ώρα",
+          "Από το γράμμα της στήλης και τον αριθμό της γραμμής",
+          "Από το χρώμα του κελιού και το μέγεθός του"
+        ],
+        answer: 1,
+        explanation: "Οι στήλες έχουν γράμματα (A, B, C...) και οι γραμμές αριθμούς (1, 2, 3...). Έτσι, το κελί στη στήλη B και γραμμή 3 ονομάζεται B3!"
+      },
+      {
+        category: "Υπολογιστικό Φύλλο (σελ. 64)",
+        question: "Πώς ονομάζεται το κελί που επιλέγουμε με το ποντίκι και εμφανίζεται με έντονο μαύρο περίγραμμα;",
+        options: [
+          "Ενεργό κελί",
+          "Κρυφό κελί",
+          "Ανενεργό κελί"
+        ],
+        answer: 0,
+        explanation: "Το ενεργό κελί είναι αυτό στο οποίο είμαστε έτοιμοι να πληκτρολογήσουμε. Το όνομά του φαίνεται πάνω αριστερά."
+      },
+      {
+        category: "Ερωτηματολόγιο (σελ. 61)",
+        question: "Στο ερωτηματολόγιο 50 μαθητών του βιβλίου, 16 παιδιά διάλεξαν «Παιχνίδι» και 6 «Τηλεόραση». Πόσα περισσότερα παιδιά προτίμησαν το παιχνίδι;",
+        options: [
+          "22 παιδιά",
+          "10 παιδιά (16 - 6 = 10)",
+          "8 παιδιά"
+        ],
+        answer: 1,
+        explanation: "16 - 6 = 10 παιδιά! Η αφαίρεση μας δείχνει τη διαφορά ανάμεσα στις δύο επιλογές."
+      },
+      {
+        category: "Διαγράμματα (σελ. 61 & 72)",
+        question: "Σε ένα διάγραμμα πίτας (στρογγυλό), ποιο στοιχείο μας εξηγεί τι σημαίνει κάθε χρώμα;",
+        options: [
+          "Ο σκληρός δίσκος",
+          "Το υπόμνημα (legend)",
+          "Ο επεξεργαστής"
+        ],
+        answer: 1,
+        explanation: "Το υπόμνημα είναι ο επεξηγηματικός πίνακας που συνδέει κάθε χρώμα της πίτας με την αντίστοιχη επιλογή."
+      },
+      {
+        category: "Ιδιότητες Αρχείων (σελ. 62)",
+        question: "Πώς μπορούμε να δούμε το μέγεθος και την ημερομηνία δημιουργίας ενός αρχείου;",
+        options: [
+          "Κάνουμε δεξί κλικ στο αρχείο και επιλέγουμε «Ιδιότητες» ή «Προτιμήσεις»",
+          "Κλείνουμε την οθόνη του υπολογιστή",
+          "Σβήνουμε το αρχείο στον κάδο ανακύκλωσης"
+        ],
+        answer: 0,
+        explanation: "Με δεξί κλικ -> «Ιδιότητες» ανοίγει το παράθυρο που μας δείχνει το μέγεθος, τον τύπο και την τοποθεσία του αρχείου."
+      },
+      {
+        category: "Ιδιότητες Αρχείων (σελ. 62)",
+        question: "Αν το αρχείο Α έχει μέγεθος 11,1 kB και το αρχείο Β έχει 24,5 kB, ποιο είναι το σωστό συμπέρασμα;",
+        options: [
+          "Το αρχείο Α είναι μεγαλύτερο",
+          "Το αρχείο Β καταλαμβάνει περισσότερο αποθηκευτικό χώρο στον δίσκο",
+          "Και τα δύο έχουν ακριβώς το ίδιο μέγεθος"
+        ],
+        answer: 1,
+        explanation: "Τα 24,5 kB είναι περισσότερα από τα 11,1 kB, άρα το αρχείο Β πιάνει περισσότερο χώρο στον δίσκο αποθήκευσης."
+      },
+      {
+        category: "Διαδρομές Αρχείων (σελ. 62)",
+        question: "Στη διαδρομή `/home/user/Έγγραφα/Ε τάξη/Ερωτηματολόγιο.odt`, ποιο στοιχείο είναι το ίδιο το αρχείο;",
+        options: [
+          "Ο φάκελος user",
+          "Ο φάκελος Ε τάξη",
+          "Το Ερωτηματολόγιο.odt"
+        ],
+        answer: 2,
+        explanation: "Το 'Ερωτηματολόγιο.odt' βρίσκεται στο τέλος της διαδρομής και είναι το αρχείο κειμένου, ενώ τα προηγούμενα είναι φάκελοι."
+      },
+      {
+        category: "Υπολογισμοί & Τύποι (σελ. 68)",
+        question: "Με ποιο σύμβολο ξεκινάμε ΠΑΝΤΑ έναν τύπο σε ένα κελί όταν θέλουμε ο υπολογιστής να κάνει έναν υπολογισμό;",
+        options: [
+          "Με το σύμβολο ίσον (=)",
+          "Με το ερωτηματικό (?)",
+          "Με τη λέξη «τέλος»"
+        ],
+        answer: 0,
+        explanation: "Κάθε τύπος υπολογισμού στο υπολογιστικό φύλλο πρέπει οπωσδήποτε να αρχίζει με το σύμβολο = (π.χ. =8+6 ή =SUM(B2:B6))."
+      }
+    ];
+
+    /* =========================================================
+       3. QUIZ STATE & LOGIC
+       ========================================================= */
+    let currentQ = 0;
+    let score = 0;
+    let correctCount = 0;
+    let answered = false;
+
+    function startQuiz() {
+      sound.click();
+      currentQ = 0;
+      score = 0;
+      correctCount = 0;
+      answered = false;
+
+      document.getElementById('screen-start').classList.add('hidden');
+      document.getElementById('screen-result').classList.add('hidden');
+      document.getElementById('screen-quiz').classList.remove('hidden');
+
+      document.getElementById('stats-bar').classList.remove('hidden');
+      document.getElementById('progress-container').classList.remove('hidden');
+
+      loadQuestion();
+    }
+
+    function loadQuestion() {
+      answered = false;
+      const data = quizData[currentQ];
+
+      // Update progress & header
+      document.getElementById('q-curr').innerText = currentQ + 1;
+      document.getElementById('score-val').innerText = score;
+      const pct = ((currentQ + 1) / quizData.length) * 100;
+      document.getElementById('progress-fill').style.width = `${pct}%`;
+
+      document.getElementById('q-category').innerText = data.category;
+      document.getElementById('q-text').innerText = `${currentQ + 1}. ${data.question}`;
+
+      // Reset explanation & next button
+      const expBox = document.getElementById('explanation-box');
+      expBox.classList.add('hidden');
+      expBox.className = "p-4 rounded-2xl text-xs md:text-sm leading-relaxed hidden transition-all";
+
+      const nextBtn = document.getElementById('next-btn');
+      nextBtn.disabled = true;
+      nextBtn.className = "bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-2.5 rounded-2xl shadow transition flex items-center gap-2 opacity-50 cursor-not-allowed";
+
+      // Render options
+      const optContainer = document.getElementById('options-container');
+      optContainer.innerHTML = '';
+
+      data.options.forEach((optText, idx) => {
+        const btn = document.createElement('button');
+        btn.className = "w-full text-left p-3.5 md:p-4 rounded-2xl border-2 border-slate-200 bg-white hover:border-blue-300 hover:bg-blue-50/50 text-slate-700 text-xs md:text-sm font-semibold transition flex items-center justify-between shadow-xs";
+        btn.innerHTML = `
+          <div class="flex items-center gap-3">
+            <span class="w-7 h-7 rounded-xl bg-slate-100 text-slate-600 font-bold flex items-center justify-center text-xs border border-slate-200">${String.fromCharCode(65 + idx)}</span>
+            <span>${optText}</span>
+          </div>
+          <span class="opt-icon text-lg hidden"></span>
+        `;
+        btn.onclick = () => selectOption(idx);
+        optContainer.appendChild(btn);
+      });
+    }
+
+    function selectOption(selectedIdx) {
+      if (answered) return;
+      answered = true;
+
+      const data = quizData[currentQ];
+      const optBtns = document.getElementById('options-container').children;
+      const isCorrect = (selectedIdx === data.answer);
+
+      // Disable buttons and show colors
+      Array.from(optBtns).forEach((btn, idx) => {
+        btn.onclick = null;
+        const iconSpan = btn.querySelector('.opt-icon');
+        iconSpan.classList.remove('hidden');
+
+        if (idx === data.answer) {
+          btn.classList.remove('border-slate-200', 'bg-white');
+          btn.classList.add('border-emerald-500', 'bg-emerald-50', 'text-emerald-900');
+          iconSpan.innerHTML = '<i class="fa-solid fa-circle-check text-emerald-500"></i>';
+        } else if (idx === selectedIdx && !isCorrect) {
+          btn.classList.remove('border-slate-200', 'bg-white');
+          btn.classList.add('border-rose-400', 'bg-rose-50', 'text-rose-900');
+          iconSpan.innerHTML = '<i class="fa-solid fa-circle-xmark text-rose-500"></i>';
+        } else {
+          btn.classList.add('opacity-40');
+        }
+      });
+
+      // Feedback sound & score
+      const expBox = document.getElementById('explanation-box');
+      const expTitle = document.getElementById('explanation-title');
+      const expText = document.getElementById('explanation-text');
+
+      if (isCorrect) {
+        sound.correct();
+        score += 10;
+        correctCount++;
+        document.getElementById('score-val').innerText = score;
+
+        expBox.className = "p-4 rounded-2xl text-xs md:text-sm leading-relaxed bg-emerald-50 border border-emerald-200 text-emerald-900 block";
+        expTitle.innerHTML = '<i class="fa-solid fa-circle-check text-emerald-600 text-base"></i> <span class="text-emerald-800 font-bold">Μπράβο! Σωστή Απάντηση! (+10 πόντοι)</span>';
+      } else {
+        sound.wrong();
+        expBox.className = "p-4 rounded-2xl text-xs md:text-sm leading-relaxed bg-rose-50 border border-rose-200 text-rose-900 block";
+        expTitle.innerHTML = '<i class="fa-solid fa-circle-xmark text-rose-600 text-base"></i> <span class="text-rose-800 font-bold">Όχι ακριβώς...</span>';
+      }
+
+      expText.innerHTML = data.explanation;
+      expBox.classList.remove('hidden');
+
+      // Enable Next button
+      const nextBtn = document.getElementById('next-btn');
+      nextBtn.disabled = false;
+      nextBtn.className = "bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-2.5 rounded-2xl shadow transition flex items-center gap-2 cursor-pointer transform hover:scale-105";
+
+      if (currentQ === quizData.length - 1) {
+        nextBtn.innerHTML = '<span>Δες το Αποτέλεσμα</span> <i class="fa-solid fa-award"></i>';
+      }
+    }
+
+    function nextQuestion() {
+      sound.click();
+      currentQ++;
+      if (currentQ < quizData.length) {
+        loadQuestion();
+      } else {
+        showResults();
+      }
+    }
+
+    function showResults() {
+      document.getElementById('screen-quiz').classList.add('hidden');
+      document.getElementById('stats-bar').classList.add('hidden');
+      document.getElementById('progress-container').classList.add('hidden');
+      document.getElementById('screen-result').classList.remove('hidden');
+
+      document.getElementById('final-score').innerText = score;
+      document.getElementById('final-correct').innerText = `${correctCount} στις 10 σωστές απαντήσεις`;
+
+      const titleEl = document.getElementById('result-title');
+      const msgEl = document.getElementById('result-msg');
+      const iconEl = document.getElementById('result-icon');
+
+      if (score >= 90) {
+        sound.fanfare();
+        confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+        iconEl.innerHTML = '🏆🌟';
+        titleEl.innerText = 'Άριστα! Είσαι Ειδικός Δεδομένων!';
+        msgEl.innerText = 'Γνωρίζεις τα πάντα για τις πηγές δεδομένων, τα κελιά, τα διαγράμματα και τις ιδιότητες των αρχείων! Ο Ήρωνας και η Υπατία είναι περήφανοι για σένα!';
+      } else if (score >= 60) {
+        sound.fanfare();
+        confetti({ particleCount: 50, spread: 50, origin: { y: 0.6 } });
+        iconEl.innerHTML = '👏🎉';
+        titleEl.innerText = 'Πολύ Καλή Προσπάθεια!';
+        msgEl.innerText = 'Έχεις καταλάβει πολύ καλά τις βασικές έννοιες του υπολογιστικού φύλλου και των αρχείων. Με μία γρήγορη επανάληψη θα πετύχεις το απόλυτο 100!';
+      } else {
+        iconEl.innerHTML = '💪📚';
+        titleEl.innerText = 'Μην τα παρατάς!';
+        msgEl.innerText = 'Διάβασε ξανά τις σελίδες 60-63 του βιβλίου Πληροφορικής και δοκίμασε άλλη μία φορά. Η εξάσκηση φέρνει τη γνώση!';
+      }
+    }
+  </script>
+</body>
+</html>
