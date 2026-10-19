@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ψηφιακοί Πράκτορες — Μάθημα 17: Υπολογιστικό φύλλο</title>
+<style>
+:root{--paper:#F3ECD9;--card:#FFFDF7;--ink:#1F3C63;--ink2:#3C5A85;--gold:#C98A2B;--gold2:#E7C583;--good:#3F7A4E;--goodbg:#E1F0E3;--bad:#B8483D;--badbg:#F7E2DF;--line:#D8CBAA;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:#2B2A28;font-family:"Trebuchet MS","Segoe UI",Verdana,sans-serif;padding:18px 14px 50px}
+.wrap{max-width:940px;margin:0 auto}
+header{display:flex;align-items:center;gap:16px;padding:18px 22px;background:var(--ink);color:var(--paper);border-radius:14px}
+.badge{width:54px;height:54px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:bold;color:var(--ink);border:3px solid var(--paper);flex:0 0 auto}
+header h1{margin:0;font-size:clamp(18px,4vw,26px)}header p{margin:4px 0 0;opacity:.85;font-size:13.5px}
+#home{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px;margin-top:20px}
+.mc{background:var(--card);border:2px solid var(--line);border-radius:12px;padding:16px;cursor:pointer;transition:.15s}
+.mc:hover{border-color:var(--gold);transform:translateY(-2px)}
+.mc .n{display:inline-block;width:26px;height:26px;line-height:26px;text-align:center;background:var(--ink);color:var(--paper);border-radius:50%;font-size:13px;font-weight:bold;margin-bottom:8px}
+.mc h3{margin:0 0 4px;font-size:15px;color:var(--ink)}.mc p{margin:0 0 8px;font-size:12.5px;color:var(--ink2)}
+.st{font-size:15px;color:var(--gold);letter-spacing:1px}
+#view{display:none;background:var(--card);border:2px solid var(--gold);border-radius:12px;padding:20px;margin-top:20px}
+#view.on{display:block}
+.back{background:none;border:2px solid var(--ink);color:var(--ink);padding:6px 14px;border-radius:8px;font-weight:bold;cursor:pointer;font-family:inherit;margin-bottom:12px}
+h2{margin:0 0 4px;color:var(--ink);font-size:20px}
+.lvs{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.lv{padding:8px 14px;border-radius:8px;border:2px solid var(--line);background:#FBFAF6;cursor:pointer;font-weight:bold;font-size:13px;font-family:inherit;color:var(--ink)}
+.lv.cur{border-color:var(--gold);background:var(--gold2)}.lv:disabled{opacity:.45;cursor:not-allowed}
+.goal{background:#FBF7EC;border-left:4px solid var(--gold);padding:8px 12px;border-radius:6px;font-size:13.5px;color:var(--ink2);margin-bottom:14px}
+button.action{font-family:inherit;background:var(--ink);color:var(--paper);border:none;padding:9px 16px;border-radius:8px;font-size:13.5px;font-weight:bold;cursor:pointer;margin:6px 6px 0 0}
+button.action:hover{background:var(--ink2)}button.action.alt{background:transparent;color:var(--ink);border:2px solid var(--ink)}
+.task{background:var(--ink);color:var(--paper);padding:10px 14px;border-radius:8px;margin-bottom:12px;font-size:14px}.tm{float:right;color:var(--gold2)}
+.fb{min-height:22px;margin:8px 0;font-weight:bold;font-size:14px}.good{color:var(--good)}.bad{color:var(--bad)}
+.qp{font-size:12px;color:var(--ink2);margin-bottom:4px}.qt{font-weight:bold;font-size:15px;margin-bottom:10px}
+.opts{display:flex;gap:8px;flex-wrap:wrap}
+.opt{padding:9px 14px;border-radius:8px;border:2px solid var(--line);background:#FBFAF6;cursor:pointer;font-size:13.5px}
+.opt:hover{border-color:var(--gold)}.opt.correct{border-color:var(--good);background:var(--goodbg)}.opt.wrong{border-color:var(--bad);background:var(--badbg)}
+.expl{margin-top:10px;font-size:13.5px;color:var(--ink2)}
+.res{margin-top:16px;padding:14px;border-radius:10px;background:var(--goodbg);color:var(--good);font-weight:bold}
+.big{font-size:24px;color:var(--gold)}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.chip{padding:9px 14px;border-radius:8px;background:#FBFAF6;border:2px solid var(--line);cursor:pointer;font-weight:bold;font-size:13.5px}
+.chip.sel{border-color:var(--gold);background:var(--gold2)}
+.bks{display:flex;gap:14px;flex-wrap:wrap}.bk{flex:1 1 220px;min-height:90px;border:2px dashed var(--line);border-radius:10px;padding:10px;background:#FBF7EC;cursor:pointer}
+.bk h4{margin:0 0 6px;color:var(--ink);font-size:14px}.bk .p{display:inline-block;background:var(--goodbg);border-radius:6px;padding:4px 10px;margin:3px;font-size:13px}
+.ol{display:flex;flex-direction:column;gap:8px}.oi{padding:10px 14px;border:2px solid var(--line);border-radius:8px;background:#FBFAF6;cursor:pointer;font-size:14px}.oi.fx{border-color:var(--good);background:var(--goodbg);cursor:default}
+.sp{display:flex;gap:18px;flex-wrap:wrap}.sp>div{flex:1 1 300px}.sp h4{margin:0 0 6px;font-size:13px;color:var(--ink2)}
+/* sheet */
+.sh{position:relative;border:1px solid #b9c1cc;border-radius:6px;background:#fff;overflow:hidden;font-size:13.5px}
+.bars{display:flex;gap:4px;align-items:center;padding:5px;background:#f3f5f8;border-bottom:1px solid #cfd5dd}
+.nb{width:70px;text-align:center;background:#fff;border:1px solid #b9c1cc;border-radius:4px;padding:4px;font-weight:bold;cursor:pointer}
+.ib{flex:1;border:1px solid #b9c1cc;border-radius:4px;padding:5px 8px;font:inherit;min-width:0}
+.bars button{border:1px solid #b9c1cc;background:#fff;border-radius:4px;cursor:pointer;padding:3px 8px;font-weight:bold}.okb{color:var(--good)}.xb{color:var(--bad)}
+.gw{overflow:auto;max-width:100%;outline:none}
+.grid{border-collapse:collapse;table-layout:fixed}
+.grid th{background:#eef1f5;border:1px solid #cfd5dd;font-weight:bold;color:#445;height:26px;position:relative;cursor:pointer;user-select:none}
+.grid th.sel{background:#d4dff0}
+.grid td{border:1px solid #dfe3e8;padding:0;height:26px;touch-action:none;user-select:none;cursor:cell}
+.cv{height:26px;line-height:26px;padding:0 6px;overflow:hidden;white-space:nowrap;text-align:left}.cv.num{text-align:right}
+td.in{background:#d9e6fb}td.mk{background:var(--gold2)}td.ok{background:var(--goodbg)}td.no{background:var(--badbg)}
+td.act{box-shadow:inset 0 0 0 2px #111}
+td input.ci{width:100%;height:26px;border:0;padding:0 6px;font:inherit;outline:2px solid #111}
+.rz{position:absolute;right:-3px;top:0;width:7px;height:100%;cursor:col-resize;z-index:2;touch-action:none}
+.rz:hover{background:var(--gold)}
+.menu{position:absolute;background:#fff;border:1px solid #888;border-radius:6px;box-shadow:0 4px 12px rgba(0,0,0,.25);z-index:9;min-width:150px;font-size:13px}
+.menu div{padding:7px 12px;cursor:pointer}.menu div:hover{background:var(--gold2)}
+.meas{position:absolute;visibility:hidden;white-space:nowrap;font:13.5px "Trebuchet MS",sans-serif}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header><div class="badge">17</div><div><h1>Ψηφιακοί Πράκτορες</h1><p>Μάθημα 17ο · Υπολογιστικό φύλλο: Οργάνωση δεδομένων σε πίνακα — Ε΄ Δημοτικού</p></div></header>
+<div id="home"></div>
+<div id="view"><button class="back" id="bk">← Πίσω στις αποστολές</button><h2 id="vt"></h2><div class="lvs" id="lvs"></div><div class="goal" id="goal"></div><div id="box"></div></div>
+</div>
+<script>
+const sh=a=>[...a].sort(()=>Math.random()-.5);
+const L=i=>String.fromCharCode(64+i);
+const isNum=v=>/^-?\d+([.,]\d+)?$/.test(String(v).trim());
+const nrm=s=>String(s).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/\s+/g," ").trim();
+const rgName=g=>{const a=L(g.c1)+g.r1,b=L(g.c2)+g.r2;return a===b?a:a+":"+b};
+const rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+
+/* ================= ENGINE: SPREADSHEET ================= */
+function mkSheet(el,o){
+  const S={cols:o.cols||6,rows:o.rows||6,d:{...(o.data||{})},w:{...(o.w||{})},dw:o.dw||90,act:o.active||"A1",rg:o.rg||null,mk:o.mark||[],ok:[],no:[],ed:null,drag:false,anchor:null,rzd:null};
+  const ro=!!o.readonly, emit=e=>o.on&&o.on(e,S);
+  S.W=c=>S.w[L(c)]||S.dw;
+  S.need=c=>{let m=0;for(let r=1;r<=S.rows;r++){const v=S.d[L(c)+r];if(v){const s=document.createElement("span");s.className="meas";s.textContent=v;document.body.appendChild(s);m=Math.max(m,s.offsetWidth+18);s.remove()}}return m};
+  function applyW(){el.querySelectorAll("col").forEach((c,i)=>{if(i>0)c.style.width=S.W(i)+"px"});let t=38;for(let c=1;c<=S.cols;c++)t+=S.W(c);el.querySelector(".grid").style.width=t+"px"}
+  function build(){
+    let h='<div class="sh">';
+    if(!o.hideBars)h+=`<div class="bars"><div class="nb"></div><button class="xb" title="Ακύρωση">✕</button><button class="okb" title="Οριστικοποίηση">✓</button><input class="ib" placeholder="Γραμμή εισαγωγής"${ro?" readonly":""}></div>`;
+    h+='<div class="gw" tabindex="0"><table class="grid"><colgroup><col style="width:38px">';
+    for(let c=1;c<=S.cols;c++)h+=`<col style="width:${S.W(c)}px">`;
+    h+='</colgroup><thead><tr><th></th>';
+    for(let c=1;c<=S.cols;c++)h+=`<th class="ch" data-c="${c}">${L(c)}<i class="rz" data-c="${c}"></i></th>`;
+    h+='</tr></thead><tbody>';
+    for(let r=1;r<=S.rows;r++){h+=`<tr><th class="rh" data-r="${r}">${r}</th>`;for(let c=1;c<=S.cols;c++)h+=`<td data-c="${c}" data-r="${r}"><div class="cv"></div></td>`;h+="</tr>"}
+    h+='</tbody></table></div><div class="menu" hidden></div></div>';
+    el.innerHTML=h;applyW();fill();paint();
+  }
+  function fill(){el.querySelectorAll("td").forEach(td=>{if(td.querySelector("input"))return;const v=S.d[L(+td.dataset.c)+td.dataset.r]||"";const cv=td.firstChild;cv.textContent=v;cv.className="cv"+(v&&isNum(v)?" num":"")})}
+  function paint(){
+    const m=S.act.match(/^([A-Z])(\d+)$/),ac=m[1].charCodeAt(0)-64,ar=+m[2],g=S.rg,multi=g&&!(g.c1===g.c2&&g.r1===g.r2);
+    el.querySelectorAll("td").forEach(td=>{const c=+td.dataset.c,r=+td.dataset.r,ref=L(c)+r;
+      td.classList.toggle("act",ref===S.act);
+      td.classList.toggle("in",!!multi&&c>=g.c1&&c<=g.c2&&r>=g.r1&&r<=g.r2);
+      td.classList.toggle("mk",S.mk.includes(ref));td.classList.toggle("ok",S.ok.includes(ref));td.classList.toggle("no",S.no.includes(ref))});
+    el.querySelectorAll(".ch").forEach(t=>t.classList.toggle("sel",+t.dataset.c===ac));
+    el.querySelectorAll(".rh").forEach(t=>t.classList.toggle("sel",+t.dataset.r===ar));
+    const nb=el.querySelector(".nb");if(nb)nb.textContent=multi?rgName(g):S.act;
+    const ib=el.querySelector(".ib");if(ib&&!S.ed)ib.value=S.d[S.act]||"";
+  }
+  function commit(val){const e=S.ed;if(!e)return;S.ed=null;if(val===""||val==null)delete S.d[e.ref];else S.d[e.ref]=val;
+    if(e.mode==="cell"){const td=el.querySelector(`td[data-c="${e.ref.charCodeAt(0)-64}"][data-r="${e.ref.slice(1)}"]`);td.innerHTML='<div class="cv"></div>'}
+    fill();paint();const ib=el.querySelector(".ib");if(ib)ib.blur();emit({type:"commit",ref:e.ref,val:S.d[e.ref]||""})}
+  function cancel(){const e=S.ed;if(!e)return;S.ed=null;if(e.mode==="cell"){const td=el.querySelector(`td[data-c="${e.ref.charCodeAt(0)-64}"][data-r="${e.ref.slice(1)}"]`);td.innerHTML='<div class="cv"></div>'}fill();paint();const ib=el.querySelector(".ib");if(ib)ib.blur()}
+  function cellEdit(ref,first){
+    if(ro||S.ed)return;S.act=ref;S.rg=null;paint();
+    const td=el.querySelector(`td[data-c="${ref.charCodeAt(0)-64}"][data-r="${ref.slice(1)}"]`);
+    td.innerHTML='<input class="ci">';const i=td.firstChild;i.value=first!=null?first:(S.d[ref]||"");S.ed={ref,mode:"cell"};i.focus();
+    i.onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();commit(i.value)}else if(e.key==="Escape")cancel()};
+    i.onblur=()=>{if(S.ed&&S.ed.mode==="cell")commit(i.value)};
+  }
+  function menuOpen(kind,idx,e){
+    if(!o.menu||!o.menu[kind])return;if(e.preventDefault)e.preventDefault();
+    const m=el.querySelector(".menu");m.innerHTML=o.menu[kind].map((it,i)=>`<div data-i="${i}">${it[0]}</div>`).join("");
+    const b=el.querySelector(".sh").getBoundingClientRect();m.style.left=(e.clientX-b.left)+"px";m.style.top=(e.clientY-b.top)+"px";m.hidden=false;m._k=kind;m._x=idx;
+  }
+  S.insRow=n=>{const nd={};for(const k in S.d){const m=k.match(/^([A-Z])(\d+)$/),r=+m[2];nd[m[1]+(r>=n?r+1:r)]=S.d[k]}S.d=nd;S.rows++;build();emit({type:"insert",kind:"row",idx:n})};
+  S.insCol=n=>{const nd={};for(const k in S.d){const m=k.match(/^([A-Z])(\d+)$/),c=m[1].charCodeAt(0)-64;nd[L(c>=n?c+1:c)+m[2]]=S.d[k]}S.d=nd;const nw={};for(const k in S.w){const c=k.charCodeAt(0)-64;nw[L(c>=n?c+1:c)]=S.w[k]}S.w=nw;S.cols++;build();emit({type:"insert",kind:"col",idx:n})};
+  S.rebuild=build;
+  el.addEventListener("pointerdown",e=>{
+    const rz=e.target.closest(".rz");if(rz){S.rzd={c:+rz.dataset.c,x:e.clientX,w:S.W(+rz.dataset.c)};e.preventDefault();return}
+    const td=e.target.closest("td");if(!td||S.ed||o.fixed)return;
+    S.anchor=[+td.dataset.c,+td.dataset.r];S.drag=true;S.rg=null;S.act=L(S.anchor[0])+S.anchor[1];paint();
+  });
+  const mv=e=>{if(!el.isConnected){off();return}
+    if(S.rzd){S.w[L(S.rzd.c)]=Math.max(30,Math.round(S.rzd.w+e.clientX-S.rzd.x));applyW();return}
+    if(!S.drag)return;const t=document.elementFromPoint(e.clientX,e.clientY),td=t&&t.closest&&t.closest("td");if(!td||!el.contains(td))return;
+    const c=+td.dataset.c,r=+td.dataset.r;S.rg={c1:Math.min(c,S.anchor[0]),c2:Math.max(c,S.anchor[0]),r1:Math.min(r,S.anchor[1]),r2:Math.max(r,S.anchor[1])};paint()};
+  const up=()=>{if(S.rzd){S.rzd=null;emit({type:"resize"});return}
+    if(!S.drag)return;S.drag=false;const g=S.rg||{c1:S.anchor[0],c2:S.anchor[0],r1:S.anchor[1],r2:S.anchor[1]};emit({type:"range",rg:g,name:rgName(g)})};
+  const off=()=>{document.removeEventListener("pointermove",mv);document.removeEventListener("pointerup",up)};
+  document.addEventListener("pointermove",mv);document.addEventListener("pointerup",up);
+  el.addEventListener("click",e=>{
+    const m=el.querySelector(".menu");
+    if(e.target.closest(".menu")){const it=e.target.closest("[data-i]");if(it){const f=o.menu[m._k][+it.dataset.i][1];m.hidden=true;f(m._x,S)}return}
+    if(m)m.hidden=true;
+    if(e.target.closest(".rz"))return;
+    let t;
+    if(t=e.target.closest("td"))emit({type:"cell",ref:L(+t.dataset.c)+t.dataset.r});
+    else if(t=e.target.closest(".ch")){emit({type:"col",c:+t.dataset.c});menuOpen("col",+t.dataset.c,e)}
+    else if(t=e.target.closest(".rh")){emit({type:"row",r:+t.dataset.r});menuOpen("row",+t.dataset.r,e)}
+    else if(e.target.closest(".nb"))emit({type:"name"});
+    else if(e.target.closest(".okb"))commit(el.querySelector(".ib").value);
+    else if(e.target.closest(".xb"))cancel();
+  });
+  el.addEventListener("contextmenu",e=>{let t;if(t=e.target.closest(".rh"))menuOpen("row",+t.dataset.r,e);else if(t=e.target.closest(".ch"))menuOpen("col",+t.dataset.c,e)});
+  el.addEventListener("dblclick",e=>{const rz=e.target.closest(".rz");if(rz){const c=+rz.dataset.c;S.w[L(c)]=Math.max(30,S.need(c));applyW();emit({type:"resize"});return}
+    const td=e.target.closest("td");if(td)cellEdit(L(+td.dataset.c)+td.dataset.r)});
+  el.addEventListener("focusin",e=>{if(e.target.classList.contains("ib")){emit({type:"input"});if(!ro&&!S.ed)S.ed={ref:S.act,mode:"bar"}}});
+  el.addEventListener("input",e=>{if(e.target.classList.contains("ib")&&S.ed&&S.ed.mode==="bar"){const td=el.querySelector(`td[data-c="${S.ed.ref.charCodeAt(0)-64}"][data-r="${S.ed.ref.slice(1)}"]`);td.firstChild.textContent=e.target.value}});
+  el.addEventListener("keydown",e=>{
+    if(e.target.classList.contains("ib")){if(e.key==="Enter"){e.preventDefault();commit(e.target.value)}else if(e.key==="Escape")cancel();return}
+    if(e.target.classList.contains("ci"))return;
+    if(ro||o.fixed||S.ed)return;
+    const m=S.act.match(/^([A-Z])(\d+)$/);let c=m[1].charCodeAt(0)-64,r=+m[2],mvd=false;
+    if(e.key==="ArrowRight"){c=Math.min(S.cols,c+1);mvd=true}else if(e.key==="ArrowLeft"){c=Math.max(1,c-1);mvd=true}else if(e.key==="ArrowDown"){r=Math.min(S.rows,r+1);mvd=true}else if(e.key==="ArrowUp"){r=Math.max(1,r-1);mvd=true}
+    if(mvd){e.preventDefault();S.act=L(c)+r;S.rg=null;paint();return}
+    if(e.key.length===1&&!e.ctrlKey&&!e.metaKey){e.preventDefault();cellEdit(S.act,e.key)}
+  });
+  build();return S;
+}
+
+/* ================= ENGINES: QUIZ, TASKS, SORT, ORDER, FILL ================= */
+function quiz(el,qs,d){
+  let i=0,sc=0;
+  const go=()=>{const q=qs[i],os=sh(q.o.map((t,k)=>({t,ok:k===q.c})));
+    el.innerHTML=`<div class="qp">Ερώτηση ${i+1}/${qs.length}</div><div class="qt">${q.q}</div><div class="qx"></div><div class="opts">${os.map((o,k)=>`<div class="opt" data-k="${k}">${o.t}</div>`).join("")}</div><div class="expl" hidden></div><button class="action nx" hidden></button>`;
+    if(q.sheet)q.sheet(el.querySelector(".qx"));
+    let ans=false;
+    el.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{if(ans)return;ans=true;const o=os[+b.dataset.k];if(o.ok)sc++;b.classList.add(o.ok?"correct":"wrong");
+      el.querySelectorAll(".opt").forEach(x=>{if(os[+x.dataset.k].ok)x.classList.add("correct")});
+      const e=el.querySelector(".expl");e.hidden=false;e.textContent=(o.ok?"✓ Σωστά! ":"✗ ")+(q.e||"");
+      const n=el.querySelector(".nx");n.hidden=false;n.textContent=i===qs.length-1?"Τέλος ▶":"Επόμενη ▶";n.onclick=()=>{i++;i<qs.length?go():d(sc,qs.length)}});
+  };go();
+}
+function clickTasks(el,so,tasks,d,timer){
+  let i=0,mis=0,t0=Date.now(),iv;
+  el.innerHTML='<div class="task"></div><div class="mnt"></div><div class="fb"></div>';
+  const tk=el.querySelector(".task"),fb=el.querySelector(".fb");
+  const show=()=>{tk.innerHTML=`<b>${i+1}/${tasks.length}</b> ${tasks[i].t}`+(timer?' <span class="tm"></span>':"")};show();
+  if(timer)iv=setInterval(()=>{if(!el.isConnected){clearInterval(iv);return}const s=el.querySelector(".tm");if(s)s.textContent="⏱ "+Math.floor((Date.now()-t0)/1000)+"″"},500);
+  mkSheet(el.querySelector(".mnt"),{...so,on:ev=>{
+    if(i>=tasks.length)return;const T=tasks[i];
+    if(!(T.ty||["cell","col","row","name","input"]).includes(ev.type))return;
+    if(T.ok(ev)){fb.textContent="✓ Σωστά!";fb.className="fb good";i++;
+      if(i>=tasks.length){clearInterval(iv);tk.innerHTML="🎉 Τέλος!"+(timer?" Χρόνος: "+Math.floor((Date.now()-t0)/1000)+"″":"");d(Math.max(0,tasks.length-mis),tasks.length)}else show()}
+    else{mis++;fb.textContent="✗ Όχι ακόμα — ξαναδοκίμασε!";fb.className="fb bad"}
+  }});
+}
+function sort2(el,A,B,items,d){
+  let sel=null,mis=0,left=items.length;
+  el.innerHTML=`<div class="chips"></div><div class="bks"><div class="bk" data-k="A"><h4>${A}</h4></div><div class="bk" data-k="B"><h4>${B}</h4></div></div><div class="fb"></div>`;
+  const ch=el.querySelector(".chips"),fb=el.querySelector(".fb");
+  sh(items).forEach(([t,k])=>{const c=document.createElement("div");c.className="chip";c.textContent=t;c.onclick=()=>{el.querySelectorAll(".chip").forEach(x=>x.classList.remove("sel"));c.classList.add("sel");sel={c,t,k}};ch.appendChild(c)});
+  el.querySelectorAll(".bk").forEach(b=>b.onclick=()=>{
+    if(!sel){fb.textContent="Πρώτα διάλεξε ένα στοιχείο από πάνω.";fb.className="fb";return}
+    if(sel.k===b.dataset.k){const p=document.createElement("span");p.className="p";p.textContent=sel.t;b.appendChild(p);sel.c.remove();sel=null;left--;fb.textContent="✓ Σωστά!";fb.className="fb good";if(!left)d(Math.max(0,items.length-mis),items.length)}
+    else{mis++;fb.textContent="✗ Δεν ανήκει εδώ. Δοκίμασε το άλλο κουτί!";fb.className="fb bad"}});
+}
+function ordr(el,steps,d){
+  let n=0,mis=0;
+  el.innerHTML='<div class="ol"></div><div class="fb"></div>';const ol=el.querySelector(".ol"),fb=el.querySelector(".fb");
+  sh(steps).forEach(s=>{const x=document.createElement("div");x.className="oi";x.textContent=s;x.onclick=()=>{if(x.classList.contains("fx"))return;
+    if(s===steps[n]){n++;x.classList.add("fx");x.textContent=n+". "+s;fb.textContent="✓ Σωστά!";fb.className="fb good";if(n===steps.length)d(Math.max(0,steps.length-mis),steps.length)}
+    else{mis++;fb.textContent="✗ Αυτό δεν γίνεται τώρα. Σκέψου τι προηγείται!";fb.className="fb bad"}};ol.appendChild(x)});
+}
+/* type-in task: expected = {ref: "text" | fn} */
+function fillTask(el,spec,d){
+  const exp=spec.expected,refs=Object.keys(exp);let tries=0,first=null;
+  el.innerHTML=`<div class="sp">${spec.show?'<div><h4>📋 Δεδομένα για πληκτρολόγηση</h4><div class="a"></div></div>':""}<div><h4>🖥️ Το δικό σου υπολογιστικό φύλλο</h4><div class="b"></div></div></div><div class="fb"></div><button class="action">✅ Έλεγχος</button>${spec.tip?`<div class="expl">${spec.tip}</div>`:""}`;
+  if(spec.show)mkSheet(el.querySelector(".a"),{cols:spec.cols,rows:spec.rows,data:spec.show,readonly:true,fixed:true,hideBars:true,dw:spec.dw||110});
+  const S=mkSheet(el.querySelector(".b"),{cols:spec.cols,rows:spec.rows,data:spec.data||{},dw:spec.dw||110,w:spec.w||{}});
+  el.querySelector(".action").onclick=()=>{
+    S.ok=[];S.no=[];
+    refs.forEach(r=>{const v=(S.d[r]||"").trim(),e=exp[r];const good=typeof e==="function"?e(v):(spec.strict?v===e:nrm(v)===nrm(e));(good?S.ok:S.no).push(r)});
+    S.rebuild();tries++;if(first===null)first=S.ok.length;
+    const fb=el.querySelector(".fb");
+    if(!S.no.length){fb.textContent="🎉 Όλα σωστά!";fb.className="fb good";d(first,refs.length)}
+    else{fb.textContent=`Σωστά ${S.ok.length}/${refs.length}. Διόρθωσε τα κόκκινα κελιά και πάτα ξανά Έλεγχος.`;fb.className="fb bad"}
+  };
+}
+
+/* ================= ACTIVITIES DATA ================= */
+const cellOpts=(c,r,mx)=>{const a=[L(c)+r,L(c<mx?c+1:c-1)+r,L(c)+(r>1?r-1:r+1)];return a};
+const cellRound=()=>{const c=rnd(1,6),r=rnd(1,6),ref=L(c)+r;return{q:"Ποιο είναι το όνομα του κελιού που είναι χρωματισμένο;",o:cellOpts(c,r,6),c:0,e:`Το κελί βρίσκεται στη στήλη ${L(c)} και στη γραμμή ${r}, άρα λέγεται ${ref}.`,sheet:m=>mkSheet(m,{cols:6,rows:6,readonly:true,fixed:true,hideBars:true,dw:54,mark:[ref]})}};
+const rangeRound=()=>{const c1=rnd(1,4),r1=rnd(1,4),c2=c1+rnd(0,2),r2=r1+rnd(c2===c1?1:0,2),g={c1,c2,r1,r2},nm=rgName(g);
+  const o=[nm,rgName({c1,c2:Math.min(6,c2+1),r1,r2}),rgName({c1:Math.max(1,c1-1)===c1?c1+1>c2?c1:c1+1:c1-1,c2,r1,r2:Math.min(6,r2+1)})].filter((x,i,a)=>a.indexOf(x)===i);
+  while(o.length<3)o.push(rgName({c1,c2,r1:r1,r2:r2+o.length}));
+  return{q:"Ποια περιοχή κελιών είναι επιλεγμένη;",o,c:0,e:`Η περιοχή ξεκινά από το κελί ${L(c1)}${r1} και τελειώνει στο ${L(c2)}${r2}: ${nm}.`,sheet:m=>mkSheet(m,{cols:6,rows:7,readonly:true,fixed:true,hideBars:true,dw:54,rg:g,active:L(c1)+r1})}};
+const spot=(...refs)=>refs;
+const T=(t,f,ty)=>({t,ok:f,ty});
+
+const ACTS=[
+{t:"Γνώρισε το φύλλο",d:"Στήλες, γραμμές, κελιά.",lv:[
+ {n:"Στήλες & γραμμές",g:"Πάτα πάνω στο σωστό σημείο του υπολογιστικού φύλλου.",run:(el,d)=>clickTasks(el,{cols:6,rows:6,active:"B3",fixed:true,readonly:true,dw:70},[
+   T("Πάτα στο όνομα της <b>στήλης C</b>.",e=>e.type==="col"&&e.c===3),T("Πάτα στο όνομα της <b>γραμμής 4</b>.",e=>e.type==="row"&&e.r===4),
+   T("Πάτα στο όνομα της <b>στήλης A</b>.",e=>e.type==="col"&&e.c===1),T("Πάτα στο όνομα της <b>γραμμής 2</b>.",e=>e.type==="row"&&e.r===2),
+   T("Πάτα στο όνομα της <b>στήλης E</b>.",e=>e.type==="col"&&e.c===5)],d)},
+ {n:"Μέρη της οθόνης",g:"Βρες τα μέρη του υπολογιστικού φύλλου. Το ενεργό κελί έχει έντονο μαύρο περίγραμμα.",run:(el,d)=>clickTasks(el,{cols:6,rows:6,active:"B3",fixed:true,readonly:true,dw:70,data:{A1:"Εκδρομή",A2:"Μουσείο",B2:"12"}},[
+   T("Πάτα στο <b>ενεργό κελί</b> (αυτό με το έντονο μαύρο περίγραμμα).",e=>e.type==="cell"&&e.ref==="B3"),
+   T("Πάτα στο πλαίσιο που δείχνει το <b>όνομα του ενεργού κελιού</b>.",e=>e.type==="name"),
+   T("Πάτα στη <b>γραμμή εισαγωγής</b> (εκεί εμφανίζεται ό,τι πληκτρολογείς).",e=>e.type==="input"),
+   T("Πάτα στο κελί <b>D5</b>.",e=>e.type==="cell"&&e.ref==="D5"),
+   T("Πάτα στο κελί <b>A2</b>.",e=>e.type==="cell"&&e.ref==="A2")],d)},
+ {n:"Κουίζ γνώσεων",g:"Τι θυμάσαι για το υπολογιστικό φύλλο;",run:(el,d)=>quiz(el,[
+   {q:"Πώς ονομάζονται οι στήλες;",o:["Με κεφαλαία λατινικά γράμματα (A, B, C…)","Με αριθμούς","Με ελληνικά γράμματα","Με χρώματα"],c:0,e:"Οι στήλες έχουν κεφαλαία λατινικά γράμματα."},
+   {q:"Πώς ονομάζονται οι γραμμές;",o:["Με αριθμούς (1, 2, 3…)","Με γράμματα","Με λέξεις","Δεν έχουν όνομα"],c:0,e:"Οι γραμμές έχουν αριθμούς."},
+   {q:"Πώς σχηματίζεται το όνομα ενός κελιού;",o:["Γράμμα στήλης + αριθμός γραμμής","Αριθμός γραμμής + χρώμα","Μόνο το γράμμα","Μόνο ο αριθμός"],c:0,e:"Π.χ. στήλη B και γραμμή 3 → κελί B3."},
+   {q:"Πώς λέγεται το κελί με το έντονο μαύρο περίγραμμα;",o:["Ενεργό κελί","Κεντρικό κελί","Κλειδωμένο κελί","Κενό κελί"],c:0,e:"Είναι το ενεργό κελί — εκεί γράφεις."},
+   {q:"Πού εμφανίζεται το όνομα του ενεργού κελιού;",o:["Πάνω από το όνομα της στήλης A","Κάτω από τον πίνακα","Στο ποντίκι","Δεν εμφανίζεται"],c:0,e:"Βρίσκεται πάνω από το όνομα της στήλης A."}],d)}]},
+{t:"Κυνήγι κελιών",d:"Βρες και ονόμασε κελιά.",lv:[
+ {n:"Ποιο κελί είναι;",g:"Δες το χρωματισμένο κελί και διάλεξε το όνομά του.",run:(el,d)=>quiz(el,[cellRound(),cellRound(),cellRound(),cellRound(),cellRound()],d)},
+ {n:"Βρες το κελί",g:"Πάτα στο κελί που σου ζητάω. Βλέπεις το όνομα στο πλαίσιο ονόματος.",run:(el,d)=>{const rs=[];while(rs.length<6){const r=L(rnd(1,6))+rnd(1,6);if(!rs.includes(r))rs.push(r)}
+   clickTasks(el,{cols:6,rows:6,dw:60},rs.map(r=>T(`Πάτα στο κελί <b>${r}</b>.`,e=>e.type==="cell"&&e.ref===r)),d)}},
+ {n:"Γρήγορο κυνήγι",g:"Χωρίς πλαίσιο ονόματος! Διάβασε τα ονόματα στηλών και γραμμών και βρες 8 κελιά όσο πιο γρήγορα μπορείς.",run:(el,d)=>{const rs=[];while(rs.length<8){const r=L(rnd(1,8))+rnd(1,9);if(!rs.includes(r))rs.push(r)}
+   clickTasks(el,{cols:8,rows:9,dw:50,hideBars:true},rs.map(r=>T(`Βρες το κελί <b>${r}</b>.`,e=>e.type==="cell"&&e.ref===r)),d,true)}}]},
+{t:"Περιοχές κελιών",d:"Επίλεξε και ονόμασε περιοχές.",lv:[
+ {n:"Επίλεξε περιοχή",g:"Κάνε κλικ στο πρώτο κελί και σύρε διαγώνια ως το τελευταίο.",run:(el,d)=>clickTasks(el,{cols:6,rows:7,dw:58,hideBars:true},
+   ["A2:B3","B1:C2","C3:D5","D4:E6"].map(n=>T(`Επίλεξε την περιοχή <b>${n}</b>.`,e=>e.name===n,["range"])),d)},
+ {n:"Ποια περιοχή είναι;",g:"Δες την επιλεγμένη περιοχή και βρες το όνομά της.",run:(el,d)=>quiz(el,[rangeRound(),rangeRound(),rangeRound(),rangeRound(),rangeRound()],d)},
+ {n:"Στήλες και γραμμές",g:"Μεγαλύτερες περιοχές: ακόμη και μια ολόκληρη γραμμή ή στήλη είναι περιοχή!",run:(el,d)=>clickTasks(el,{cols:6,rows:7,dw:58,hideBars:true},
+   ["B2:B6","A4:E4","C2:E5","A1:F1","D3:F7"].map(n=>T(`Επίλεξε την περιοχή <b>${n}</b>.`,e=>e.name===n,["range"])),d)}]},
+{t:"Πληκτρολόγηση στα κελιά",d:"Φτιάξε τον πρώτο σου πίνακα.",lv:[
+ {n:"Ο πρώτος πίνακας",g:"Η Υπατία και ο Ήρωνας καταγράφουν τις ψήφους της τάξης. Πάτα σε κελί και γράψε (ή διπλό κλικ). Τέλειωσε με Enter ή ✓.",run:(el,d)=>fillTask(el,{cols:3,rows:4,dw:160,show:{A1:"Εκδρομή",A2:"Αρχαιολογικό Μουσείο",B2:"12",A3:"Πινακοθήκη",B3:"9"},expected:{A1:"Εκδρομή",A2:"Αρχαιολογικό Μουσείο",B2:"12",A3:"Πινακοθήκη",B3:"9"},tip:"Συμβουλή: το A1 είναι ο τίτλος του πίνακα."},d)},
+ {n:"Νέα ερώτηση",g:"Η τάξη ρώτησε: «Πού θα πάμε βόλτα;». Πληκτρολόγησε τα νέα δεδομένα.",run:(el,d)=>{const x={A1:"Αγαπημένο μέρος",A2:"Θάλασσα",B2:"8",A3:"Βουνό",B3:"11",A4:"Πάρκο",B4:"6"};fillTask(el,{cols:3,rows:5,dw:150,show:x,expected:x},d)}},
+ {n:"Πίνακας με επικεφαλίδες",g:"Φτιάξε πίνακα με τίτλο και επικεφαλίδες στηλών.",run:(el,d)=>{const x={A1:"Προτιμήσεις παιδιών",A2:"Επιλογή",B2:"Ψήφοι",A3:"Αρχαιολογικό Μουσείο",B3:"15",A4:"Πινακοθήκη",B4:"10",A5:"Ζωολογικός Κήπος",B5:"7"};fillTask(el,{cols:3,rows:6,dw:170,show:x,expected:x},d)}}]},
+{t:"Διόρθωση & πλάτος στήλης",d:"Διόρθωσε λάθη και μεγάλωσε στήλες.",lv:[
+ {n:"Κουίζ",g:"Πώς διορθώνουμε και μεγαλώνουμε;",run:(el,d)=>quiz(el,[
+   {q:"Πώς ολοκληρώνεις την πληκτρολόγηση σε ένα κελί;",o:["Πατώντας Enter ή το ✓ στη γραμμή εισαγωγής","Κλείνοντας το πρόγραμμα","Πατώντας το Χ","Δεν χρειάζεται τίποτα"],c:0,e:"Enter ή ✓ ολοκληρώνουν την πληκτρολόγηση."},
+   {q:"Πώς διορθώνεις ένα λάθος σε κελί;",o:["Διπλό κλικ στο κελί ή κλικ στη γραμμή εισαγωγής","Διαγράφεις όλο το φύλλο","Κλικ στο όνομα της στήλης","Πατάς το ποντίκι μία φορά και περιμένεις"],c:0,e:"Με διπλό κλικ στο ενεργό κελί ή πάνω στη γραμμή εισαγωγής."},
+   {q:"Τι κάνει το πλήκτρο Χ στη γραμμή εισαγωγής;",o:["Ακυρώνει τη διόρθωση","Οριστικοποιεί τη διόρθωση","Διαγράφει τη στήλη","Αποθηκεύει το αρχείο"],c:0,e:"Το ✓ οριστικοποιεί, το Χ ακυρώνει."},
+   {q:"Πώς μεγαλώνεις μια στήλη;",o:["Σέρνω την κάθετη γραμμή μετά το όνομα της στήλης ή κάνω διπλό κλικ πάνω της","Πατάω Enter","Γράφω πιο μικρά γράμματα","Διαγράφω το κελί"],c:0,e:"Σύρε ή διπλό κλικ στην κάθετη γραμμή μετά το όνομα της στήλης."},
+   {q:"Πώς γίνεται ο δείκτης του ποντικιού όταν είναι πάνω στην κάθετη γραμμή της στήλης;",o:["Διπλό βέλος αριστερά-δεξιά","Χέρι","Ρολόι","Σταυρός"],c:0,e:"Ο δείκτης παίρνει τη μορφή διπλού βέλους."}],d)},
+ {n:"Μεγάλωσε τις στήλες",g:"Οι λέξεις δεν χωράνε! Σύρε την κάθετη γραμμή στο όνομα της στήλης ή κάνε διπλό κλικ πάνω της.",run:(el,d)=>{
+   el.innerHTML='<div class="task"></div><div class="mnt"></div><div class="fb"></div>';const tk=el.querySelector(".task"),fb=el.querySelector(".fb");let ok1=false,ok2=false;
+   const upd=S=>{ok1=S.W(1)>=S.need(1);ok2=S.W(2)>=S.need(2);tk.innerHTML=`Μεγάλωσε τη <b>στήλη A</b> ${ok1?"✅":"⬜"} και τη <b>στήλη B</b> ${ok2?"✅":"⬜"} ώστε να φαίνονται ολόκληρες οι λέξεις.`;
+     if(ok1&&ok2){fb.textContent="🎉 Μπράβο! Τώρα φαίνονται όλα.";fb.className="fb good";d(2,2)}};
+   const S=mkSheet(el.querySelector(".mnt"),{cols:4,rows:4,dw:46,readonly:true,data:{A1:"Αρχαιολογικό Μουσείο",A2:"Πινακοθήκη",B1:"Παιδιά που ψήφισαν",B2:"12"},on:(e,S)=>{if(e.type==="resize")upd(S)}});upd(S)}},
+ {n:"Βρες και διόρθωσε",g:"Στον πίνακα υπάρχουν λάθη. Διόρθωσέ τα με διπλό κλικ στο κελί!",run:(el,d)=>fillTask(el,{cols:3,rows:4,dw:170,strict:true,data:{A1:"Εκδρομή τάξης",A2:"Αρχαιολογικο Μουσείο",B2:"21",A3:"Πινακοθηκη",B3:"9"},expected:{A2:"Αρχαιολογικό Μουσείο",B2:"12",A3:"Πινακοθήκη"},tip:"Διόρθωσε: A2 → Αρχαιολογικό Μουσείο · B2 → 12 · A3 → Πινακοθήκη (πρόσεξε τους τόνους!)"},d)}]},
+{t:"Εισαγωγή γραμμής & στήλης",d:"Πρόσθεσε νέες γραμμές και στήλες.",lv:[
+ {n:"Βάλε σε σειρά",g:"Βάλε τα βήματα για να εισαγάγεις μια νέα γραμμή με τη σωστή σειρά (πάτα πρώτα αυτό που γίνεται πρώτο).",run:(el,d)=>ordr(el,["Κάνω δεξί κλικ στο όνομα της γραμμής","Επιλέγω «Εισαγωγή γραμμής»","Εμφανίζεται μια νέα, κενή γραμμή","Γράφω μια επικεφαλίδα στη νέα γραμμή"],d)},
+ {n:"Νέα γραμμή",g:"Θέλουμε επικεφαλίδα πάνω από τα δεδομένα. Κάνε δεξί κλικ (ή πάτα) στο όνομα της γραμμής 1 και διάλεξε «Εισαγωγή γραμμής».",run:(el,d)=>insTask(el,2,d)},
+ {n:"Γραμμή και στήλη",g:"Θα πρέπει να εισαγάγεις και γραμμή και στήλη. Ακολούθησε τις οδηγίες βήμα-βήμα.",run:(el,d)=>insTask(el,4,d)}]},
+{t:"Λέξεις και αριθμοί",d:"Πού στοιχίζονται αυτόματα;",lv:[
+ {n:"Αριστερά ή δεξιά;",g:"Διάλεξε ένα στοιχείο και μετά το κουτί που ταιριάζει. Οι λέξεις στοιχίζονται αριστερά, οι αριθμοί δεξιά.",run:(el,d)=>sort2(el,"Στοιχίζεται ΑΡΙΣΤΕΡΑ","Στοιχίζεται ΔΕΞΙΑ",[["Πινακοθήκη","A"],["25","B"],["Μουσείο","A"],["8","B"],["Τάξη","A"],["130","B"]],d)},
+ {n:"Δοκίμασε μόνος",g:"Πληκτρολόγησε και παρατήρησε πού πηγαίνουν οι λέξεις και οι αριθμοί!",run:(el,d)=>fillTask(el,{cols:3,rows:3,dw:120,expected:{A1:v=>v&&!isNum(v),A2:v=>v&&!isNum(v),B1:v=>isNum(v),B2:v=>isNum(v)},tip:"Γράψε <b>λέξεις</b> στα κελιά A1 και A2 και <b>αριθμούς</b> στα B1 και B2. Πού στοιχίζονται;"},d)},
+ {n:"Δύσκολες περιπτώσεις",g:"Προσοχή! Τι θεωρεί το φύλλο λέξη και τι αριθμό;",run:(el,d)=>quiz(el,[
+   {q:"Πού στοιχίζεται το «2026»;",o:["Δεξιά","Αριστερά"],c:0,e:"Είναι αριθμός → δεξιά."},
+   {q:"Πού στοιχίζεται το «12 μαθητές»;",o:["Αριστερά","Δεξιά"],c:0,e:"Περιέχει γράμματα, άρα είναι κείμενο → αριστερά."},
+   {q:"Πού στοιχίζεται το «B3» όταν το πληκτρολογείς σε κελί;",o:["Αριστερά","Δεξιά"],c:0,e:"Έχει γράμμα, άρα είναι κείμενο → αριστερά."},
+   {q:"Πού στοιχίζεται το «3,5»;",o:["Δεξιά","Αριστερά"],c:0,e:"Είναι αριθμός (δεκαδικός) → δεξιά."},
+   {q:"Πού στοιχίζεται η λέξη «τρία»;",o:["Αριστερά","Δεξιά"],c:0,e:"Είναι λέξη, όχι ψηφία → αριστερά."},
+   {q:"Πού στοιχίζεται το «100»;",o:["Δεξιά","Αριστερά"],c:0,e:"Αριθμός → δεξιά."}],d)}]},
+{t:"Τελικό κουίζ",d:"Η εκδρομή της τάξης: ό,τι έμαθες.",lv:[
+ {n:"Εύκολο",g:"Ξεκινάμε απλά!",run:(el,d)=>quiz(el,[
+   {q:"Σε ποια στήλη και γραμμή βρίσκεται το κελί B3;",o:["Στήλη B, γραμμή 3","Στήλη 3, γραμμή B","Στήλη A, γραμμή 2","Δεν υπάρχει"],c:0,e:"Πρώτα το γράμμα της στήλης, μετά ο αριθμός της γραμμής."},
+   {q:"Με τι ονομάζονται οι γραμμές;",o:["Αριθμούς","Γράμματα","Χρώματα","Λέξεις"],c:0,e:"1, 2, 3, 4…"},
+   {q:"Πώς λέγεται το κελί με το έντονο μαύρο περίγραμμα;",o:["Ενεργό κελί","Μεγάλο κελί","Κενό κελί","Πρώτο κελί"],c:0,e:"Ενεργό κελί."},
+   {q:"Ποιο πλήκτρο ολοκληρώνει την πληκτρολόγηση στο κελί;",o:["Enter","Esc","Shift","Tab"],c:0,e:"Enter (ή το ✓ στη γραμμή εισαγωγής)."},
+   {q:"Ποια είναι η σωστή ονομασία για την ομάδα κελιών Α2, Α3, Β2, Β3;",o:["Περιοχή κελιών Α2:Β3","Στήλη Α2","Γραμμή Β3","Φύλλο Α"],c:0,e:"Γειτονικά κελιά αποτελούν περιοχή κελιών."}],d)},
+ {n:"Μέτριο",g:"Λίγο πιο δύσκολα.",run:(el,d)=>quiz(el,[
+   {q:"Πού εμφανίζεται ό,τι πληκτρολογείς;",o:["Στο ενεργό κελί και στη γραμμή εισαγωγής","Μόνο στην οθόνη του ποντικιού","Στο όνομα της στήλης","Πουθενά"],c:0,e:"Και στο κελί και στη γραμμή εισαγωγής."},
+   {q:"Η λέξη είναι πιο μεγάλη από το κελί. Τι κάνουμε;",o:["Μεγαλώνουμε τη στήλη","Σβήνουμε τη λέξη","Κλείνουμε το φύλλο","Αλλάζουμε γραμμή"],c:0,e:"Σύρουμε ή κάνουμε διπλό κλικ στην κάθετη γραμμή μετά το όνομα της στήλης."},
+   {q:"Ποιο κουμπί ακυρώνει μια διόρθωση στη γραμμή εισαγωγής;",o:["Χ","✓","Enter","Κανένα"],c:0,e:"Το Χ ακυρώνει, το ✓ οριστικοποιεί."},
+   {q:"Πώς εισάγουμε νέα γραμμή;",o:["Δεξί κλικ στο όνομα της γραμμής → «Εισαγωγή γραμμής»","Δεξί κλικ στο ποντίκι","Πατάμε Esc","Σβήνουμε μια γραμμή"],c:0,e:"Δεξί κλικ στο όνομα γραμμής και επιλογή «Εισαγωγή γραμμής»."},
+   {q:"Πού στοιχίζονται αυτόματα οι αριθμοί;",o:["Δεξιά","Αριστερά","Στο κέντρο","Δεν στοιχίζονται"],c:0,e:"Οι αριθμοί δεξιά, οι λέξεις αριστερά."}],d)},
+ {n:"Δύσκολο",g:"Για πραγματικούς πράκτορες!",run:(el,d)=>quiz(el,[
+   {q:"Ποια κελιά ανήκουν στην περιοχή A2:B3;",o:["A2, A3, B2, B3","A2, B3","A2, A3, A4, B3","A2, B2"],c:0,e:"Είναι γειτονικά κελιά: 2 στήλες × 2 γραμμές."},
+   {q:"Πώς επιλέγεις την περιοχή A2:B3;",o:["Κλικ στο A2 και σύρσιμο διαγώνια ως το B3","Κλικ μόνο στο B3","Διπλό κλικ στο A1","Πατάς Enter δύο φορές"],c:0,e:"Κλικ στο πρώτο κελί και σύρσιμο ως το τελευταίο."},
+   {q:"Πόσα κελιά έχει η περιοχή A1:C2;",o:["6","3","4","5"],c:0,e:"3 στήλες (A, B, C) × 2 γραμμές = 6 κελιά."},
+   {q:"Στον πίνακα της εκδρομής, τι γράφουμε στο κελί A1;",o:["Τον τίτλο (επικεφαλίδα) του πίνακα","Το πλήθος των παιδιών","Τον κωδικό","Τίποτα"],c:0,e:"Στο A1 γράφουμε τον τίτλο του πίνακα."},
+   {q:"Πώς ονομάζεται το κελί στη στήλη D και γραμμή 7;",o:["D7","7D","D-7","Δ7"],c:0,e:"Λατινικό γράμμα στήλης και αριθμός γραμμής: D7."},
+   {q:"Ποια είναι η σωστή σειρά για να διορθώσεις ένα λάθος;",o:["Διπλό κλικ στο κελί → διορθώνω → Enter ή ✓","Enter → διπλό κλικ → διορθώνω","Σβήνω τη στήλη → ξαναγράφω","Κλείνω και ανοίγω το πρόγραμμα"],c:0,e:"Διπλό κλικ, διόρθωση και οριστικοποίηση με ✓ ή Enter."}],d)}]}
+];
+
+/* insert row/col interactive task */
+function insTask(el,total,d){
+  const init={A1:"Αρχαιολογικό Μουσείο",B1:"12",A2:"Πινακοθήκη",B2:"9"};
+  el.innerHTML='<div class="task"></div><div class="mnt"></div><div class="fb"></div><button class="action alt">↺ Επαναφορά</button>';
+  const tk=el.querySelector(".task"),fb=el.querySelector(".fb");let wrong=0,fin=false,S;
+  const stage=()=>{const d=S.d,r1=!["A1","B1","C1","D1"].some(k=>d[k]);
+    let s=0;if(d.A2==="Αρχαιολογικό Μουσείο"&&r1){s=1;if(d.A1){s=2;if(total===4&&S.d.C2==="12"&&!d.B2){s=3;if(d.B1)s=4}}}return s};
+  const msgs=["Κάνε δεξί κλικ (ή πάτα) στο όνομα της <b>γραμμής 1</b> → «Εισαγωγή γραμμής».","Γράψε έναν <b>τίτλο</b> στο νέο κελί <b>A1</b> (π.χ. «Επιλογές»).","Κάνε δεξί κλικ (ή πάτα) στο όνομα της <b>στήλης B</b> → «Εισαγωγή στήλης».","Γράψε μια <b>επικεφαλίδα</b> στο κελί <b>B1</b> της νέας στήλης (π.χ. «Ημέρα»)."];
+  const chk=()=>{const s=stage();if(s>=total){tk.innerHTML="🎉 Τέλος!";fb.textContent="Τέλεια! Το φύλλο οργανώθηκε.";fb.className="fb good";if(!fin){fin=true;d(Math.max(0,total-wrong),total)}}else tk.innerHTML=`<b>${s+1}/${total}</b> ${msgs[s]}`};
+  const start=()=>{S=mkSheet(el.querySelector(".mnt"),{cols:4,rows:5,dw:150,w:{B:70},data:{...init},
+    menu:{row:[["Αντιγραφή",()=>{fb.textContent="Όχι αυτό — ψάξε «Εισαγωγή γραμμής».";fb.className="fb bad"}],["Εισαγωγή γραμμής",(i,S)=>S.insRow(i)]],col:[["Αντιγραφή",()=>{fb.textContent="Όχι αυτό — ψάξε «Εισαγωγή στήλης».";fb.className="fb bad"}],["Εισαγωγή στήλης",(i,S)=>S.insCol(i)]]},
+    on:e=>{if(e.type==="insert"){const s=stage();if(!((e.kind==="row"&&e.idx===1)||(e.kind==="col"&&e.idx===2))||(e.kind==="col"&&s<2)){wrong++;fb.textContent="Η εισαγωγή έγινε σε λάθος θέση ή σειρά. Πάτα «Επαναφορά» και ξαναδοκίμασε.";fb.className="fb bad"}else{fb.textContent="✓ Σωστά!";fb.className="fb good"}}
+      if(e.type==="insert"||e.type==="commit")chk()}});chk()};
+  start();el.querySelector(".action").onclick=()=>{if(!fin)wrong++;fb.textContent="";start()};
+}
+
+/* ================= APP SHELL ================= */
+let prog={};try{prog=JSON.parse(localStorage.getItem("m17")||"{}")}catch(e){}
+const save=()=>{try{localStorage.setItem("m17",JSON.stringify(prog))}catch(e){}};
+const stars=(n)=>"★".repeat(n)+"☆".repeat(3-n);
+const home=document.getElementById("home"),view=document.getElementById("view");
+function drawHome(){home.innerHTML="";ACTS.forEach((a,i)=>{const p=prog[i]||[0,0,0],c=document.createElement("div");c.className="mc";
+  c.innerHTML=`<span class="n">${i+1}</span><h3>${a.t}</h3><p>${a.d}</p><div class="st">${p.map(x=>stars(x)).join(" ")}</div>`;c.onclick=()=>openAct(i);home.appendChild(c)})}
+let cur=0;
+function openAct(i){cur=i;home.style.display="none";view.classList.add("on");document.getElementById("vt").textContent=`Αποστολή ${i+1}: ${ACTS[i].t}`;drawLevels();startLevel(i,0)}
+function drawLevels(l){const p=prog[cur]||[0,0,0],w=document.getElementById("lvs");w.innerHTML="";
+  ACTS[cur].lv.forEach((lv,k)=>{const b=document.createElement("button");b.className="lv"+(k===l?" cur":"");b.disabled=k>0&&!p[k-1];b.textContent=`Επίπεδο ${k+1}: ${lv.n} ${p[k]?stars(p[k]):""}`;b.onclick=()=>startLevel(cur,k);w.appendChild(b)})}
+function startLevel(a,l){cur=a;drawLevels(l);const lv=ACTS[a].lv[l],box=document.getElementById("box");document.getElementById("goal").textContent=lv.g;
+  const nb=document.createElement("div");box.replaceWith(nb);nb.id="box";
+  lv.run(nb,(sc,tot)=>{const pc=tot?sc/tot:1,s=pc>=.9?3:pc>=.6?2:1;prog[a]=prog[a]||[0,0,0];prog[a][l]=Math.max(prog[a][l],s);save();drawLevels(l);
+    const r=document.createElement("div");r.className="res";const more=l<ACTS[a].lv.length-1;
+    r.innerHTML=`Αποτέλεσμα: <span class="big">${stars(s)}</span> (${sc}/${tot})<br>`;
+    const b1=document.createElement("button");b1.className="action alt";b1.textContent="↺ Ξανά";b1.onclick=()=>startLevel(a,l);r.appendChild(b1);
+    if(more){const b2=document.createElement("button");b2.className="action";b2.textContent="Επόμενο επίπεδο ▶";b2.onclick=()=>startLevel(a,l+1);r.appendChild(b2)}
+    else if(a<ACTS.length-1){const b2=document.createElement("button");b2.className="action";b2.textContent="Επόμενη αποστολή ▶";b2.onclick=()=>openAct(a+1);r.appendChild(b2)}
+    nb.appendChild(r);r.scrollIntoView({behavior:"smooth",block:"nearest"})});}
+document.getElementById("bk").onclick=()=>{view.classList.remove("on");home.style.display="";drawHome()};
+drawHome();
+</script>
+</body>
+</html>
