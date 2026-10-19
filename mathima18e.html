@@ -1,0 +1,1797 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Μάθημα 18: Αριθμητικές πράξεις στο υπολογιστικό φύλλο - Ε΄ Δημοτικού</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@700&family=Fredoka:wght@400;500;600;700&display=swap');
+    
+    body {
+      font-family: 'Fredoka', 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 50%, #fef3c7 100%);
+    }
+
+    .font-heading {
+      font-family: 'Comfortaa', cursive;
+    }
+
+    .glass-card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(12px);
+    }
+
+    /* Spreadsheet Grid Styles */
+    .sheet-grid {
+      border-collapse: collapse;
+      font-family: 'Courier New', monospace;
+    }
+    .sheet-header {
+      background: #f1f5f9;
+      color: #475569;
+      font-weight: 700;
+      border: 1px solid #cbd5e1;
+      text-align: center;
+      user-select: none;
+      padding: 4px 8px;
+    }
+    .sheet-cell {
+      border: 1px solid #cbd5e1;
+      min-width: 80px;
+      height: 34px;
+      padding: 4px 8px;
+      font-size: 13px;
+      position: relative;
+      background: #ffffff;
+      transition: all 0.15s ease;
+    }
+    .sheet-cell.active-cell {
+      border: 2px solid #2563eb !important;
+      background-color: #eff6ff;
+      z-index: 10;
+    }
+    .sheet-cell.active-cell::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      right: -4px;
+      width: 7px;
+      height: 7px;
+      background: #2563eb;
+      cursor: crosshair;
+    }
+    .sheet-cell.with-border {
+      border: 2px solid #0f172a !important;
+    }
+    .sheet-cell.wrap-text {
+      white-space: normal !important;
+      line-height: 1.15;
+      height: 48px;
+    }
+  </style>
+</head>
+<body class="min-h-screen text-slate-800 flex flex-col">
+
+  <!-- Header Bar -->
+  <header class="sticky top-0 z-50 glass-card border-b border-indigo-200 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+      <!-- Title -->
+      <div class="flex items-center space-x-3 cursor-pointer" onclick="switchView('dashboard')">
+        <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-indigo-600 to-blue-500 flex items-center justify-center text-white text-2xl shadow-md transform hover:rotate-6 transition">
+          <i class="fa-solid fa-calculator"></i>
+        </div>
+        <div>
+          <h1 class="text-lg md:text-xl font-bold font-heading text-indigo-950 leading-tight">
+            Πληροφορική Ε΄ Δημοτικού
+          </h1>
+          <p class="text-xs text-slate-500 font-semibold">
+            Μάθημα 18: Αριθμητικές πράξεις στο υπολογιστικό φύλλο
+          </p>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="flex items-center space-x-3 bg-white px-4 py-2 rounded-2xl border border-indigo-100 shadow-inner">
+        <div class="flex items-center space-x-1.5 text-amber-500 text-lg" title="Αστέρια Επιτυχίας">
+          <i class="fa-solid fa-star"></i>
+          <span id="global-stars" class="font-bold text-slate-800 text-base">0</span>
+          <span class="text-xs text-slate-400 font-normal">/ 16</span>
+        </div>
+        <div class="h-5 w-px bg-slate-200"></div>
+        <div class="flex items-center space-x-1.5 text-indigo-600 text-lg" title="Συνολικοί Πόντοι">
+          <i class="fa-solid fa-trophy"></i>
+          <span id="global-score" class="font-bold text-slate-800 text-base">0</span>
+        </div>
+        <div class="h-5 w-px bg-slate-200"></div>
+        <button id="sound-toggle" onclick="toggleMute()" class="text-slate-500 hover:text-indigo-600 p-1 text-lg transition" title="Ήχος">
+          <i class="fa-solid fa-volume-high"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Progress Indicator -->
+    <div class="w-full bg-slate-100 h-2">
+      <div id="overall-progress" class="bg-gradient-to-r from-blue-400 via-indigo-500 to-amber-400 h-2 transition-all duration-500" style="width: 0%;"></div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="flex-grow max-w-7xl w-full mx-auto p-4 md:p-6 flex flex-col gap-6">
+
+    <!-- 1. DASHBOARD VIEW (Grid of 8 Activities) -->
+    <div id="view-dashboard" class="space-y-6">
+      
+      <!-- Hero Banner -->
+      <div class="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-700 rounded-3xl p-6 md:p-8 text-white shadow-xl relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-6">
+        <div class="z-10 max-w-2xl space-y-3">
+          <span class="bg-white/20 backdrop-blur px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider inline-flex items-center gap-1.5">
+            <i class="fa-solid fa-square-root-variable"></i> Υπολογισμοί & Τύποι στο Calc
+          </span>
+          <h2 class="text-2xl md:text-4xl font-extrabold font-heading leading-tight">
+            Υπολογίζουμε Αυτόματα στο Υπολογιστικό Φύλλο!
+          </h2>
+          <p class="text-indigo-100 text-sm md:text-base leading-relaxed">
+            Η <strong>Υπατία</strong> και ο <strong>Ήρωνας</strong> υπολογίζουν το κόστος της σχολικής εκδρομής! Μάθε τα σύμβολα <strong>+, -, *, /</strong>, τη συνάρτηση <strong>=SUM()</strong>, τη δύναμη του <strong>=</strong>, πώς οι τύποι προσαρμόζονται αυτόματα όταν αλλάζουν οι τιμές, και πώς ο μαύρος σταυρός <strong>(+)</strong> αντιγράφει τύπους στη στιγμή!
+          </p>
+          <div class="flex flex-wrap gap-3 pt-2">
+            <button onclick="switchActivity('act1')" class="bg-amber-400 hover:bg-amber-300 text-slate-900 font-bold px-5 py-2.5 rounded-2xl shadow-lg transform hover:-translate-y-0.5 transition flex items-center gap-2">
+              <i class="fa-solid fa-play"></i> Έναρξη: Αποστολή 1
+            </button>
+            <button onclick="showDiplomaModal(true)" class="bg-white/20 hover:bg-white/30 text-white font-bold px-4 py-2.5 rounded-2xl backdrop-blur transition flex items-center gap-2">
+              <i class="fa-solid fa-certificate"></i> Προβολή Διπλώματος
+            </button>
+          </div>
+        </div>
+
+        <!-- Characters Avatars -->
+        <div class="z-10 flex items-center gap-4 bg-white/10 p-4 rounded-3xl backdrop-blur-md border border-white/20 shadow-inner">
+          <div class="text-center">
+            <div class="w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-amber-200 border-2 border-white flex items-center justify-center text-3xl md:text-4xl shadow-md">
+              👧
+            </div>
+            <span class="text-xs font-bold mt-1 block">Υπατία</span>
+          </div>
+          <div class="text-center">
+            <div class="w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-sky-200 border-2 border-white flex items-center justify-center text-3xl md:text-4xl shadow-md">
+              👦
+            </div>
+            <span class="text-xs font-bold mt-1 block">Ήρωνας</span>
+          </div>
+        </div>
+
+        <div class="absolute -right-10 -bottom-10 w-64 h-64 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
+      </div>
+
+      <!-- Activities Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5" id="activities-grid">
+        <!-- Rendered by JavaScript -->
+      </div>
+
+    </div>
+
+    <!-- 2. SINGLE ACTIVITY WORKSPACE VIEW -->
+    <div id="view-activity" class="hidden space-y-6">
+      <!-- Activity Top Navigation Bar -->
+      <div class="glass-card p-4 rounded-2xl border border-indigo-100 flex flex-wrap items-center justify-between gap-4 shadow-sm">
+        <button onclick="switchView('dashboard')" class="text-indigo-700 hover:text-indigo-900 font-bold text-sm flex items-center gap-2 bg-indigo-50 hover:bg-indigo-100 px-4 py-2 rounded-xl transition">
+          <i class="fa-solid fa-arrow-left"></i> Πίσω στο Ταμπλό
+        </button>
+
+        <!-- Current Title & Icon -->
+        <div class="flex items-center gap-3">
+          <span id="act-header-icon" class="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center text-xl shadow"></span>
+          <div>
+            <span id="act-header-num" class="text-xs font-bold text-indigo-600 tracking-wider uppercase block">Αποστολή</span>
+            <h3 id="act-header-title" class="text-lg md:text-xl font-bold font-heading text-slate-800"></h3>
+          </div>
+        </div>
+
+        <!-- Level Selector Tabs -->
+        <div class="flex items-center gap-2 bg-slate-100 p-1 rounded-2xl">
+          <button id="lvl-btn-1" onclick="switchLevel(1)" class="px-4 py-1.5 rounded-xl text-xs md:text-sm font-bold transition flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-slate-400"></span> Επίπεδο 1
+          </button>
+          <button id="lvl-btn-2" onclick="switchLevel(2)" class="px-4 py-1.5 rounded-xl text-xs md:text-sm font-bold transition flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-slate-400"></span> Επίπεδο 2
+          </button>
+        </div>
+      </div>
+
+      <!-- Activity Dynamic Content Box -->
+      <div id="activity-workspace" class="glass-card p-6 md:p-8 rounded-3xl border border-indigo-100 shadow-md min-h-[480px] flex flex-col justify-between">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Universal Modal Alert / Celebration -->
+  <div id="modal-container" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div id="modal-card" class="bg-white rounded-3xl max-w-md w-full p-6 text-center shadow-2xl border-4 border-amber-300 transform scale-95 transition-all duration-300 space-y-4">
+      <div id="modal-icon" class="text-6xl">🌟</div>
+      <h3 id="modal-title" class="text-2xl font-bold font-heading text-slate-800">Μπράβο!</h3>
+      <p id="modal-msg" class="text-slate-600 text-sm md:text-base"></p>
+      <div class="pt-2 flex justify-center gap-3">
+        <button id="modal-action-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-6 py-2.5 rounded-2xl shadow-lg transition">
+          Συνέχεια
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Diploma Modal (Certificate) -->
+  <div id="diploma-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-4 hidden">
+    <div class="bg-amber-50 rounded-3xl max-w-2xl w-full p-8 shadow-2xl border-8 border-double border-amber-400 relative text-center space-y-4">
+      <button onclick="showDiplomaModal(false)" class="absolute top-4 right-4 text-slate-400 hover:text-slate-700 text-xl">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div class="text-5xl">🏆📜✨</div>
+      <span class="text-xs font-bold text-amber-700 uppercase tracking-widest block">Επίσημο Ψηφιακό Δίπλωμα</span>
+      <h2 class="text-2xl md:text-3xl font-black font-heading text-slate-900">
+        MASTER ΑΡΙΘΜΗΤΙΚΩΝ ΠΡΑΞΕΩΝ & ΤΥΠΩΝ
+      </h2>
+      <p class="text-slate-700 text-sm md:text-base italic">
+        Απονέμεται στον/στην εξαιρετικό/-ή μαθητή/-τρια της <strong>Ε΄ Τάξης Δημοτικού</strong>:
+      </p>
+
+      <div class="py-2">
+        <input id="student-name-input" type="text" placeholder="Γράψε το Ονοματεπώνυμό σου εδώ..." class="text-center font-heading text-xl md:text-2xl font-bold text-indigo-900 bg-white border-2 border-amber-300 rounded-2xl px-4 py-2 w-full max-w-md shadow-inner outline-none focus:border-indigo-500">
+      </div>
+
+      <p class="text-xs text-slate-600">
+        για την επιτυχή ολοκλήρωση και των 16 δοκιμασιών του <strong>Μαθήματος 18: Αριθμητικές πράξεις στο υπολογιστικό φύλλο</strong>.
+      </p>
+
+      <div class="py-3 border-y border-amber-200 grid grid-cols-3 gap-2 text-xs md:text-sm font-bold text-slate-700">
+        <div>
+          <span class="block text-[11px] font-normal text-slate-500">Αστέρια:</span>
+          <span id="diploma-stars" class="text-base md:text-lg text-amber-600">0 / 16</span>
+        </div>
+        <div>
+          <span class="block text-[11px] font-normal text-slate-500">Πόντοι:</span>
+          <span id="diploma-score" class="text-base md:text-lg text-indigo-600">0 pts</span>
+        </div>
+        <div>
+          <span class="block text-[11px] font-normal text-slate-500">Ημερομηνία:</span>
+          <span id="diploma-date" class="text-slate-800"></span>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-around pt-2 text-xs text-slate-500 font-semibold">
+        <div>
+          <span class="block text-sm">👧 Υπατία</span>
+          <span>Υπεύθυνη Τύπων (=)</span>
+        </div>
+        <div class="text-center">
+          <span class="text-2xl">🎓</span>
+        </div>
+        <div>
+          <span class="block text-sm">👦 Ήρωνας</span>
+          <span>Ειδικός Συναρτήσεων (Σ)</span>
+        </div>
+      </div>
+
+      <div class="pt-4 flex flex-wrap justify-center gap-3">
+        <button onclick="window.print()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-6 py-2 rounded-2xl shadow transition flex items-center gap-2 text-sm">
+          <i class="fa-solid fa-print"></i> Εκτύπωση / Αποθήκευση PDF
+        </button>
+        <button onclick="showDiplomaModal(false)" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-5 py-2 rounded-2xl transition text-sm">
+          Κλείσιμο
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="text-center text-xs text-slate-500 py-6 border-t border-slate-200 mt-auto">
+    Πληροφορική Ε΄ Δημοτικού • Μάθημα 18: Αριθμητικές πράξεις στο υπολογιστικό φύλλο
+  </footer>
+
+  <!-- Main JavaScript Logic -->
+  <script>
+    /* ====================================================================
+       1. WEB AUDIO SYNTHESIZER
+       ==================================================================== */
+    class SoundEngine {
+      constructor() {
+        this.ctx = null;
+        this.muted = false;
+      }
+      init() {
+        if (!this.ctx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          if (AudioContext) this.ctx = new AudioContext();
+        }
+      }
+      playTone(freq, type = 'sine', duration = 0.15, gainVal = 0.15) {
+        if (this.muted) return;
+        this.init();
+        if (!this.ctx) return;
+        try {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = type;
+          osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+          gain.gain.setValueAtTime(gainVal, this.ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + duration);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start();
+          osc.stop(this.ctx.currentTime + duration);
+        } catch(e) {}
+      }
+      click() { this.playTone(450, 'sine', 0.05, 0.1); }
+      correct() {
+        if (this.muted) return;
+        this.init();
+        this.playTone(523.25, 'triangle', 0.1, 0.2); // C5
+        setTimeout(() => this.playTone(659.25, 'triangle', 0.12, 0.2), 90); // E5
+        setTimeout(() => this.playTone(783.99, 'triangle', 0.2, 0.25), 180); // G5
+      }
+      wrong() {
+        if (this.muted) return;
+        this.init();
+        this.playTone(280, 'sawtooth', 0.14, 0.2);
+        setTimeout(() => this.playTone(190, 'sawtooth', 0.2, 0.2), 110);
+      }
+      fanfare() {
+        if (this.muted) return;
+        this.init();
+        const notes = [523.25, 659.25, 783.99, 1046.50];
+        notes.forEach((freq, idx) => {
+          setTimeout(() => this.playTone(freq, 'triangle', 0.25, 0.25), idx * 110);
+        });
+      }
+    }
+
+    const sound = new SoundEngine();
+
+    function toggleMute() {
+      sound.muted = !sound.muted;
+      const btn = document.getElementById('sound-toggle');
+      if (sound.muted) {
+        btn.innerHTML = '<i class="fa-solid fa-volume-xmark text-rose-500"></i>';
+      } else {
+        btn.innerHTML = '<i class="fa-solid fa-volume-high text-indigo-600"></i>';
+        sound.click();
+      }
+    }
+
+    /* ====================================================================
+       2. METADATA & STATE
+       ==================================================================== */
+    const activitiesMeta = [
+      { id: 'act1', num: 1, title: 'Τα Σύμβολα των Πράξεων', icon: 'fa-plus-minus', color: 'from-blue-500 to-indigo-600', badge: 'Πρόσθεση +, Αφαίρεση -, Πολλαπλασιασμός *, Διαίρεση /' },
+      { id: 'act2', num: 2, title: 'Το Σύμβολο Σ & η Συνάρτηση SUM', icon: 'fa-sigma', color: 'from-emerald-500 to-teal-600', badge: 'Άθροισμα =SUM(B2:B3)' },
+      { id: 'act3', num: 3, title: 'Το Μυστικό του Συμβόλου =', icon: 'fa-equals', color: 'from-amber-500 to-orange-600', badge: 'Ξεκινάμε ΠΑΝΤΑ με =' },
+      { id: 'act4', num: 4, title: 'Αριθμοί vs Ονόματα Κελιών', icon: 'fa-arrows-rotate', color: 'from-rose-500 to-pink-600', badge: 'Έκπτωση: 110€ ➔ 88€ και αυτόματη ενημέρωση' },
+      { id: 'act5', num: 5, title: 'Το Εργαστήριο των Τάξεων', icon: 'fa-school', color: 'from-cyan-500 to-blue-600', badge: 'Υπολογισμός Κόστους ανά Παιδί (Δ΄, Ε΄, ΣΤ΄)' },
+      { id: 'act6', num: 6, title: 'Αυτόματη Αντιγραφή Τύπων (+)', icon: 'fa-clone', color: 'from-purple-500 to-violet-600', badge: 'Ο Μαύρος Σταυρός στη γωνία του κελιού' },
+      { id: 'act7', num: 7, title: 'Μορφοποίηση: Αναδίπλωση & Περιγράμματα', icon: 'fa-border-all', color: 'from-teal-500 to-emerald-700', badge: 'Αναδίπλωση κειμένου, εκτύπωση & νομίσματα (€)' },
+      { id: 'act8', num: 8, title: 'Το Μεγάλο Master Quiz', icon: 'fa-award', color: 'from-yellow-500 to-amber-600', badge: 'Master Challenge & Ψηφιακό Δίπλωμα' }
+    ];
+
+    let userProgress = {
+      stars: {},
+      score: 0,
+      activeAct: null,
+      activeLevel: 1
+    };
+
+    try {
+      const saved = localStorage.getItem('pliroforiki_e_m18_save');
+      if (saved) userProgress = JSON.parse(saved);
+    } catch(e) {}
+
+    function saveProgress() {
+      try {
+        localStorage.setItem('pliroforiki_e_m18_save', JSON.stringify(userProgress));
+      } catch(e) {}
+      updateHeaderStats();
+    }
+
+    function updateHeaderStats() {
+      const starsCount = Object.values(userProgress.stars).filter(Boolean).length;
+      document.getElementById('global-stars').innerText = starsCount;
+      document.getElementById('global-score').innerText = userProgress.score;
+      document.getElementById('diploma-stars').innerText = `${starsCount} / 16`;
+      document.getElementById('diploma-score').innerText = `${userProgress.score} pts`;
+
+      const pct = Math.round((starsCount / 16) * 100);
+      document.getElementById('overall-progress').style.width = `${pct}%`;
+    }
+
+    function switchView(view) {
+      sound.click();
+      if (view === 'dashboard') {
+        document.getElementById('view-dashboard').classList.remove('hidden');
+        document.getElementById('view-activity').classList.add('hidden');
+        userProgress.activeAct = null;
+        renderDashboardGrid();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+
+    function switchActivity(actId) {
+      sound.click();
+      userProgress.activeAct = actId;
+      userProgress.activeLevel = 1;
+      document.getElementById('view-dashboard').classList.add('hidden');
+      document.getElementById('view-activity').classList.remove('hidden');
+
+      const meta = activitiesMeta.find(a => a.id === actId);
+      document.getElementById('act-header-num').innerText = `Αποστολή ${meta.num}`;
+      document.getElementById('act-header-title').innerText = meta.title;
+      document.getElementById('act-header-icon').className = `w-10 h-10 rounded-xl bg-gradient-to-r ${meta.color} text-white flex items-center justify-center text-xl shadow`;
+      document.getElementById('act-header-icon').innerHTML = `<i class="fa-solid ${meta.icon}"></i>`;
+
+      switchLevel(1);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function switchLevel(lvl) {
+      sound.click();
+      userProgress.activeLevel = lvl;
+
+      const btn1 = document.getElementById('lvl-btn-1');
+      const btn2 = document.getElementById('lvl-btn-2');
+
+      const s1 = userProgress.stars[`${userProgress.activeAct}_l1`];
+      const s2 = userProgress.stars[`${userProgress.activeAct}_l2`];
+
+      if (lvl === 1) {
+        btn1.className = 'px-4 py-1.5 rounded-xl text-xs md:text-sm font-bold bg-white text-indigo-700 shadow-sm border border-indigo-200 flex items-center gap-1.5';
+        btn2.className = 'px-4 py-1.5 rounded-xl text-xs md:text-sm font-bold text-slate-500 hover:text-slate-800 flex items-center gap-1.5';
+      } else {
+        btn2.className = 'px-4 py-1.5 rounded-xl text-xs md:text-sm font-bold bg-white text-indigo-700 shadow-sm border border-indigo-200 flex items-center gap-1.5';
+        btn1.className = 'px-4 py-1.5 rounded-xl text-xs md:text-sm font-bold text-slate-500 hover:text-slate-800 flex items-center gap-1.5';
+      }
+
+      btn1.innerHTML = `<i class="fa-solid fa-star ${s1 ? 'text-amber-400' : 'text-slate-300'}"></i> Επίπεδο 1`;
+      btn2.innerHTML = `<i class="fa-solid fa-star ${s2 ? 'text-amber-400' : 'text-slate-300'}"></i> Επίπεδο 2`;
+
+      loadActivityWorkspace(userProgress.activeAct, lvl);
+    }
+
+    function awardSuccess(actId, lvl, pts = 50) {
+      const starKey = `${actId}_l${lvl}`;
+      const isFirst = !userProgress.stars[starKey];
+      if (isFirst) {
+        userProgress.stars[starKey] = true;
+        userProgress.score += pts;
+        saveProgress();
+      }
+
+      sound.fanfare();
+      confetti({ particleCount: 75, spread: 65, origin: { y: 0.6 } });
+
+      const meta = activitiesMeta.find(a => a.id === actId);
+
+      showModal({
+        icon: '🌟🎉',
+        title: 'Φανταστική Επιτυχία!',
+        msg: `Ολοκλήρωσες το <strong>Επίπεδο ${lvl}</strong> στην αποστολή: <em>«${meta.title}»</em>!<br>Κέρδισες <strong>+${pts} πόντους</strong> και <strong>1 Αστέρι</strong>!`,
+        actionText: (lvl === 1) ? 'Στο Επίπεδο 2 🚀' : 'Πίσω στις Αποστολές 🏁',
+        actionCallback: () => {
+          if (lvl === 1) switchLevel(2);
+          else switchView('dashboard');
+        }
+      });
+    }
+
+    function showModal({ icon, title, msg, actionText, actionCallback }) {
+      const container = document.getElementById('modal-container');
+      document.getElementById('modal-icon').innerHTML = icon;
+      document.getElementById('modal-title').innerHTML = title;
+      document.getElementById('modal-msg').innerHTML = msg;
+      const btn = document.getElementById('modal-action-btn');
+      btn.innerText = actionText || 'Εντάξει';
+      btn.onclick = () => {
+        container.classList.add('hidden');
+        if (actionCallback) actionCallback();
+      };
+      container.classList.remove('hidden');
+    }
+
+    function showDiplomaModal(show) {
+      sound.click();
+      const m = document.getElementById('diploma-modal');
+      if (show) {
+        updateHeaderStats();
+        m.classList.remove('hidden');
+      } else {
+        m.classList.add('hidden');
+      }
+    }
+
+    function renderDashboardGrid() {
+      const grid = document.getElementById('activities-grid');
+      grid.innerHTML = '';
+
+      activitiesMeta.forEach(meta => {
+        const s1 = userProgress.stars[`${meta.id}_l1`];
+        const s2 = userProgress.stars[`${meta.id}_l2`];
+        const completed = s1 && s2;
+
+        const card = document.createElement('div');
+        card.className = 'glass-card rounded-3xl p-5 border border-indigo-100 shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer flex flex-col justify-between group';
+        card.onclick = () => switchActivity(meta.id);
+
+        card.innerHTML = `
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <span class="w-10 h-10 rounded-2xl bg-gradient-to-tr ${meta.color} text-white flex items-center justify-center text-lg shadow-md group-hover:scale-110 transition">
+                <i class="fa-solid ${meta.icon}"></i>
+              </span>
+              <div class="flex items-center gap-1 text-sm">
+                <i class="fa-solid fa-star ${s1 ? 'text-amber-400' : 'text-slate-200'}"></i>
+                <i class="fa-solid fa-star ${s2 ? 'text-amber-400' : 'text-slate-200'}"></i>
+              </div>
+            </div>
+
+            <span class="text-[11px] font-bold text-indigo-700 uppercase tracking-wider block">Αποστολή ${meta.num}</span>
+            <h4 class="font-bold font-heading text-slate-800 text-base leading-snug group-hover:text-indigo-600 transition">
+              ${meta.title}
+            </h4>
+            <p class="text-xs text-slate-500 mt-1 font-semibold">${meta.badge}</p>
+          </div>
+
+          <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold">
+            <span class="${completed ? 'text-emerald-600' : 'text-slate-400'} flex items-center gap-1">
+              <i class="fa-solid ${completed ? 'fa-circle-check' : 'fa-circle-dot'}"></i>
+              ${completed ? 'Ολοκληρώθηκε' : (s1 || s2 ? 'Σε εξέλιξη' : 'Δεν ξεκίνησε')}
+            </span>
+            <span class="text-indigo-600 group-hover:translate-x-1 transition flex items-center gap-1">
+              Παίξε <i class="fa-solid fa-chevron-right text-[10px]"></i>
+            </span>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    /* ====================================================================
+       4. ACTIVITY WORKSPACES RENDERER (ACTIVITIES 1 TO 8)
+       ==================================================================== */
+    function loadActivityWorkspace(actId, lvl) {
+      const ws = document.getElementById('activity-workspace');
+      ws.innerHTML = '';
+      switch(actId) {
+        case 'act1': renderAct1(ws, lvl); break;
+        case 'act2': renderAct2(ws, lvl); break;
+        case 'act3': renderAct3(ws, lvl); break;
+        case 'act4': renderAct4(ws, lvl); break;
+        case 'act5': renderAct5(ws, lvl); break;
+        case 'act6': renderAct6(ws, lvl); break;
+        case 'act7': renderAct7(ws, lvl); break;
+        case 'act8': renderAct8(ws, lvl); break;
+      }
+    }
+
+    /* --------------------------------------------------------------------
+       ACTIVITY 1: Τα Σύμβολα των Πράξεων (+, -, *, /) - σελ. 68-69
+       -------------------------------------------------------------------- */
+    function renderAct1(container, lvl) {
+      if (lvl === 1) {
+        const ops = [
+          { sym: '+', name: 'Πρόσθεση', desc: 'Για να προσθέσουμε δύο αριθμούς (π.χ. 12 + 10)' },
+          { sym: '-', name: 'Αφαίρεση', desc: 'Για να βρούμε τη διαφορά (π.χ. 16 - 6)' },
+          { sym: '*', name: 'Πολλαπλασιασμός', desc: 'Το αστεράκι αντί για το x των μαθηματικών' },
+          { sym: '/', name: 'Διαίρεση', desc: 'Η κάθετος (slash) αντί για το σύμβολο :' }
+        ];
+
+        container.innerHTML = `
+          <div class="space-y-4">
+            <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-2xl">
+              <h4 class="font-bold text-blue-900 text-sm md:text-base flex items-center gap-2">
+                <i class="fa-solid fa-calculator"></i> Επίπεδο 1: Τα 4 Σύμβολα των Πράξεων (σελ. 68)
+              </h4>
+              <p class="text-xs md:text-sm text-blue-800 mt-1">
+                Στο υπολογιστικό φύλλο τα σύμβολα είναι: <strong>+</strong> για πρόσθεση, <strong>-</strong> για αφαίρεση, <strong>*</strong> για πολλαπλασιασμό και <strong>/</strong> για διαίρεση! Αντιστοίχισε κάθε πράξη με το σωστό της σύμβολο:
+              </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              ${ops.map((op, idx) => `
+                <div class="p-4 bg-white border border-slate-200 rounded-2xl flex items-center justify-between gap-3 shadow-xs">
+                  <div>
+                    <span class="text-xs font-bold text-indigo-600 uppercase block">${op.name}</span>
+                    <span class="text-xs text-slate-600 font-semibold">${op.desc}</span>
+                  </div>
+                  <select id="act1-sel-${idx}" class="p-2.5 border-2 border-indigo-200 rounded-xl font-mono text-lg font-black bg-indigo-50 text-indigo-900 outline-none focus:border-indigo-500">
+                    <option value="">?</option>
+                    <option value="+">+</option>
+                    <option value="-">-</option>
+                    <option value="*">*</option>
+                    <option value="/">/</option>
+                  </select>
+                </div>
+              `).join('')}
+            </div>
+
+            <div class="mt-4 pt-4 border-t border-slate-100 flex items-center justify-between">
+              <button onclick="window.checkAct1L1()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-6 py-2.5 rounded-2xl shadow transition">
+                <i class="fa-solid fa-check mr-1"></i> Έλεγχος Συμβόλων
+              </button>
+              <div id="act1-fb" class="text-sm font-bold"></div>
+            </div>
+          </div>
+        `;
+
+        window.checkAct1L1 = () => {
+          let correct = 0;
+          ops.forEach((op, idx) => {
+            const val = document.getElementById(`act1-sel-${idx}`).value;
+            if (val === op.sym) correct++;
+          });
+
+          const fb = document.getElementById('act1-fb');
+          if (correct === ops.length) {
+            sound.correct();
+            fb.className = 'text-sm font-bold text-emerald-600';
+            fb.innerHTML = '🎉 Μπράβο! Γνωρίζεις άριστα και τα 4 σύμβολα: +, -, *, /!';
+            awardSuccess('act1', 1, 50);
+          } else {
+            sound.wrong();
+            fb.className = 'text-sm font-bold text-rose-600';
+            fb.innerHTML = `❌ Έχεις ${correct} στα 4 σωστά. Θυμήσου: * για πολλαπλασιασμό και / για διαίρεση!`;
+          }
+        };
+
+      } else {
+        // Level 2: Real-world problems (tickets, bus split)
+        const problems = [
+          { q: '1. Θέλουμε να μοιράσουμε το κόστος του λεωφορείου (110€) σε 22 παιδιά. Ποια πράξη θα κάνουμε;', ans: '/' },
+          { q: '2. Κάθε εισιτήριο για το μουσείο κοστίζει 4€. Θέλουμε να βρούμε πόσο κοστίζουν τα 12 εισιτήρια:', ans: '*' },
+          { q: '3. Στην ψηφοφορία 12 παιδιά ψήφισαν Μουσείο και 10 Πινακοθήκη. Πώς βρίσκουμε το σύνολο;', ans: '+' },
+          { q: '4. Το λεωφορείο κόστιζε 110€ αλλά πήραμε έκπτωση 22€. Πώς βρίσκουμε τη νέα τιμή;', ans: '-' }
+        ];
+
+        container.innerHTML = `
+          <div class="space-y-4">
+            <div class="bg-indigo-50 border-l-4 border-indigo-500 p-4 rounded-r-2xl">
+              <h4 class="font-bold text-indigo-900 text-sm md:text-base flex items-center gap-2">
+                <i class="fa-solid fa-puzzle-piece"></i> Επίπεδο 2: Ποιο σύμβολο ταιριάζει σε κάθε πρόβλημα;
+              </h4>
+              <p class="text-xs md:text-sm text-indigo-800 mt-1">
+                Διάβασε τα πρακτικά σενάρια της εκδρομής και διάλεξε το κατάλληλο σύμβολο:
+              </p>
+            </div>
+
+            <div class="space-y-3">
+              ${problems.map((p, idx) => `
+                <div class="p-3 bg-white border border-slate-200 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-3 shadow-xs">
+                  <span class="text-xs md:text-sm font-semibold text-slate-800">${p.q}</span>
+                  <select id="act1-l2-sel-${idx}" class="p-2 border-2 border-indigo-200 rounded-xl font-mono text-base font-bold bg-slate-50 outline-none">
+                    <option value="">-- Επίλεξε --</option>
+                    <option value="+">+ (Πρόσθεση)</option>
+                    <option value="-">- (Αφαίρεση)</option>
+                    <option value="*">* (Πολλαπλασιασμός)</option>
+                    <option value="/">/ (Διαίρεση)</option>
+                  </select>
+                </div>
+              `).join('')}
+            </div>
+
+            <div class="mt-4 pt-4 border-t border-slate-100 flex items-center justify-between">
+              <button onclick="window.checkAct1L2()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-6 py-2.5 rounded-2xl shadow transition">
+                <i class="fa-solid fa-check mr-1"></i> Έλεγχος Επιλογών
+              </button>
+              <div id="act1-l2-fb" class="text-sm font-bold"></div>
+            </div>
+          </div>
+        `;
+
+        window.checkAct1L2 = () => {
+          let correct = 0;
+          problems.forEach((p, idx) => {
+            const val = document.getElementById(`act1-l2-sel-${idx}`).value;
+            if (val === p.ans) correct++;
+          });
+
+          const fb = document.getElementById('act1-l2-fb');
+          if (correct === problems.length) {
+            sound.correct();
+            fb.className = 'text-sm font-bold text-emerald-600';
+            fb.innerHTML = '🎉 Άριστα! Διάλεξες το σωστό σύμβολο για όλα τα προβλήματα!';
+            awardSuccess('act1', 2, 50);
+          } else {
+            sound.wrong();
+            fb.className = 'text-sm font-bold text-rose-600';
+            fb.innerHTML = `Έχεις ${correct} στα 4 σωστά. Σκέψου: μοιράζω = διαίρεση (/), βρίσκω σύνολο = πρόσθεση (+)!`;
+          }
+        };
+      }
+    }
+
+    /* --------------------------------------------------------------------
+       ACTIVITY 2: Το Σύμβολο Σ και η Συνάρτηση =SUM(B2:B3) - σελ. 67-68
+       -------------------------------------------------------------------- */
+    function renderAct2(container, lvl) {
+      if (lvl === 1) {
+        // Step-by-step applying the SUM function on cell B4
+        container.innerHTML = `
+          <div class="space-y-4">
+            <div class="bg-emerald-50 border-l-4 border-emerald-500 p-4 rounded-r-2xl">
+              <h4 class="font-bold text-emerald-900 text-sm md:text-base flex items-center gap-2">
+                <i class="fa-solid fa-calculator"></i> Επίπεδο 1: Υπολογισμός Αθροίσματος με το Κουμπί Σ (σελ. 67)
+              </h4>
+              <p class="text-xs md:text-sm text-emerald-800 mt-1">
+                Η Υπατία θέλει να βρει το σύνολο των μαθητών που ψήφισαν (12 στο Μουσείο + 10 στην Πινακοθήκη). Κάνε κλικ στο κελί <strong>B4</strong> και πάτησε το κουμπί <strong>Σ</strong> στην εργαλειοθήκη!
+              </p>
+            </div>
+
+            <!-- Toolbar Simulation with SUM Button -->
+            <div class="bg-slate-100 border-2 border-slate-300 rounded-2xl p-3 shadow-inner max-w-xl mx-auto flex items-center justify-between gap-3">
+              <div class="flex items-center gap-2">
+                <span class="w-14 bg-white border border-slate-300 rounded-lg p-1.5 text-center font-mono font-bold text-slate-800 text-sm" id="act2-cell-name">B4</span>
+                <span class="font-serif italic font-bold text-slate-500 text-sm">fx</span>
+                <input id="act2-fx" type="text" readonly value="" placeholder="Γραμμή εισαγωγής" class="bg-white border border-slate-300 rounded-lg p-1.5 text-xs font-mono font-bold text-indigo-700 w-52 outline-none">
+              </div>
+              <button id="act2-sum-btn" onclick="window.applySumAct2()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded-xl text-xs flex items-center gap-1.5 shadow transition">
+                <span class="text-base font-black">Σ</span>
+                <span>Άθροισμα</span>
+              </button>
+            </div>
+
+            <!-- Spreadsheet Grid -->
+            <div class="overflow-x-auto flex justify-center py-2">
+              <table class="sheet-grid border-2 border-slate-300 shadow-sm rounded-xl overflow-hidden bg-white">
+                <thead>
+                  <tr>
+                    <th class="sheet-header w-10"></th>
+                    <th class="sheet-header w-44">A</th>
+                    <th class="sheet-header w-28">B</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="bg-slate-50 font-bold text-xs">
+                    <td class="sheet-header">1</td>
+                    <td class="sheet-cell text-left" colspan="2">Επιλογές για εκδρομή</td>
+                  </tr>
+                  <tr>
+                    <td class="sheet-header">2</td>
+                    <td class="sheet-cell text-left font-semibold">Αρχαιολογικό μουσείο</td>
+                    <td class="sheet-cell text-right font-bold text-slate-800">12</td>
+                  </tr>
+                  <tr>
+                    <td class="sheet-header">3</td>
+                    <td class="sheet-cell text-left font-semibold">Πινακοθήκη</td>
+                    <td class="sheet-cell text-right font-bold text-slate-800">10</td>
+                  </tr>
+                  <tr>
+                    <td class="sheet-header">4</td>
+                    <td class="sheet-cell text-left font-bold text-indigo-900">Σύνολο</td>
+                    <td id="act2-target-cell" class="sheet-cell active-cell text-right font-mono font-bold text-slate-400">?</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="text-center space-y-2">
+              <button id="act2-enter-btn" onclick="window.confirmEnterAct2()" class="hidden bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-2.5 rounded-2xl shadow transition">
+                Πάτησε Enter ↵ για να υπολογιστεί το αποτέλεσμα!
+              </button>
+              <div id="act2-fb" class="text-sm font-bold min-h-[24px]"></div>
+            </div>
+          </div>
+        `;
+
+        window.applySumAct2 = () => {
+          sound.click();
+          document.getElementById('act2-fx').value = '=SUM(B2:B3)';
+          document.getElementById('act2-target-cell').innerText = 'SUM(B2:B3)';
+          document.getElementById('act2-target-cell').className = 'sheet-cell active-cell text-right font-mono font-bold text-emerald-700 bg-emerald-50';
+          document.getElementById('act2-enter-btn').classList.remove('hidden');
+          document.getElementById('act2-fb').className = 'text-sm font-bold text-blue-600';
+          document.getElementById('act2-fb').innerHTML = 'ℹ️ Το φύλλο πρότεινε την περιοχή <strong>B2:B3</strong>. Τώρα πάτησε <strong>Enter ↵</strong> για να οριστικοποιήσεις!';
+        };
+
+        window.confirmEnterAct2 = () => {
+          sound.correct();
+          document.getElementById('act2-target-cell').innerText = '22';
+          document.getElementById('act2-target-cell').className = 'sheet-cell active-cell text-right font-mono font-black text-emerald-900 bg-emerald-100 text-base';
+          document.getElementById('act2-enter-btn').classList.add('hidden');
+          const fb = document.getElementById('act2-fb');
+          fb.className = 'text-sm font-bold text-emerald-600';
+          fb.innerHTML = '🎉 Μπράβο! Στο κελί B4 εμφανίστηκε ο αριθμός 22, ενώ στη γραμμή fx παραμένει η συνάρτηση =SUM(B2:B3)!';
+          awardSuccess('act2', 1, 50);
+        };
+
+      } else {
+        // Level 2: Knowledge questions about SUM and Sigma (σελ. 68)
+        container.innerHTML = `
+          <div class="space-y-4">
+            <div class="bg-teal-50 border-l-4 border-teal-500 p-4 rounded-r-2xl">
+              <h4 class="font-bold text-teal-900 text-sm md:text-base flex items-center gap-2">
+                <i class="fa-solid fa-graduation-cap"></i> Επίπεδο 2: Ήξερες ότι... για το Σ και το SUM (σελ. 68)
+              </h4>
+              <p class="text-xs md:text-sm text-teal-800 mt-1">
+                Απάντησε στις δύο ιστορικές ερωτήσεις από το πλαίσιο <em>«Ήξερες ότι...»</em> του βιβλίου!
+              </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl mx-auto">
+              <div class="p-4 bg-white border border-slate-200 rounded-2xl space-y-2">
+                <label class="text-xs font-bold text-slate-800 block">
+                  1. Τι σημαίνει η αγγλική λέξη <strong>SUM</strong>; (σελ. 68)
+                </label>
+                <select id="act2-q1" class="w-full p-2.5 border border-slate-300 rounded-xl text-xs font-bold outline-none">
+                  <option value="">-- Επίλεξε --</option>
+                  <option value="sum">Άθροισμα</option>
+                  <option value="sub">Διαίρεση</option>
+                  <option value="mul">Μέγιστο</option>
+                </select>
+              </div>
+
+              <div class="p-4 bg-white border border-slate-200 rounded-2xl space-y-2">
+                <label class="text-xs font-bold text-slate-800 block">
+                  2. Το ελληνικό γράμμα <strong>Σ</strong> στα Μαθηματικά αποτελεί διεθνές σύμβολο για:
+                </label>
+                <select id="act2-q2" class="w-full p-2.5 border border-slate-300 rounded-xl text-xs font-bold outline-none">
+                  <option value="">-- Επίλεξε --</option>
+                  <option value="sum">Το άθροισμα</option>
+                  <option value="eq">Την ισότητα</option>
+                  <option value="pi">Τον κύκλο</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="mt-4 pt-4 border-t border-slate-100 flex items-center justify-between">
+              <button onclick="window.checkAct2L2()" class="bg-teal-600 hover:bg-teal-700 text-white font-bold px-6 py-2.5 rounded-2xl shadow transition">
+                <i class="fa-solid fa-check mr-1"></i> Έλεγχος Γνώσεων
+              </button>
+              <div id="act2-l2-fb" class="text-sm font-bold"></div>
+            </div>
+          </div>
+        `;
+
+        window.checkAct2L2 = () => {
+          const q1 = document.getElementById('act2-q1').value;
+          const q2 = document.getElementById('act2-q2').value;
+          const fb = document.getElementById('act2-l2-fb');
+
+          if (q1 === 'sum' && q2 === 'sum') {
+            sound.correct();
+            fb.className = 'text-sm font-bold text-emerald-600';
+            fb.innerHTML = '🎉 Άριστα! SUM σημαίνει άθροισμα και το ελληνικό Σ είναι το διεθνές μαθηματικό σύμβολο αθροίσματος!';
+            awardSuccess('act2', 2, 50);
+          } else {
+            sound.wrong();
+            fb.className = 'text-sm font-bold text-rose-600';
+            fb.innerHTML = '❌ Ξανασκέψου το! SUM και Σ σημαίνουν και τα δύο Άθροισμα!';
+          }
+        };
+      }
+    }
+
+    /* --------------------------------------------------------------------
+       ACTIVITY 3: Το Μυστικό του Συμβόλου = στην Αρχή των Τύπων (σελ. 68-69)
+       -------------------------------------------------------------------- */
+    function renderAct3(container, lvl) {
+      if (lvl === 1) {
+        // Test: What happens with '=' vs without '='
+        container.innerHTML = `
+          <div class="space-y-4">
+            <div class="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-2xl">
+              <h4 class="font-bold text-amber-900 text-sm md:text-base flex items-center gap-2">
+                <i class="fa-solid fa-equals"></i> Επίπεδο 1: Ξεκινάμε ΠΑΝΤΑ με το σύμβολο ίσον (=) (σελ. 68)
+              </h4>
+              <p class="text-xs md:text-sm text-amber-800 mt-1">
+                <strong>Κανόνας Βιβλίου:</strong> Για να κάνουμε οποιονδήποτε υπολογισμό σε ένα κελί, <strong>ξεκινάμε γράφοντας πρώτα το σύμβολο =</strong>. Αν δεν το βάλουμε, ο υπολογιστής θεωρεί ότι γράψαμε απλό κείμενο!
+              </p>
+            </div>
+
+            <!-- Interactive Simulation Box -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl mx-auto">
+              <!-- Case A: without = -->
+              <div class="p-4 bg-white border-2 border-slate-300 rounded-2xl shadow-sm space-y-2">
+                <span class="text-xs font-bold text-slate-500 uppercase block">Περίπτωση Α: Χωρίς =</span>
+                <div class="p-2 bg-slate-50 border border-slate-200 rounded font-mono text-sm text-slate-700">
+                  Πληκτρολογούμε: <code>10+5</code>
+                </div>
+                <div class="p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs font-bold text-rose-800">
+                  Αποτέλεσμα: Παραμένει το κείμενο <strong>10+5</strong> και δεν υπολογίζεται τίποτα!
+                </div>
+              </div>
+
+              <!-- Case B: with = -->
+              <div class="p-4 bg-white border-2 border-emerald-300 rounded-2xl shadow-sm space-y-2">
+                <span class="text-xs font-bold text-emerald-700 uppercase block">Περίπτωση Β: Με = στην αρχή</span>
+                <div class="p-2 bg-slate-50 border border-slate-200 rounded font-mono text-sm text-slate-700">
+                  Πληκτρολογούμε: <code>=10+5</code>
+                </div>
+                <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs font-bold text-emerald-800">
+                  Αποτέλεσμα: Εμφανίζεται αυτόματα ο αριθμός <strong>15</strong>!
+                </div>
+              </div>
+            </div>
+
+            <!-- Question -->
+            <div class="max-w-md mx-auto p-4 bg-white border border-slate-200 rounded-2xl space-y-2">
+              <label class="text-xs md:text-sm font-bold text-slate-800 block">
+                Ποιος από τους παρακάτω τύπους είναι γραμμένος ΣΩΣΤΑ για να υπολογίσει μια πράξη;
+              </label>
+              <select id="act3-q1" class="w-full p-2.5 border border-slate-300 rounded-xl text-xs md:text-sm font-bold outline-none">
+                <option value="">-- Επίλεξε τύπο --</option>
+                <option value="ok">=A1+B1</option>
+                <option value="no1">A1+B1</option>
+                <option value="no2">πράξη A1 συν B1</option>
+              </select>
+            </div>
+
+            <div class="mt-4 pt-4 border-t border-slate-100 flex items-center justify-between">
+              <button onclick="window.checkAct3L1()" class="bg-amber-600 hover:bg-amber-700 text-white font-bold px-6 py-2.5 rounded-2xl shadow transition">
+                <i class="fa-solid fa-check mr-1"></i> Έλεγχος Τύπου
+              </button>
+              <div id="act3-fb" class="text-sm font-bold"></div>
+            </div>
+          </div>
+        `;
+
+        window.checkAct3L1 = () => {
+          const val = document.getElementById('act3-q1').value;
+          const fb = document.getElementById('act3-fb');
+
+          if (val === 'ok') {
+            sound.correct();
+            fb.className = 'text-sm font-bold text-emerald-600';
+            fb.innerHTML = '🎉 Μπράβο! Ο τύπος <strong>=A1+B1</strong> ξεκινάει με = και εκτελείται αυτόματα!';
+            awardSuccess('act3', 1, 50);
+          } else {
+            sound.wrong();
+            fb.className = 'text-sm font-bold text-rose-600';
+            fb.innerHTML = '❌ Θυμήσου: Χωρίς το σύμβολο ίσον (=) στην αρχή, δεν γίνεται καμία πράξη!';
+          }
+        };
+
+      } else {
+        // Level 2: Interactive Cell Calculator with = validation
+        container.innerHTML = `
+          <div class="space-y-4">
+            <div class="bg-orange-50 border-l-4 border-orange-500 p-4 rounded-r-2xl">
+              <h4 class="font-bold text-orange-900 text-sm md:text-base flex items-center gap-2">
+                <i class="fa-solid fa-terminal"></i> Επίπεδο 2: Δοκίμασε τους Δικούς σου Τύπους!
+              </h4>
+              <p class="text-xs md:text-sm text-orange-800 mt-1">
+                Γράψε στο παρακάτω κελί έναν τύπο (π.χ. <code>=12+10</code> ή <code>=20/4</code>) και πάτα Enter!
+              </p>
+            </div>
+
+            <div class="max-w-md mx-auto bg-white border-2 border-slate-300 rounded-2xl p-6 shadow-md space-y-4">
+              <div class="flex items-center gap-2">
+                <span class="w-14 bg-slate-100 border border-slate-300 rounded-lg p-1.5 text-center font-mono font-bold text-slate-700 text-sm">C1</span>
+                <span class="font-serif italic font-bold text-slate-500">fx</span>
+                <input id="act3-calc-input" type="text" placeholder="Γράψε π.χ. =12+10" class="flex-grow p-2 border-2 border-amber-300 rounded-xl font-mono font-bold text-slate-800 outline-none">
+                <button onclick="window.runAct3Calc()" class="bg-amber-500 hover:bg-amber-600 text-white font-bold px-4 py-2 rounded-xl transition">
+                  Enter ↵
+                </button>
+              </div>
+
+              <!-- Display Cell -->
+              <div class="border-2 border-slate-400 bg-slate-50 rounded-xl p-4 flex items-center justify-between">
+                <span class="text-xs font-bold text-slate-500 uppercase">Περιεχόμενο Κελιού C1:</span>
+                <span id="act3-calc-result" class="text-xl font-mono font-black text-slate-800 bg-white px-4 py-1 rounded-lg border border-slate-200">
+                  (κενό)
+                </span>
+              </div>
+            </div>
+
+            <div id="act3-l2-fb" class="text-center text-sm font-bold min-h-[24px]"></div>
+          </div>
+        `;
+
+        window.runAct3Calc = () => {
+          const raw = document.getElementById('act3-calc-input').value.trim();
+          const resEl = document.getElementById('act3-calc-result');
+          const fb = document.getElementById('act3-l2-fb');
+
+          if (!raw) return;
+
+          if (!raw.startsWith('=')) {
+            sound.wrong();
+            resEl.innerText = raw;
+            fb.className = 'text-center text-sm font-bold text-rose-600';
+            fb.innerHTML = `⚠️ Ξέχασες το σύμβολο = στην αρχή! Το φύλλο εμφάνισε απλό κείμενο: <em>${raw}</em>.`;
+          } else {
+            try {
+              const expr = raw.substring(1).replace(/x/g, '*').replace(/:/g, '/');
+              // Safe evaluation for basic math
+              if (!/^[0-9+\-*/().\s]+$/.test(expr)) throw new Error();
+              const val = Function(`'use strict'; return (${expr})`)();
+              sound.correct();
+              resEl.innerText = val;
+              fb.className = 'text-center text-sm font-bold text-emerald-600';
+              fb.innerHTML = `🎉 Μπράβο! Ο τύπος ${raw} υπολογίστηκε τέλεια σε <strong>${val}</strong>!`;
+              awardSuccess('act3', 2, 50);
+            } catch(e) {
+              sound.wrong();
+              resEl.innerText = '#ΣΦΑΛΜΑ!';
+              fb.className = 'text-center text-sm font-bold text-rose-600';
+              fb.innerText = '❌ Σφάλμα στον τύπο! Έλεγξε τα νούμερα και τα σύμβολα.';
+            }
+          }
+        };
+      }
+    }
+
+    /* --------------------------------------------------------------------
+       ACTIVITY 4: Αριθμοί vs Διευθύνσεις Κελιών & Έκπτωση (σελ. 68-70)
+       -------------------------------------------------------------------- */
+    function renderAct4(container, lvl) {
+      if (lvl === 1) {
+        // Concept: Why cell names are better than numbers
+        container.innerHTML = `
+          <div class="space-y-4">
+            <div class="bg-rose-50 border-l-4 border-rose-500 p-4 rounded-r-2xl">
+              <h4 class="font-bold text-rose-900 text-sm md:text-base flex items-center gap-2">
+                <i class="fa-solid fa-lightbulb"></i> Επίπεδο 1: Γιατί κάνουμε κλικ στα κελιά αντί να γράφουμε αριθμούς; (σελ. 68)
+              </h4>
+              <p class="text-xs md:text-sm text-rose-800 mt-1">
+                <strong>Σελίδα 68:</strong> Σε έναν τύπο, αντί να πληκτρολογούμε σταθερούς αριθμούς (π.χ. <code>110/22</code>), είναι πολύ καλύτερο να κάνουμε κλικ στα κελιά που περιέχουν τους αριθμούς (π.χ. <code>=E2/B4</code>). Γιατί συμβαίνει αυτό;
+              </p>
+            </div>
+
+            <div class="max-w-xl mx-auto space-y-3">
+              <div class="p-4 bg-white border border-slate-200 rounded-2xl space-y-2">
+                <label class="text-xs md:text-sm font-bold text-slate-800 block">
+                  Ποιο είναι το τεράστιο πλεονέκτημα όταν χρησιμοποιούμε ονόματα κελιών στους τύπους;
+                </label>
+                <div class="space-y-2">
+                  <label class="flex items-start gap-2 p-2 bg-slate-50 hover:bg-rose-50 rounded-xl border border-slate-200 cursor-pointer text-xs md:text-sm">
+                    <input type="radio" name="act4-r" value="auto" class="text-rose-600 mt-0.5">
+                    <span>Αν μελλοντικά αλλάξει ένας αριθμός σε ένα κελί, <strong>αλλάζει αυτόματα</strong> και το αποτέλεσμα του τύπου!</span>
+                  </label>
+                  <label class="flex items-start gap-2 p-2 bg-slate-50 hover:bg-rose-50 rounded-xl border border-slate-200 cursor-pointer text-xs md:text-sm">
+                    <input type="radio" name="act4-r" value="color" class="text-rose-600 mt-0.5">
+                    <span>Γίνεται μόνο και μόνο για να αλλάζει χρώμα η γραμματοσειρά.</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-4 pt-4 border-t border-slate-100 flex items-center justify-between">
+              <button onclick="window.checkAct4L1()" class="bg-rose-600 hover:bg-rose-700 text-white font-bold px-6 py-2.5 rounded-2xl shadow transition">
+                <i class="fa-solid fa-check mr-1"></i> Έλεγχος Απάντησης
+              </button>
+              <div id="act4-fb" class="text-sm font-bold"></div>
+            </div>
+          </div>
+        `;
+
+        window.checkAct4L1 = () => {
+          const sel = document.querySelector('input[name="act4-r"]:checked');
+          const fb = document.getElementById('act4-fb');
+          if (!sel) return;
+
+          if (sel.value === 'auto') {
+            sound.correct();
+            fb.className = 'text-sm font-bold text-emerald-600';
+            fb.innerHTML = '🎉 Ακριβώς! Αυτή είναι η μαγεία του υπολογιστικού φύλλου: όλα επανυπολογίζονται μόνα τους!';
+            awardSuccess('act4', 1, 50);
+          } else {
+            sound.wrong();
+            fb.className = 'text-sm font-bold text-rose-600';
+            fb.innerHTML = '❌ Ξαναδιάβασε το κείμενο στη σελίδα 68 του βιβλίου!';
+          }
+        };
+
+      } else {
+        // Level 2: Interactive simulation of discount from 110€ to 88€ (σελ. 70)
+        container.innerHTML = `
+          <div class="space-y-4">
+            <div class="bg-pink-50 border-l-4 border-pink-500 p-4 rounded-r-2xl">
+              <h4 class="font-bold text-pink-900 text-sm md:text-base flex items-center gap-2">
+                <i class="fa-solid fa-tags"></i> Επίπεδο 2: Προσομοίωση Έκπτωσης Λεωφορείου (σελ. 70)
+              </h4>
+              <p class="text-xs md:text-sm text-pink-800 mt-1">
+                <strong>Σενάριο Σελίδας 70:</strong> Αρχικά το λεωφορείο στοιχίζει 110€ για 22 παιδιά (110 / 22 = 5€ ανά παιδί). Αν εφαρμοστεί έκπτωση και το λεωφορείο στοιχίσει <strong>88€</strong>, άλλαξε την τιμή στο κελί E2 και δες τι θα συμβεί αυτόματα στο κελί E3!
+              </p>
+            </div>
+
+            <!-- Table Simulation -->
+            <div class="overflow-x-auto flex justify-center py-2">
+              <table class="sheet-grid border-2 border-slate-300 shadow-md rounded-xl overflow-hidden bg-white max-w-md w-full">
+                <thead>
+                  <tr>
+                    <th class="sheet-header w-10"></th>
+                    <th class="sheet-header w-36">D</th>
+                    <th class="sheet-header w-32">E</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="bg-slate-50 font-bold text-xs">
+                    <td class="sheet-header">1</td>
+                    <td class="sheet-cell text-left" colspan="2">Κόστος εκδρομής</td>
+                  </tr>
+                  <tr>
+                    <td class="sheet-header">2</td>
+                    <td class="sheet-cell text-left font-semibold">Λεωφορείο (€)</td>
+                    <td class="sheet-cell p-1">
+                      <input id="act4-bus-cost" type="number" value="110" oninput="window.updateDiscountSim()" class="w-full p-1 border-2 border-pink-300 rounded font-bold text-right text-pink-900 outline-none focus:border-pink-600">
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="sheet-header">3</td>
+                    <td class="sheet-cell text-left font-semibold">Παιδί (€)</td>
+                    <td id="act4-kid-cost" class="sheet-cell text-right font-black text-emerald-700 bg-emerald-50 text-base">
+                      5 €
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="text-center space-y-2">
+              <p class="text-xs text-slate-500 font-semibold">
+                Τύπος στο κελί E3: <code class="bg-slate-100 px-2 py-0.5 rounded text-indigo-700 font-bold">=E2/B4</code> (όπου B4 = 22 παιδιά)
+              </p>
+              <div id="act4-l2-fb" class="text-sm font-bold min-h-[24px]"></div>
+            </div>
+          </div>
+        `;
+
+        window.updateDiscountSim = () => {
+          const cost = parseFloat(document.getElementById('act4-bus-cost').value);
+          const kidEl = document.getElementById('act4-kid-cost');
+          const fb = document.getElementById('act4-l2-fb');
+
+          if (isNaN(cost)) {
+            kidEl.innerText = '-';
+            return;
+          }
+
+          const res = (cost / 22);
+          kidEl.innerText = `${res % 1 === 0 ? res : res.toFixed(2)} €`;
+
+          if (cost === 88) {
+            sound.correct();
+            fb.className = 'text-center text-sm font-bold text-emerald-600';
+            fb.innerHTML = '🎉 Μπράβο! Το νέο αποτέλεσμα <strong>4 €</strong> εμφανίστηκε αυτόματα μόλις έγραψες 88 στο κελί E2!';
+            awardSuccess('act4', 2, 50);
+          } else {
+            fb.className = 'text-center text-xs font-semibold text-slate-500';
+            fb.innerText = `ℹ️ Με κόστος ${cost}€, κάθε παιδί πληρώνει αυτόματα ${kidEl.innerText}. Δοκίμασε να βάλεις 88!`;
+          }
+        };
+      }
+    }
+
+    /* --------------------------------------------------------------------
+       ACTIVITY 5: Το Εργαστήριο των Τάξεων (Δ΄, Ε΄, ΣΤ΄) - σελ. 69-70
+       -------------------------------------------------------------------- */
+    function renderAct5(container, lvl) {
+      if (lvl === 1) {
+        // Writing the formula =C7/B7 for grade D
+        container.innerHTML = `
+          <div class="space-y-4">
+            <div class="bg-cyan-50 border-l-4 border-cyan-500 p-4 rounded-r-2xl">
+              <h4 class="font-bold text-cyan-900 text-sm md:text-base flex items-center gap-2">
+                <i class="fa-solid fa-table"></i> Επίπεδο 1: Ποιον τύπο θα γράψουμε στο κελί D7; (σελ. 69-70)
+              </h4>
+              <p class="text-xs md:text-sm text-cyan-800 mt-1">
+                Στον πίνακα της σελίδας 70 έχουμε τα στοιχεία για τη <strong>Δ΄ Τάξη</strong>:
+                Στο κελί <strong>B7</strong> είναι τα παιδιά (18) και στο <strong>C7</strong> το κόστος λεωφορείου (90€). 
+                Ποιον τύπο πρέπει να γράψουμε στο κελί <strong>D7</strong> για να υπολογιστεί το κόστος ανά παιδί;
+              </p>
+            </div>
+
+            <!-- Spreadsheet Excerpt -->
+            <div class="overflow-x-auto flex justify-center py-2">
+              <table class="sheet-grid border-2 border-slate-300 shadow-sm rounded-xl overflow-hidden bg-white max-w-lg w-full">
+                <thead>
+                  <tr>
+                    <th class="sheet-header w-8"></th>
+                    <th class="sheet-header w-16">A</th>
+                    <th class="sheet-header w-20">B</th>
+                    <th class="sheet-header w-24">C</th>
+                    <th class="sheet-header w-32">D</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="bg-slate-100 font-bold text-xs text-slate-600">
+                    <td class="sheet-header">6</td>
+                    <td class="sheet-cell">Τάξη</td>
+                    <td class="sheet-cell text-right">Παιδιά</td>
+                    <td class="sheet-cell text-right">Λεωφορείο</td>
+                    <td class="sheet-cell text-right">Κόστος ανά παιδί</td>
+                  </tr>
+                  <tr>
+                    <td class="sheet-header">7</td>
+                    <td class="sheet-cell font-bold text-indigo-700">Δ</td>
+                    <td class="sheet-cell text-right font-bold">18</td>
+                    <td class="sheet-cell text-right font-bold">90</td>
+                    <td class="sheet-cell active-cell text-right font-mono font-bold text-blue-700">?</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Options -->
+            <div class="max-w-md mx-auto p-4 bg-white border border-slate-200 rounded-2xl space-y-2">
+              <label class="text-xs md:text-sm font-bold text-slate-800 block">
+                Διάλεξε τον σωστό τύπο για το κελί D7:
+              </label>
+              <select id="act5-q1" class="w-full p-2.5 border border-slate-300 rounded-xl text-xs md:text-sm font-bold outline-none">
+                <option value="">-- Επίλεξε τύπο --</option>
+                <option value="ok">=C7/B7</option>
+                <option value="no1">=B7/C7</option>
+                <option value="no2">=90/18</option>
+                <option value="no3">=C7*B7</option>
+              </select>
+            </div>
+
+            <div class="mt-4 pt-4 border-t border-slate-100 flex items-center justify-between">
+              <button onclick="window.checkAct5L1()" class="bg-cyan-600 hover:bg-cyan-700 text-white font-bold px-6 py-2.5 rounded-2xl shadow transition">
+                <i class="fa-solid fa-check mr-1"></i> Έλεγχος Τύπου
+              </button>
+              <div id="act5-fb" class="text-sm font-bold"></div>
+            </div>
+          </div>
+        `;
+
+        window.checkAct5L1 = () => {
+          const val = document.getElementById('act5-q1').value;
+          const fb = document.getElementById('act5-fb');
+
+          if (val === 'ok') {
+            sound.correct();
+            fb.className = 'text-sm font-bold text-emerald-600';
+            fb.innerHTML = '🎉 Μπράβο! Ο τύπος <strong>=C7/B7</strong> διαιρεί το κόστος του λεωφορείου (90€) με τα παιδιά (18)!';
+            awardSuccess('act5', 1, 50);
+          } else {
+            sound.wrong();
+            fb.className = 'text-sm font-bold text-rose-600';
+            fb.innerHTML = '❌ Σκέψου: Διαιρούμε το κόστος (στήλη C) με τα παιδιά (στήλη B), άρα =C7/B7!';
+          }
+        };
+
+      } else {
+        // Level 2: Calculating for all grades (D, E, ST) and checking results
+        container.innerHTML = `
+          <div class="space-y-4">
+            <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-2xl">
+              <h4 class="font-bold text-blue-900 text-sm md:text-base flex items-center gap-2">
+                <i class="fa-solid fa-calculator"></i> Επίπεδο 2: Υπολόγισε το Κόστος για τις Τάξεις Δ΄, Ε΄, ΣΤ΄
+              </h4>
+              <p class="text-xs md:text-sm text-blue-800 mt-1">
+                Συμπλήρωσε το αποτέλεσμα που υπολογίζει το φύλλο για κάθε τάξη:
+              </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div class="p-4 bg-white border border-slate-200 rounded-2xl space-y-2 text-center">
+                <span class="text-xs font-bold text-indigo-700 uppercase block">Δ΄ Τάξη (=C7/B7)</span>
+                <span class="text-xs text-slate-500 block">90€ / 18 παιδιά</span>
+                <input id="act5-res-d" type="number" placeholder="€ ανά παιδί" class="w-full p-2 border-2 border-blue-200 rounded-xl font-bold text-center outline-none">
+              </div>
+
+              <div class="p-4 bg-white border border-slate-200 rounded-2xl space-y-2 text-center">
+                <span class="text-xs font-bold text-emerald-700 uppercase block">Ε΄ Τάξη (=C8/B8)</span>
+                <span class="text-xs text-slate-500 block">88€ / 22 παιδιά</span>
+                <input id="act5-res-e" type="number" placeholder="€ ανά παιδί" class="w-full p-2 border-2 border-emerald-200 rounded-xl font-bold text-center outline-none">
+              </div>
+
+              <div class="p-4 bg-white border border-slate-200 rounded-2xl space-y-2 text-center">
+                <span class="text-xs font-bold text-purple-700 uppercase block">ΣΤ΄ Τάξη (=C9/B9)</span>
+                <span class="text-xs text-slate-500 block">100€ / 20 παιδιά</span>
+                <input id="act5-res-st" type="number" placeholder="€ ανά παιδί" class="w-full p-2 border-2 border-purple-200 rounded-xl font-bold text-center outline-none">
+              </div>
+            </div>
+
+            <div class="mt-4 pt-4 border-t border-slate-100 flex items-center justify-between">
+              <button onclick="window.checkAct5L2()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-2.5 rounded-2xl shadow transition">
+                <i class="fa-solid fa-check mr-1"></i> Έλεγχος Αποτελεσμάτων
+              </button>
+              <div id="act5-l2-fb" class="text-sm font-bold"></div>
+            </div>
+          </div>
+        `;
+
+        window.checkAct5L2 = () => {
+          const d = parseFloat(document.getElementById('act5-res-d').value);
+          const e = parseFloat(document.getElementById('act5-res-e').value);
+          const st = parseFloat(document.getElementById('act5-res-st').value);
+          const fb = document.getElementById('act5-l2-fb');
+
+          if (d === 5 && e === 4 && st === 5) {
+            sound.correct();
+            fb.className = 'text-sm font-bold text-emerald-600';
+            fb.innerHTML = '🎉 Άριστα! Δ: 5€, Ε: 4€, ΣΤ: 5€! Υπολόγισες τέλεια τα κόστη όλων των τάξεων!';
+            awardSuccess('act5', 2, 50);
+          } else {
+            sound.wrong();
+            fb.className = 'text-sm font-bold text-rose-600';
+            fb.innerHTML = '❌ Κάποιος υπολογισμός είναι λάθος: 90/18=5, 88/22=4, 100/20=5!';
+          }
+        };
+      }
+    }
+
+    /* --------------------------------------------------------------------
+       ACTIVITY 6: Αυτόματη Αντιγραφή Τύπων με τον Μαύρο Σταυρό (+) - σελ. 70-71
+       -------------------------------------------------------------------- */
+    function renderAct6(container, lvl) {
+      if (lvl === 1) {
+        // Recognition of the fill handle (+ cross) in cell corner
+        container.innerHTML = `
+          <div class="space-y-4">
+            <div class="bg-purple-50 border-l-4 border-purple-500 p-4 rounded-r-2xl">
+              <h4 class="font-bold text-purple-900 text-sm md:text-base flex items-center gap-2">
+                <i class="fa-solid fa-plus"></i> Επίπεδο 1: Η Τελεία και ο Μαύρος Σταυρός (+) (σελ. 70)
+              </h4>
+              <p class="text-xs md:text-sm text-purple-800 mt-1">
+                <strong>Σελίδα 70:</strong> Στην κάτω δεξιά γωνία του ενεργού κελιού εμφανίζεται μία τελεία. Όταν τοποθετήσουμε εκεί τον δείκτη του ποντικιού, τι μορφή παίρνει;
+              </p>
+            </div>
+
+            <!-- Comparison cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-xl mx-auto">
+              <button onclick="window.pickAct6Cursor('cross', this)" class="act6-btn p-4 border-2 border-slate-200 rounded-2xl bg-white hover:bg-purple-50 transition text-center space-y-2">
+                <span class="text-4xl font-black text-slate-800 block">+</span>
+                <span class="text-xs font-bold text-slate-700 block">Μαύρος Σταυρός (+)</span>
+              </button>
+              <button onclick="window.pickAct6Cursor('arrow', this)" class="act6-btn p-4 border-2 border-slate-200 rounded-2xl bg-white hover:bg-purple-50 transition text-center space-y-2">
+                <span class="text-4xl font-black text-slate-800 block">↔</span>
+                <span class="text-xs font-bold text-slate-700 block">Διπλό Βέλος (↔)</span>
+              </button>
+              <button onclick="window.pickAct6Cursor('hand', this)" class="act6-btn p-4 border-2 border-slate-200 rounded-2xl bg-white hover:bg-purple-50 transition text-center space-y-2">
+                <span class="text-4xl font-black text-slate-800 block">👆</span>
+                <span class="text-xs font-bold text-slate-700 block">Χεράκι (Δείκτης)</span>
+              </button>
+            </div>
+
+            <div id="act6-fb" class="text-center text-sm font-bold min-h-[24px]"></div>
+          </div>
+        `;
+
+        window.pickAct6Cursor = (type, btn) => {
+          sound.click();
+          const fb = document.getElementById('act6-fb');
+          document.querySelectorAll('.act6-btn').forEach(b => b.className = 'act6-btn p-4 border-2 border-slate-200 rounded-2xl bg-white text-center space-y-2');
+
+          if (type === 'cross') {
+            sound.correct();
+            btn.className = 'act6-btn p-4 border-2 border-emerald-500 bg-emerald-50 rounded-2xl text-center space-y-2 font-bold';
+            fb.className = 'text-center text-sm font-bold text-emerald-600';
+            fb.innerHTML = '🎉 Σωστά! Ο δείκτης παίρνει τη μορφή μαύρου σταυρού (+) και επιτρέπει το αυτόματο σύρσιμο!';
+            awardSuccess('act6', 1, 50);
+          } else {
+            sound.wrong();
+            btn.className = 'act6-btn p-4 border-2 border-rose-400 bg-rose-50 rounded-2xl text-center space-y-2 font-bold';
+            fb.className = 'text-center text-sm font-bold text-rose-600';
+            fb.innerHTML = '❌ Όχι! Το διπλό βέλος ↔ είναι για το πλάτος. Στη γωνία γίνεται μαύρος σταυρός (+)!';
+          }
+        };
+
+      } else {
+        // Level 2: Interactive drag-to-fill simulation
+        container.innerHTML = `
+          <div class="space-y-4">
+            <div class="bg-violet-50 border-l-4 border-violet-500 p-4 rounded-r-2xl">
+              <h4 class="font-bold text-violet-900 text-sm md:text-base flex items-center gap-2">
+                <i class="fa-solid fa-arrows-down-to-line"></i> Επίπεδο 2: Σύρε και Αντίγραψε τον Τύπο! (σελ. 70-71)
+              </h4>
+              <p class="text-xs md:text-sm text-violet-800 mt-1">
+                Στο κελί D7 έχουμε γράψει τον τύπο <code>=C7/B7</code>. Πάτησε το κουμπί <strong>«Αυτόματη Συμπλήρωση με Σύρσιμο»</strong> για να αντιγραφεί ο τύπος στις γραμμές 8 και 9 και παρατήρησε πώς αλλάζουν αυτόματα τα ονόματα των κελιών!
+              </p>
+            </div>
+
+            <!-- Table Simulation with Fill Handle -->
+            <div class="overflow-x-auto flex justify-center py-2">
+              <table class="sheet-grid border-2 border-slate-300 shadow-md rounded-xl overflow-hidden bg-white max-w-lg w-full">
+                <thead>
+                  <tr>
+                    <th class="sheet-header w-8"></th>
+                    <th class="sheet-header w-14">A</th>
+                    <th class="sheet-header w-20">B</th>
+                    <th class="sheet-header w-24">C</th>
+                    <th class="sheet-header w-36">D</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="bg-slate-100 font-bold text-xs text-slate-600">
+                    <td class="sheet-header">6</td>
+                    <td class="sheet-cell">Τάξη</td>
+                    <td class="sheet-cell text-right">Παιδιά</td>
+                    <td class="sheet-cell text-right">Λεωφορείο</td>
+                    <td class="sheet-cell text-right">Κόστος ανά παιδί</td>
+                  </tr>
+                  <tr>
+                    <td class="sheet-header">7</td>
+                    <td class="sheet-cell font-bold">Δ</td>
+                    <td class="sheet-cell text-right">18</td>
+                    <td class="sheet-cell text-right">90</td>
+                    <td class="sheet-cell active-cell text-right font-mono font-bold text-indigo-700 relative">
+                      5,00 €
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="sheet-header">8</td>
+                    <td class="sheet-cell font-bold">Ε</td>
+                    <td class="sheet-cell text-right">22</td>
+                    <td class="sheet-cell text-right">88</td>
+                    <td id="act6-fill-d8" class="sheet-cell text-right font-mono text-slate-300 italic">...</td>
+                  </tr>
+                  <tr>
+                    <td class="sheet-header">9</td>
+                    <td class="sheet-cell font-bold">ΣΤ</td>
+                    <td class="sheet-cell text-right">20</td>
+                    <td class="sheet-cell text-right">100</td>
+                    <td id="act6-fill-d9" class="sheet-cell text-right font-mono text-slate-300 italic">...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="text-center space-y-2">
+              <button onclick="window.autoFillAct6()" class="bg-purple-600 hover:bg-purple-700 text-white font-bold px-6 py-2.5 rounded-2xl shadow transition flex items-center gap-2 mx-auto">
+                <i class="fa-solid fa-arrow-down"></i>
+                <span>Αυτόματη Συμπλήρωση με Σύρσιμο (Fill Down)</span>
+              </button>
+              <div id="act6-l2-fb" class="text-sm font-bold min-h-[24px]"></div>
+            </div>
+          </div>
+        `;
+
+        window.autoFillAct6 = () => {
+          sound.correct();
+          const d8 = document.getElementById('act6-fill-d8');
+          const d9 = document.getElementById('act6-fill-d9');
+          d8.className = 'sheet-cell text-right font-mono font-bold text-emerald-700 bg-emerald-50';
+          d8.innerHTML = '4,00 € <span class="text-[9px] block text-slate-500 font-normal">(=C8/B8)</span>';
+          d9.className = 'sheet-cell text-right font-mono font-bold text-emerald-700 bg-emerald-50';
+          d9.innerHTML = '5,00 € <span class="text-[9px] block text-slate-500 font-normal">(=C9/B9)</span>';
+
+          const fb = document.getElementById('act6-l2-fb');
+          fb.className = 'text-center text-sm font-bold text-emerald-600';
+          fb.innerHTML = '🎉 Εκπληκτικό! Αντιγράφηκε ο τύπος και όχι το αποτέλεσμα! Στο D8 έγινε =C8/B8 και στο D9 =C9/B9!';
+          awardSuccess('act6', 2, 50);
+        };
+      }
+    }
+
+    /* --------------------------------------------------------------------
+       ACTIVITY 7: Μορφοποίηση: Αναδίπλωση, Περιγράμματα & Νομίσματα - σελ. 69, 71
+       -------------------------------------------------------------------- */
+    function renderAct7(container, lvl) {
+      if (lvl === 1) {
+        // Wrap text tool
+        container.innerHTML = `
+          <div class="space-y-4">
+            <div class="bg-teal-50 border-l-4 border-teal-500 p-4 rounded-r-2xl">
+              <h4 class="font-bold text-teal-900 text-sm md:text-base flex items-center gap-2">
+                <i class="fa-solid fa-align-center"></i> Επίπεδο 1: Αναδίπλωση Κειμένου στο Κελί D6 (σελ. 71)
+              </h4>
+              <p class="text-xs md:text-sm text-teal-800 mt-1">
+                <strong>Σελίδα 71:</strong> Στο κελί D6 η επικεφαλίδα «Κόστος ανά παιδί» είναι μεγάλη. Αντί να μεγαλώσουμε πολύ τη στήλη, μπορούμε να κάνουμε <strong>«Αναδίπλωση κειμένου»</strong> για να σπάσει σε δύο γραμμές μέσα στο ίδιο κελί!
+              </p>
+            </div>
+
+            <!-- Simulator -->
+            <div class="max-w-md mx-auto bg-white border-2 border-slate-300 rounded-2xl p-6 shadow-sm space-y-4 text-center">
+              <div class="flex justify-center gap-2">
+                <button onclick="window.toggleWrapAct7()" class="bg-teal-600 hover:bg-teal-700 text-white font-bold px-4 py-2 rounded-xl text-xs flex items-center gap-2 transition shadow">
+                  <i class="fa-solid fa-paragraph"></i>
+                  <span>Κουμπί «Αναδίπλωση Κειμένου»</span>
+                </button>
+              </div>
+
+              <!-- Preview Cell -->
+              <div class="flex justify-center py-2">
+                <table class="sheet-grid bg-white">
+                  <thead>
+                    <tr>
+                      <th class="sheet-header w-10">6</th>
+                      <th id="act7-wrap-cell" class="sheet-cell text-center font-bold text-xs text-slate-800" style="width: 110px;">
+                        Κόστος ανά παιδί
+                      </th>
+                    </tr>
+                  </thead>
+                </table>
+              </div>
+
+              <div id="act7-fb" class="text-sm font-bold min-h-[24px]"></div>
+            </div>
+          </div>
+        `;
+
+        let isWrapped = false;
+        window.toggleWrapAct7 = () => {
+          sound.click();
+          const cell = document.getElementById('act7-wrap-cell');
+          const fb = document.getElementById('act7-fb');
+          isWrapped = !isWrapped;
+
+          if (isWrapped) {
+            cell.classList.add('wrap-text');
+            cell.innerHTML = 'Κόστος<br>ανά παιδί';
+            sound.correct();
+            fb.className = 'text-center text-sm font-bold text-emerald-600';
+            fb.innerHTML = '🎉 Μπράβο! Το κείμενο αναδιπλώθηκε σε δύο γραμμές και χωράει τέλεια!';
+            awardSuccess('act7', 1, 50);
+          } else {
+            cell.classList.remove('wrap-text');
+            cell.innerHTML = 'Κόστος ανά παιδί';
+            fb.innerText = '';
+          }
+        };
+
+      } else {
+        // Level 2: Borders & Currency tool matching
+        const tools = [
+          { name: 'Περιγράμματα', icon: 'fa-border-all', desc: 'Για να εμφανίζονται και να εκτυπώνονται οι γραμμές του πίνακα στο χαρτί' },
+          { name: 'Μορφή Νομίσματος (€)', icon: 'fa-euro-sign', desc: 'Προσθέτει αυτόματα το σύμβολο € δίπλα στους αριθμούς (π.χ. 5,00 €)' },
+          { name: 'Δεκαδικά Ψηφία (.00)', icon: 'fa-coins', desc: 'Αυξάνει ή μειώνει τα ψηφία μετά την υποδιαστολή' }
+        ];
+
+        container.innerHTML = `
+          <div class="space-y-4">
+            <div class="bg-emerald-50 border-l-4 border-emerald-500 p-4 rounded-r-2xl">
+              <h4 class="font-bold text-emerald-900 text-sm md:text-base flex items-center gap-2">
+                <i class="fa-solid fa-paintbrush"></i> Επίπεδο 2: Χρήσιμα Εικονίδια Μορφοποίησης (σελ. 69 & 71)
+              </h4>
+              <p class="text-xs md:text-sm text-emerald-800 mt-1">
+                Αντιστοίχισε τη λειτουργία κάθε εικονιδίου με το κατάλληλο εργαλείο:
+              </p>
+            </div>
+
+            <div class="space-y-3 max-w-xl mx-auto">
+              ${tools.map((t, idx) => `
+                <div class="p-4 bg-white border border-slate-200 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-3 shadow-xs">
+                  <div class="flex items-center gap-3">
+                    <span class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center text-lg">
+                      <i class="fa-solid ${t.icon}"></i>
+                    </span>
+                    <span class="text-xs md:text-sm font-semibold text-slate-800">${t.desc}</span>
+                  </div>
+                  <select id="act7-l2-sel-${idx}" class="p-2 border border-slate-300 rounded-xl text-xs font-bold outline-none bg-slate-50">
+                    <option value="">-- Επίλεξε --</option>
+                    <option value="Περιγράμματα">Περιγράμματα</option>
+                    <option value="Μορφή Νομίσματος (€)">Μορφή Νομίσματος (€)</option>
+                    <option value="Δεκαδικά Ψηφία (.00)">Δεκαδικά Ψηφία (.00)</option>
+                  </select>
+                </div>
+              `).join('')}
+            </div>
+
+            <div class="mt-4 pt-4 border-t border-slate-100 flex items-center justify-between">
+              <button onclick="window.checkAct7L2()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-6 py-2.5 rounded-2xl shadow transition">
+                <i class="fa-solid fa-check mr-1"></i> Έλεγχος Μορφοποίησης
+              </button>
+              <div id="act7-l2-fb" class="text-sm font-bold"></div>
+            </div>
+          </div>
+        `;
+
+        window.checkAct7L2 = () => {
+          let correct = 0;
+          tools.forEach((t, idx) => {
+            const val = document.getElementById(`act7-l2-sel-${idx}`).value;
+            if (val === t.name) correct++;
+          });
+
+          const fb = document.getElementById('act7-l2-fb');
+          if (correct === tools.length) {
+            sound.correct();
+            fb.className = 'text-sm font-bold text-emerald-600';
+            fb.innerHTML = '🎉 Άριστα! Γνωρίζεις όλα τα βασικά εργαλεία για όμορφους πίνακες!';
+            awardSuccess('act7', 2, 50);
+          } else {
+            sound.wrong();
+            fb.className = 'text-sm font-bold text-rose-600';
+            fb.innerHTML = `Έχεις ${correct} στα 3 σωστά. Ξαναδιάβασε τις περιγραφές!`;
+          }
+        };
+      }
+    }
+
+    /* --------------------------------------------------------------------
+       ACTIVITY 8: Το Μεγάλο Master Quiz του Μαθήματος 18 (σελ. 67-71)
+       -------------------------------------------------------------------- */
+    function renderAct8(container, lvl) {
+      if (lvl === 1) {
+        // Fast True/False
+        const tf = [
+          { q: '1. Κάθε τύπος υπολογισμού στο υπολογιστικό φύλλο ξεκινάει πάντα με το σύμβολο =.', ans: true },
+          { q: '2. Το σύμβολο για τον πολλαπλασιασμό είναι το γράμμα x.', ans: false },
+          { q: '3. Η συνάρτηση =SUM(B2:B3) υπολογίζει το άθροισμα της περιοχής κελιών.', ans: true },
+          { q: '4. Όταν σύρουμε τον μαύρο σταυρό (+), αντιγράφεται ο τύπος και προσαρμόζονται αυτόματα τα κελιά.', ans: true },
+          { q: '5. Οι γραμμές ανάμεσα στα κελιά εκτυπώνονται αυτόματα στο χαρτί χωρίς περιγράμματα.', ans: false }
+        ];
+
+        let answers = {};
+
+        container.innerHTML = `
+          <div class="space-y-4">
+            <div class="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-2xl">
+              <h4 class="font-bold text-amber-900 text-sm md:text-base flex items-center gap-2">
+                <i class="fa-solid fa-bolt"></i> Επίπεδο 1: 5 Ερωτήσεις Σωστού / Λάθους (Μάθημα 18)
+              </h4>
+              <p class="text-xs md:text-sm text-amber-800 mt-1">
+                Διάβασε προσεκτικά τις προτάσεις και επίλεξε <strong>Σωστό</strong> ή <strong>Λάθος</strong>:
+              </p>
+            </div>
+
+            <div class="space-y-3">
+              ${tf.map((t, idx) => `
+                <div class="p-3 bg-white border border-slate-200 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+                  <span class="text-xs md:text-sm font-semibold text-slate-800">${t.q}</span>
+                  <div class="flex items-center gap-2">
+                    <button onclick="window.setAct8Tf(${idx}, true, this)" class="act8-tf-btn-${idx} px-4 py-1.5 rounded-xl text-xs font-bold border border-slate-200 bg-slate-50 hover:bg-emerald-50 transition">
+                      Σωστό
+                    </button>
+                    <button onclick="window.setAct8Tf(${idx}, false, this)" class="act8-tf-btn-${idx} px-4 py-1.5 rounded-xl text-xs font-bold border border-slate-200 bg-slate-50 hover:bg-rose-50 transition">
+                      Λάθος
+                    </button>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+
+            <div class="mt-4 pt-4 border-t border-slate-100 flex items-center justify-between">
+              <button onclick="window.checkAct8L1()" class="bg-amber-500 hover:bg-amber-600 text-white font-bold px-6 py-2.5 rounded-2xl shadow transition">
+                <i class="fa-solid fa-check mr-1"></i> Έλεγχος Σωστού/Λάθους
+              </button>
+              <div id="act8-fb" class="text-sm font-bold"></div>
+            </div>
+          </div>
+        `;
+
+        window.setAct8Tf = (idx, val, btn) => {
+          sound.click();
+          answers[idx] = val;
+          document.querySelectorAll(`.act8-tf-btn-${idx}`).forEach(b => {
+            b.className = `act8-tf-btn-${idx} px-4 py-1.5 rounded-xl text-xs font-bold border border-slate-200 bg-slate-50 text-slate-700`;
+          });
+          btn.className = `act8-tf-btn-${idx} px-4 py-1.5 rounded-xl text-xs font-bold text-white shadow-sm ${val ? 'bg-emerald-600 border-emerald-600' : 'bg-rose-600 border-rose-600'}`;
+        };
+
+        window.checkAct8L1 = () => {
+          const fb = document.getElementById('act8-fb');
+          if (Object.keys(answers).length < tf.length) {
+            sound.wrong();
+            fb.className = 'text-sm font-bold text-amber-600';
+            fb.innerHTML = '⚠️ Απάντησε και στις 5 ερωτήσεις!';
+            return;
+          }
+
+          let correct = 0;
+          tf.forEach((t, idx) => {
+            if (answers[idx] === t.ans) correct++;
+          });
+
+          if (correct === tf.length) {
+            fb.className = 'text-sm font-bold text-emerald-600';
+            fb.innerHTML = '🎉 5 στα 5 Σωστά! Είσαι πανέτοιμος για το τελικό Επίπεδο 2!';
+            awardSuccess('act8', 1, 50);
+          } else {
+            sound.wrong();
+            fb.className = 'text-sm font-bold text-rose-600';
+            fb.innerHTML = `Έχεις ${correct} στα 5 σωστά. Ξαναδιάβασε προσεκτικά τις προτάσεις!`;
+          }
+        };
+
+      } else {
+        // Level 2: 5 Multiple Choice Questions unlocking Certificate
+        const mc = [
+          {
+            q: '1. Ποιο είναι το σύμβολο για τη διαίρεση στο υπολογιστικό φύλλο;',
+            opts: ['Η κάθετος / (slash)', 'Το σύμβολο :', 'Το σύμβολο %'],
+            ans: 0
+          },
+          {
+            q: '2. Γιατί προτιμάμε να γράφουμε =E2/B4 αντί για =110/22;',
+            opts: ['Γιατί αν αλλάξει η τιμή στο κελί, ενημερώνεται αυτόματα το αποτέλεσμα', 'Γιατί οι αριθμοί απαγορεύονται στο φύλλο', 'Για να είναι πιο μεγάλος ο πίνακας'],
+            ans: 0
+          },
+          {
+            q: '3. Τι μορφή παίρνει ο δείκτης του ποντικιού στην κάτω δεξιά γωνία του ενεργού κελιού για αυτόματη αντιγραφή;',
+            opts: ['Μαύρος σταυρός (+)', 'Διπλό βέλος (↔)', 'Ερωτηματικό (?)'],
+            ans: 0
+          },
+          {
+            q: '4. Αν αντιγράψουμε τον τύπο =C7/B7 στην από κάτω γραμμή (γραμμή 8), τι θα γίνει αυτόματα;',
+            opts: ['Θα γίνει =C8/B8', 'Θα παραμείνει =C7/B7', 'Θα σβηστεί ο τύπος'],
+            ans: 0
+          },
+          {
+            q: '5. Ποιο εργαλείο σπάει ένα μακρύ κείμενο σε δύο γραμμές μέσα στο ίδιο κελί;',
+            opts: ['Αναδίπλωση κειμένου (Wrap text)', 'Περιγράμματα', 'Συνάρτηση SUM'],
+            ans: 0
+          }
+        ];
+
+        let mcAns = {};
+
+        container.innerHTML = `
+          <div class="space-y-4">
+            <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded-r-2xl">
+              <h4 class="font-bold text-yellow-900 text-sm md:text-base flex items-center gap-2">
+                <i class="fa-solid fa-trophy"></i> Επίπεδο 2: Το Τελικό Τεστ του Master των Πράξεων!
+              </h4>
+              <p class="text-xs md:text-sm text-yellow-800 mt-1">
+                Απάντησε σωστά και στις 5 ερωτήσεις για να ξεκλειδώσεις το <strong>Χρυσό Ψηφιακό Δίπλωμα</strong>!
+              </p>
+            </div>
+
+            <div class="space-y-4">
+              ${mc.map((m, qIdx) => `
+                <div class="p-4 bg-white border border-slate-200 rounded-2xl space-y-2 shadow-xs">
+                  <div class="text-xs md:text-sm font-bold text-slate-800">${m.q}</div>
+                  <div class="grid grid-cols-1 gap-2 mt-2">
+                    ${m.opts.map((opt, optIdx) => `
+                      <label class="flex items-center gap-2.5 p-2.5 bg-slate-50 hover:bg-yellow-50 rounded-xl border border-slate-200 cursor-pointer text-xs md:text-sm transition">
+                        <input type="radio" name="act8-mc-${qIdx}" value="${optIdx}" onchange="window.setMcAct8(${qIdx}, ${optIdx})" class="text-amber-500 focus:ring-amber-400">
+                        <span class="font-medium text-slate-700">${opt}</span>
+                      </label>
+                    `).join('')}
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+
+            <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
+              <button onclick="window.checkAct8L2()" class="bg-amber-500 hover:bg-amber-600 text-white font-bold px-6 py-2.5 rounded-2xl shadow transition">
+                <i class="fa-solid fa-award mr-1"></i> Υποβολή Τελικού Τεστ
+              </button>
+              <div id="act8-fb-2" class="text-sm font-bold"></div>
+            </div>
+          </div>
+        `;
+
+        window.setMcAct8 = (qIdx, optIdx) => {
+          sound.click();
+          mcAns[qIdx] = optIdx;
+        };
+
+        window.checkAct8L2 = () => {
+          const fb = document.getElementById('act8-fb-2');
+          if (Object.keys(mcAns).length < mc.length) {
+            sound.wrong();
+            fb.className = 'text-sm font-bold text-amber-600';
+            fb.innerHTML = '⚠️ Απάντησε σε όλες τις ερωτήσεις!';
+            return;
+          }
+
+          let correct = 0;
+          mc.forEach((m, idx) => {
+            if (mcAns[idx] === m.ans) correct++;
+          });
+
+          if (correct === mc.length) {
+            fb.className = 'text-sm font-bold text-emerald-600';
+            fb.innerHTML = '🎉 5/5 ΣΩΣΤΑ! Είσαι ο απόλυτος Master των Αριθμητικών Πράξεων στο Υπολογιστικό Φύλλο!';
+            awardSuccess('act8', 2, 100);
+            setTimeout(() => showDiplomaModal(true), 1200);
+          } else {
+            sound.wrong();
+            fb.className = 'text-sm font-bold text-rose-600';
+            fb.innerHTML = `Έχεις ${correct} στις 5 σωστές. Προσπάθησε ξανά για το απόλυτο 100%!`;
+          }
+        };
+      }
+    }
+
+    /* ====================================================================
+       INITIALIZATION
+       ==================================================================== */
+    window.addEventListener('DOMContentLoaded', () => {
+      try {
+        const today = new Date().toLocaleDateString('el-GR');
+        document.getElementById('diploma-date').innerText = today;
+      } catch(e) {}
+
+      updateHeaderStats();
+      renderDashboardGrid();
+    });
+  </script>
+</body>
+</html>
