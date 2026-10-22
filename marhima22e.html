@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Μάθημα 22 - Φίλτρα Αναζήτησης</title>
+<style>
+:root{--paper:#F3ECD9;--card:#FFFDF7;--ink:#1F3C63;--ink2:#3C5A85;--gold:#C98A2B;--gold2:#E7C583;--good:#3F7A4E;--goodbg:#E1F0E3;--bad:#B8483D;--badbg:#F7E2DF;--line:#D8CBAA}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:#2B2A28;font-family:"Trebuchet MS","Segoe UI",sans-serif;padding:16px 12px 40px}
+.wrap{max-width:960px;margin:0 auto}
+header{display:flex;align-items:center;gap:14px;padding:16px 20px;background:var(--ink);color:var(--paper);border-radius:12px;margin-bottom:20px;box-shadow:0 4px 10px rgba(0,0,0,.1)}
+.badge{width:50px;height:50px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:bold;color:var(--ink);border:3px solid var(--paper);flex-shrink:0}
+header h1{margin:0;font-size:21px}
+header p{margin:4px 0 0;font-size:13px;opacity:.9}
+#menuView{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:14px}
+.card{background:var(--card);border:2px solid var(--line);border-radius:12px;padding:16px;cursor:pointer;transition:.15s;box-shadow:0 2px 6px rgba(0,0,0,.04)}
+.card:hover{border-color:var(--gold);transform:translateY(-2px);box-shadow:0 6px 14px rgba(0,0,0,.08)}
+.num-tag{display:inline-block;width:26px;height:26px;line-height:26px;text-align:center;background:var(--ink);color:var(--paper);border-radius:50%;font-size:12px;font-weight:bold;margin-bottom:8px}
+.card h3{margin:0 0 6px;font-size:15px;color:var(--ink)}
+.card p{margin:0 0 8px;font-size:12px;color:var(--ink2);line-height:1.3}
+.tag{display:inline-block;padding:3px 8px;background:var(--goodbg);color:var(--good);border-radius:4px;font-size:11px;font-weight:bold}
+#actView{background:var(--card);border:2px solid var(--gold);border-radius:12px;padding:20px;box-shadow:0 6px 16px rgba(0,0,0,.06)}
+.btn-back{background:none;border:2px solid var(--ink);color:var(--ink);padding:7px 16px;border-radius:8px;font-weight:bold;cursor:pointer;margin-bottom:14px;font-family:inherit;font-size:13px}
+.btn-back:hover{background:var(--ink);color:var(--paper)}
+.sub-tabs{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.sub-tab{padding:6px 14px;border-radius:20px;font-size:12.5px;font-weight:bold;background:#e2e8f0;border:1px solid #cbd5e1;cursor:pointer}
+.sub-tab.active{background:var(--gold);color:var(--ink);border-color:var(--gold)}
+.task-box{background:var(--ink);color:var(--paper);padding:14px 18px;border-radius:8px;font-size:14.5px;line-height:1.45;margin-bottom:16px}
+.sim-box{background:#f8fafc;border:2px solid #cbd5e1;border-radius:10px;padding:16px;margin-bottom:14px}
+.feedback{min-height:28px;margin:12px 0;font-weight:bold;font-size:14.5px;padding:8px 12px;border-radius:6px}
+.good{color:var(--good);background:var(--goodbg)}
+.bad{color:var(--bad);background:var(--badbg)}
+.action-btn{background:var(--ink);color:var(--paper);border:none;padding:10px 18px;border-radius:8px;font-weight:bold;cursor:pointer;font-size:13.5px;font-family:inherit}
+.action-btn:hover{background:var(--ink2)}
+.action-btn.alt{background:transparent;color:var(--ink);border:2px solid var(--ink)}
+.next-btn{background:var(--ink);color:var(--paper);border:none;padding:11px 20px;border-radius:8px;font-weight:bold;cursor:pointer;font-size:14px;margin-top:12px;font-family:inherit}
+.filter-tabs{display:flex;gap:8px;padding:8px;background:#e2e8f0;border-radius:8px;margin-bottom:12px;overflow-x:auto}
+.filter-btn{background:#fff;border:1px solid #cbd5e1;border-radius:6px;padding:6px 12px;font-size:13px;font-weight:bold;cursor:pointer;white-space:nowrap}
+.filter-btn.active{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.results-area{background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:14px;min-height:160px}
+.search-bar-sim{display:flex;gap:8px;margin-bottom:12px}
+.search-input{flex:1;padding:8px 12px;border:1px solid #cbd5e1;border-radius:20px;font-size:14px;outline:none}
+.suggest-box{background:#fff;border:1px solid #cbd5e1;border-radius:8px;margin-top:4px;overflow:hidden;box-shadow:0 4px 10px rgba(0,0,0,.08)}
+.suggest-item{padding:8px 14px;cursor:pointer;font-size:13.5px;border-bottom:1px solid #f1f5f9}
+.suggest-item:hover{background:#f1f5f9;color:var(--ink)}
+.quiz-choice{background:#fff;border:2px solid #e2e8f0;border-radius:8px;padding:12px 14px;margin-bottom:8px;cursor:pointer;font-weight:bold;font-size:13.5px}
+.quiz-choice:hover{border-color:var(--gold);background:#fbf7ec}
+.quiz-choice.correct{background:var(--goodbg);color:var(--good);border-color:var(--good)}
+.quiz-choice.wrong{background:var(--badbg);color:var(--bad);border-color:var(--bad)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="badge">22</div>
+    <div>
+      <h1>Ψηφιακοί Πράκτορες — Φίλτρα Αναζήτησης & Αποτελέσματα</h1>
+      <p>Μάθημα 22ο · Εικόνες, Βίντεο, Ειδήσεις, Αυτόματη Συμπλήρωση & Ασφαλής Αναζήτηση — Ε΄ Δημοτικού</p>
+    </div>
+  </header>
+
+  <div id="menuView"></div>
+  <div id="actView" style="display:none">
+    <button class="btn-back" onclick="showMenu()">← Πίσω στο μενού</button>
+    <div class="sub-tabs" id="subTabsBar"></div>
+    <div class="task-box" id="taskDesc"></div>
+    <div class="sim-box" id="simArea"></div>
+    <div class="feedback" id="fbMsg" style="display:none"></div>
+    <div id="nextArea"></div>
+  </div>
+</div>
+
+<script>
+var curAct = 0;
+var curSub = 0;
+
+var activities = [
+  // ACT 1: Τα Φίλτρα της Μηχανής Αναζήτησης
+  {
+    title: "1. Τα Φίλτρα Αναζήτησης",
+    desc: "Μάθε να απομονώνεις Εικόνες, Βίντεο και Ειδήσεις.",
+    subs: [
+      {
+        name: "Επίπεδο 1: Φίλτρο Εικόνων",
+        task: "<b>Αποστολή 1/3:</b> Η Υπατία ψάχνει φωτογραφίες από απειλούμενα ζώα. Πάτα το κουμπί <b>«Εικόνες»</b> στα φίλτρα για να εμφανιστούν μόνο φωτογραφίες!",
+        render: function(box) {
+          box.innerHTML = renderFilterSim("images");
+        }
+      },
+      {
+        name: "Επίπεδο 2: Φίλτρο Βίντεο",
+        task: "<b>Αποστολή 2/3:</b> Ο Ήρωνας θέλει να δει πώς κολυμπάει η θαλάσσια χελώνα. Πάτα το φίλτρο <b>«Βίντεο»</b>!",
+        render: function(box) {
+          box.innerHTML = renderFilterSim("videos");
+        }
+      },
+      {
+        name: "Επίπεδο 3: Φίλτρο Ειδήσεων",
+        task: "<b>Αποστολή 3/3:</b> Θέλουμε τα πιο πρόσφατα νέα και άρθρα εφημερίδων. Πάτα το φίλτρο <b>«Ειδήσεις»</b>!",
+        render: function(box) {
+          box.innerHTML = renderFilterSim("news");
+        }
+      }
+    ]
+  },
+
+  // ACT 2: Αυτόματη Συμπλήρωση (Autosuggest)
+  {
+    title: "2. Αυτόματη Συμπλήρωση",
+    desc: "Πώς η μηχανή προβλέπει τι ψάχνεις καθώς πληκτρολογείς.",
+    subs: [
+      {
+        name: "Επίπεδο 1: Πληκτρολόγηση",
+        task: "<b>Αποστολή 1/3:</b> Γράψε <b>«ζώα»</b> στο πεδίο αναζήτησης (ή πάτα 'Αυτόματο γράψιμο') και δες ποιες σχετικές φράσεις σου προτείνει η μηχανή!",
+        render: function(box) {
+          box.innerHTML = 
+            '<div class="search-bar-sim">' +
+              '<input type="text" class="search-input" id="acInput" placeholder="Πληκτρολόγησε εδώ..." oninput="checkSuggest(this.value)" />' +
+              '<button class="action-btn alt" onclick="autoTypeAC()">Αυτόματο γράψιμο</button>' +
+            '</div>' +
+            '<div class="suggest-box" id="sugBox" style="display:none"></div>';
+        }
+      },
+      {
+        name: "Επίπεδο 2: Επιλογή Πρότασης",
+        task: "<b>Αποστολή 2/3:</b> Πάτησε πάνω στην πρόταση <b>«Υδρόβια ζώα της Ελλάδας»</b> από τη λίστα για να συμπληρωθεί απευθείας η αναζήτηση!",
+        render: function(box) {
+          box.innerHTML = 
+            '<div class="suggest-box" style="display:block">' +
+              '<div class="suggest-item" onclick="pickSugItem(false)">🐾 Ζώα υπό εξαφάνιση</div>' +
+              '<div class="suggest-item" style="font-weight:bold;color:var(--ink)" onclick="pickSugItem(true)">🌊 Υδρόβια ζώα της Ελλάδας</div>' +
+              '<div class="suggest-item" onclick="pickSugItem(false)">🌲 Ενδημικά ζώα της Ελλάδας</div>' +
+            '</div>';
+        }
+      },
+      {
+        name: "Επίπεδο 3: Γιατί βοηθάει;",
+        task: "<b>Αποστολή 3/3:</b> Για ποιον λόγο η μηχανή μάς εμφανίζει προτάσεις καθώς πληκτρολογούμε (σελ. 81);",
+        render: function(box) {
+          renderQuiz(box, [
+            { t: "Μας γλιτώνει χρόνο και μας προτείνει σωστές λέξεις-κλειδιά", ok: true, exp: "Σωστά! Η αυτόματη συμπλήρωση διευκολύνει την αναζήτηση." },
+            { t: "Μας κλειδώνει τον υπολογιστή", ok: false, exp: "Λάθος." },
+            { t: "Σβήνει τις ιστοσελίδες", ok: false, exp: "Λάθος." }
+          ]);
+        }
+      }
+    ]
+  },
+
+  // ACT 3: Επιλογή Κατάλληλης Μορφής Αποτελέσματος
+  {
+    title: "3. Μορφές Αποτελεσμάτων",
+    desc: "Κείμενο, εικόνα, βίντεο ή χάρτης ανάλογα με τον στόχο μας.",
+    subs: [
+      {
+        name: "Επίπεδο 1: Οπτική Πληροφορία",
+        task: "<b>Αποστολή 1/3:</b> Θέλουμε να δούμε ακριβώς πώς μοιάζει το φτέρωμα του σπιζαετού. Ποια μορφή αποτελέσματος είναι η πιο κατάλληλη;",
+        render: function(box) {
+          renderQuiz(box, [
+            { t: "🖼️ Εικόνες", ok: true, exp: "Σωστά! Οι εικόνες προσφέρουν άμεση οπτική πληροφόρηση (σελ. 80)." },
+            { t: "🗺️ Χάρτες", ok: false, exp: "Ο χάρτης δείχνει τοποθεσία, όχι εμφάνιση." },
+            { t: "✈️ Πτήσεις", ok: false, exp: "Οι πτήσεις αφορούν αεροπλάνα!" }
+          ]);
+        }
+      },
+      {
+        name: "Επίπεδο 2: Κίνηση και Ήχος",
+        task: "<b>Αποστολή 2/3:</b> Θέλουμε να ακούσουμε το κελάηδημα και να δούμε πώς πετάει ένα πουλί. Τι επιλέγουμε;",
+        render: function(box) {
+          renderQuiz(box, [
+            { t: "🎥 Βίντεο", ok: true, exp: "Μπράβο! Το βίντεο συνδυάζει κίνηση και ήχο (σελ. 80)." },
+            { t: "📄 Μόνο κείμενο", ok: false, exp: "Το κείμενο δεν έχει ήχο." },
+            { t: "📚 Βιβλία", ok: false, exp: "Όχι." }
+          ]);
+        }
+      },
+      {
+        name: "Επίπεδο 3: Τοποθεσία στο Χώρο",
+        task: "<b>Αποστολή 3/3:</b> Θέλουμε να βρούμε πού ακριβώς βρίσκεται το Εθνικό Θαλάσσιο Πάρκο Ζακύνθου. Ποιο φίλτρο είναι ιδανικό;",
+        render: function(box) {
+          renderQuiz(box, [
+            { t: "🗺️ Χάρτες", ok: true, exp: "Τέλεια! Οι χάρτες δείχνουν ακριβώς πού βρίσκεται αυτό που ψάχνουμε." },
+            { t: "📰 Ειδήσεις", ok: false, exp: "Όχι." },
+            { t: "🖼️ Εικόνες", ok: false, exp: "Όχι." }
+          ]);
+        }
+      }
+    ]
+  },
+
+  // ACT 4: Ασφαλής Αναζήτηση & Παιδικές Μηχανές
+  {
+    title: "4. Ασφαλής Αναζήτηση & Kiddle",
+    desc: "Προστασία από ακατάλληλο περιεχόμενο στο διαδίκτυο.",
+    subs: [
+      {
+        name: "Επίπεδο 1: Ενεργοποίηση SafeSearch",
+        task: "<b>Αποστολή 1/3:</b> Πάτησε το κουμπί <b>«Ενεργοποίηση Ασφαλούς Αναζήτησης»</b> για να μπλοκάρονται οι ακατάλληλες ιστοσελίδες!",
+        render: function(box) {
+          box.innerHTML = 
+            '<div style="text-align:center;padding:16px">' +
+              '<div style="font-size:40px;margin-bottom:8px">🛡️</div>' +
+              '<div style="font-size:15px;margin-bottom:12px">Κατάσταση: <b id="ssState" style="color:var(--bad)">Ανενεργή (Χωρίς προστασία)</b></div>' +
+              '<button class="action-btn" id="btnToggleSS" onclick="toggleSafeSearch()">Ενεργοποίηση Ασφαλούς Αναζήτησης 🔒</button>' +
+            '</div>';
+        }
+      },
+      {
+        name: "Επίπεδο 2: Παιδικές Μηχανές Αναζήτησης",
+        task: "<b>Αποστολή 2/3:</b> Ποια από τις παρακάτω μηχανές αναζήτησης είναι ειδικά σχεδιασμένη για παιδιά (σελ. 82);",
+        render: function(box) {
+          renderQuiz(box, [
+            { t: "🤖 Kiddle (και KidzSearch)", ok: true, exp: "Σωστά! Το Kiddle φιλτράρει επιβλαβές περιεχόμενο και είναι ιδανικό για παιδιά." },
+            { t: "💼 HackerSearch", ok: false, exp: "Όχι, αυτό είναι επικίνδυνο." },
+            { t: "🎮 GameDark", ok: false, exp: "Όχι." }
+          ]);
+        }
+      },
+      {
+        name: "Επίπεδο 3: Γιατί χρειάζεται;",
+        task: "<b>Αποστολή 3/3:</b> Γιατί είναι σημαντικό να χρησιμοποιούμε φίλτρα ασφαλείας;",
+        render: function(box) {
+          renderQuiz(box, [
+            { t: "Για να μην εμφανίζονται ιστοσελίδες ακατάλληλες για παιδιά", ok: true, exp: "Ακριβώς! Μας προστατεύει από ακατάλληλο περιεχόμενο." },
+            { t: "Για να κλείνει η οθόνη του υπολογιστή", ok: false, exp: "Όχι." },
+            { t: "Για να γράφουμε πιο αργά", ok: false, exp: "Όχι." }
+          ]);
+        }
+      }
+    ]
+  }
+];
+
+function initMenu() {
+  var m = document.getElementById("menuView");
+  m.innerHTML = "";
+  activities.forEach(function(act, idx) {
+    var c = document.createElement("div");
+    c.className = "card";
+    c.onclick = function() { loadActivity(idx, 0); };
+    c.innerHTML = '<span class="num-tag">' + (idx + 1) + '</span>' +
+                  '<h3>' + act.title + '</h3>' +
+                  '<p>' + act.desc + '</p>' +
+                  '<span class="tag">3 Επίπεδα ➔</span>';
+    m.appendChild(c);
+  });
+}
+
+function showMenu() {
+  document.getElementById("menuView").style.display = "grid";
+  document.getElementById("actView").style.display = "none";
+}
+
+function loadActivity(actIdx, subIdx) {
+  curAct = actIdx;
+  curSub = subIdx;
+  var act = activities[actIdx];
+  var sub = act.subs[subIdx];
+
+  document.getElementById("menuView").style.display = "none";
+  document.getElementById("actView").style.display = "block";
+
+  var tabs = document.getElementById("subTabsBar");
+  tabs.innerHTML = "";
+  act.subs.forEach(function(s, k) {
+    var b = document.createElement("button");
+    b.className = "sub-tab" + (k === subIdx ? " active" : "");
+    b.textContent = s.name;
+    b.onclick = function() { loadActivity(actIdx, k); };
+    tabs.appendChild(b);
+  });
+
+  document.getElementById("taskDesc").innerHTML = sub.task;
+  var fb = document.getElementById("fbMsg");
+  fb.textContent = "";
+  fb.style.display = "none";
+  document.getElementById("nextArea").innerHTML = "";
+
+  var sa = document.getElementById("simArea");
+  sa.innerHTML = "";
+  sub.render(sa);
+}
+
+function setSuccess(msg) {
+  var fb = document.getElementById("fbMsg");
+  fb.textContent = msg;
+  fb.className = "feedback good";
+  fb.style.display = "block";
+
+  var nextArea = document.getElementById("nextArea");
+  if (!nextArea.hasChildNodes()) {
+    var nb = document.createElement("button");
+    nb.className = "next-btn";
+    var act = activities[curAct];
+    if (curSub < act.subs.length - 1) {
+      nb.textContent = "Επόμενο επίπεδο (" + (curSub + 2) + "/3) ▶";
+      nb.onclick = function() { loadActivity(curAct, curSub + 1); };
+    } else if (curAct < activities.length - 1) {
+      nb.textContent = "Επόμενη δραστηριότητα ▶";
+      nb.onclick = function() { loadActivity(curAct + 1, 0); };
+    } else {
+      nb.textContent = "🎉 Ολοκλήρωσες όλες τις δραστηριότητες του Μαθήματος 22! Πίσω στο μενού";
+      nb.onclick = showMenu;
+    }
+    nextArea.appendChild(nb);
+  }
+}
+
+function setError(msg) {
+  var fb = document.getElementById("fbMsg");
+  fb.textContent = msg;
+  fb.className = "feedback bad";
+  fb.style.display = "block";
+}
+
+function renderFilterSim(targetFilter) {
+  return '<div class="filter-tabs">' +
+           '<button class="filter-btn" id="f_all" onclick="clickFilter(\'all\', \'' + targetFilter + '\')">Όλα</button>' +
+           '<button class="filter-btn" id="f_images" onclick="clickFilter(\'images\', \'' + targetFilter + '\')">🖼️ Εικόνες</button>' +
+           '<button class="filter-btn" id="f_videos" onclick="clickFilter(\'videos\', \'' + targetFilter + '\')">🎥 Βίντεο</button>' +
+           '<button class="filter-btn" id="f_news" onclick="clickFilter(\'news\', \'' + targetFilter + '\')">📰 Ειδήσεις</button>' +
+           '<button class="filter-btn" id="f_maps" onclick="clickFilter(\'maps\', \'' + targetFilter + '\')">🗺️ Χάρτες</button>' +
+         '</div>' +
+         '<div class="results-area" id="filterRes">' +
+           '<div style="color:#64748b;text-align:center">Πάτησε το σωστό φίλτρο στην πάνω γραμμή!</div>' +
+         '</div>';
+}
+
+function clickFilter(chosen, target) {
+  document.querySelectorAll(".filter-btn").forEach(function(b){ b.classList.remove("active"); });
+  document.getElementById("f_" + chosen).classList.add("active");
+  var res = document.getElementById("filterRes");
+
+  if (chosen === target) {
+    if (chosen === "images") {
+      res.innerHTML = '<div style="display:flex;gap:10px;justify-content:center">' +
+                      '<div style="text-align:center"><div style="font-size:45px">🐢</div><div style="font-size:12px;font-weight:bold">Καρέτα-καρέτα.jpg</div></div>' +
+                      '<div style="text-align:center"><div style="font-size:45px">🦭</div><div style="font-size:12px;font-weight:bold">Φώκια-Μονάχους.png</div></div>' +
+                      '<div style="text-align:center"><div style="font-size:45px">🦅</div><div style="font-size:12px;font-weight:bold">Χρυσαετός.jpg</div></div>' +
+                      '</div>';
+      setSuccess("🎉 Μπράβο! Το φίλτρο 'Εικόνες' απομόνωσε μόνο φωτογραφίες των ζώων!");
+    } else if (chosen === "videos") {
+      res.innerHTML = '<div style="background:#f1f5f9;padding:12px;border-radius:8px">' +
+                      '<b>▶ Βίντεο: Το ταξίδι της θαλάσσιας χελώνας στη Ζάκυνθο (4:12)</b><br>' +
+                      '<span style="font-size:12px;color:#64748b">YouTube · Διάρκεια: 4 λεπτά · Ήχος & Κίνηση</span>' +
+                      '</div>';
+      setSuccess("🎉 Άψογα! Το φίλτρο 'Βίντεο' εμφάνισε αποτελέσματα με κίνηση και ήχο!");
+    } else if (chosen === "news") {
+      res.innerHTML = '<div style="background:#f1f5f9;padding:12px;border-radius:8px">' +
+                      '<b>📰 Εφημερίδα: Νέες δράσεις για την προστασία της άγριας ζωής</b><br>' +
+                      '<span style="font-size:12px;color:#64748b">Πριν από 2 ώρες · Δημοσιογραφικό άρθρο</span>' +
+                      '</div>';
+      setSuccess("🎉 Πολύ σωστά! Το φίλτρο 'Ειδήσεις' εμφάνισε τα πρόσφατα άρθρα!");
+    }
+  } else {
+    setError("✗ Αυτό το φίλτρο δεν ταιριάζει με τον στόχο της αποστολής! Δοκίμασε το σωστό.");
+  }
+}
+
+function checkSuggest(val) {
+  var b = document.getElementById("sugBox");
+  if (val.trim().length > 0) {
+    b.style.display = "block";
+    b.innerHTML = '<div class="suggest-item" onclick="pickSugItem(false)">🐾 Ζώα υπό εξαφάνιση στην Ελλάδα</div>' +
+                  '<div class="suggest-item" style="font-weight:bold;color:var(--ink)" onclick="pickSugItem(true)">🌊 Υδρόβια ζώα της Ελλάδας</div>' +
+                  '<div class="suggest-item" onclick="pickSugItem(false)">🌲 Ενδημικά ζώα της Ελλάδας</div>';
+    setSuccess("✓ Είδες; Η μηχανή αναγνώρισε τη λέξη και πρότεινε 3 σχετικές φράσεις!");
+  } else {
+    b.style.display = "none";
+  }
+}
+function autoTypeAC() {
+  document.getElementById("acInput").value = "ζώα";
+  checkSuggest("ζώα");
+}
+function pickSugItem(isTarget) {
+  if (isTarget) {
+    setSuccess("🎉 Τέλεια! Επέλεξες την πρόταση 'Υδρόβια ζώα' και η μηχανή γέμισε απευθείας το πεδίο αναζήτησης!");
+  } else {
+    setSuccess("✓ Πολύ ωραία επιλογή! Η αυτόματη συμπλήρωση μας γλιτώνει χρόνο πληκτρολόγησης!");
+  }
+}
+
+function toggleSafeSearch() {
+  var st = document.getElementById("ssState");
+  st.textContent = "Ενεργή 🔒 (Ασφαλές περιεχόμενο για παιδιά)";
+  st.style.color = "var(--good)";
+  document.getElementById("btnToggleSS").style.display = "none";
+  setSuccess("🎉 Συγχαρητήρια! Η Ασφαλής Αναζήτηση ενεργοποιήθηκε και φιλτράρει ό,τι δεν είναι κατάλληλο για μαθητές!");
+}
+
+function renderQuiz(box, choices) {
+  box.innerHTML = "";
+  choices.forEach(function(c) {
+    var d = document.createElement("div");
+    d.className = "quiz-choice";
+    d.textContent = c.t;
+    d.onclick = function() {
+      if (c.ok) {
+        d.classList.add("correct");
+        setSuccess(c.exp);
+      } else {
+        d.classList.add("wrong");
+        setError(c.exp);
+      }
+    };
+    box.appendChild(d);
+  });
+}
+
+initMenu();
+</script>
+</body>
+</html>
