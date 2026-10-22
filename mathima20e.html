@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Μάθημα 20 - Τεχνητή Νοημοσύνη & Μηχανική Μάθηση</title>
+<style>
+:root{--paper:#F3ECD9;--card:#FFFDF7;--ink:#1F3C63;--ink2:#3C5A85;--gold:#C98A2B;--gold2:#E7C583;--good:#3F7A4E;--goodbg:#E1F0E3;--bad:#B8483D;--badbg:#F7E2DF;--line:#D8CBAA}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:#2B2A28;font-family:"Trebuchet MS","Segoe UI",sans-serif;padding:16px 12px 40px}
+.wrap{max-width:960px;margin:0 auto}
+header{display:flex;align-items:center;gap:14px;padding:16px 20px;background:var(--ink);color:var(--paper);border-radius:12px;margin-bottom:20px;box-shadow:0 4px 10px rgba(0,0,0,.1)}
+.badge{width:50px;height:50px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:bold;color:var(--ink);border:3px solid var(--paper);flex-shrink:0}
+header h1{margin:0;font-size:21px}
+header p{margin:4px 0 0;font-size:13px;opacity:.9}
+#menuView{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:14px}
+.card{background:var(--card);border:2px solid var(--line);border-radius:12px;padding:16px;cursor:pointer;transition:.15s;box-shadow:0 2px 6px rgba(0,0,0,.04)}
+.card:hover{border-color:var(--gold);transform:translateY(-2px);box-shadow:0 6px 14px rgba(0,0,0,.08)}
+.num-tag{display:inline-block;width:26px;height:26px;line-height:26px;text-align:center;background:var(--ink);color:var(--paper);border-radius:50%;font-size:12px;font-weight:bold;margin-bottom:8px}
+.card h3{margin:0 0 6px;font-size:15px;color:var(--ink)}
+.card p{margin:0 0 8px;font-size:12px;color:var(--ink2);line-height:1.3}
+.tag{display:inline-block;padding:3px 8px;background:var(--goodbg);color:var(--good);border-radius:4px;font-size:11px;font-weight:bold}
+#actView{background:var(--card);border:2px solid var(--gold);border-radius:12px;padding:20px;box-shadow:0 6px 16px rgba(0,0,0,.06)}
+.btn-back{background:none;border:2px solid var(--ink);color:var(--ink);padding:7px 16px;border-radius:8px;font-weight:bold;cursor:pointer;margin-bottom:14px;font-family:inherit;font-size:13px}
+.btn-back:hover{background:var(--ink);color:var(--paper)}
+.task-box{background:var(--ink);color:var(--paper);padding:14px 18px;border-radius:8px;font-size:14.5px;line-height:1.45;margin-bottom:16px}
+.feedback{min-height:28px;margin:12px 0;font-weight:bold;font-size:14.5px;padding:8px 12px;border-radius:6px}
+.good{color:var(--good);background:var(--goodbg)}
+.bad{color:var(--bad);background:var(--badbg)}
+.sim-box{background:#f8fafc;border:2px solid #cbd5e1;border-radius:10px;padding:16px;margin-bottom:14px}
+.action-btn{background:var(--ink);color:var(--paper);border:none;padding:10px 18px;border-radius:8px;font-weight:bold;cursor:pointer;font-size:13.5px;font-family:inherit}
+.action-btn:hover{background:var(--ink2)}
+.action-btn.alt{background:transparent;color:var(--ink);border:2px solid var(--ink)}
+.canvas-wrap{border:2px dashed #94a3b8;border-radius:8px;background:#fff;position:relative;width:300px;height:240px;touch-action:none;user-select:none;-webkit-user-select:none;margin:0 auto}
+canvas{width:100%;height:100%;touch-action:none;display:block}
+.ai-suggestions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;min-height:36px;align-items:center;justify-content:center}
+.sug-pill{background:#e2e8f0;padding:8px 16px;border-radius:20px;font-size:14px;cursor:pointer;font-weight:bold;border:2px solid #cbd5e1;transition:.15s}
+.sug-pill:hover{background:var(--gold2);border-color:var(--gold);transform:scale(1.05)}
+.sug-pill.active{background:var(--goodbg);color:var(--good);border-color:var(--good)}
+.chat-window{background:#fff;border:1px solid #cbd5e1;border-radius:8px;height:240px;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px}
+.chat-msg{max-width:80%;padding:8px 12px;border-radius:12px;font-size:13.5px;line-height:1.35}
+.msg-ai{background:#e0f2fe;color:#0369a1;align-self:flex-start;border-bottom-left-radius:2px}
+.msg-user{background:#dcfce7;color:#15803d;align-self:flex-end;border-bottom-right-radius:2px}
+.chat-input-bar{display:flex;gap:8px;margin-top:10px}
+.chat-txt{flex:1;border:1px solid #cbd5e1;border-radius:6px;padding:8px 12px;font-size:14px;outline:none}
+.vote-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;width:100%}
+.vote-card{background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:12px}
+.vote-card h4{margin:0 0 6px;color:var(--ink);font-size:14px}
+.vote-option{padding:8px 10px;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;font-size:13.5px;border:1px solid #e2e8f0;background:#fff}
+.vote-option:hover{background:#f1f5f9}
+.vote-option.liked{background:var(--goodbg);color:var(--good);font-weight:bold;border-color:var(--good)}
+.tool-btn{background:#fff;border:1px solid #94a3b8;border-radius:6px;padding:7px 14px;font-size:13px;font-weight:bold;cursor:pointer;font-family:inherit}
+.next-btn{background:var(--ink);color:var(--paper);border:none;padding:11px 20px;border-radius:8px;font-weight:bold;cursor:pointer;font-size:14px;margin-top:12px;font-family:inherit}
+.next-btn:hover{background:var(--ink2)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="badge">20</div>
+    <div>
+      <h1>Ψηφιακοί Πράκτορες — Τεχνητή Νοημοσύνη & Μηχανική Μάθηση</h1>
+      <p>Μάθημα 20ό · Δεδομένα, εκπαίδευση, αναγνώριση μοτίβων και συστάσεις — Ε΄ Δημοτικού</p>
+    </div>
+  </header>
+
+  <div id="menuView"></div>
+  <div id="actView" style="display:none">
+    <button class="btn-back" onclick="showMenu()">← Πίσω στο μενού</button>
+    <div class="task-box" id="taskDesc"></div>
+    <div class="sim-box" id="simArea"></div>
+    <div class="feedback" id="fbMsg" style="display:none"></div>
+    <div id="nextArea"></div>
+  </div>
+</div>
+
+<script>
+var curIndex = 0;
+
+var activities = [
+  {
+    title: "1. Ο Ψηφιακός Βοηθός (Chatbot)",
+    desc: "Μίλησε με τον βοηθό mAigov που απαντά με τεχνητή νοημοσύνη.",
+    task: "<b>Αποστολή:</b> Δοκίμασε να κάνεις μια ερώτηση στον ψηφιακό βοηθό mAigov. Πληκτρολόγησε: <b>Πώς εκδίδω κάρτα βιβλιοθήκης;</b> ή πάτα το κουμπί 'Έτοιμη Ερώτηση' και δες πώς απαντάει σε φυσική γλώσσα!",
+    init: function(el) {
+      el.innerHTML = '<div class="chat-window" id="chatLogs">' +
+                     '<div class="chat-msg msg-ai">Γεια σου! Είμαι ο ψηφιακός βοηθός mAigov. Πώς μπορώ να σε βοηθήσω σήμερα;</div>' +
+                     '</div>' +
+                     '<div class="chat-input-bar">' +
+                     '<input type="text" class="chat-txt" id="chatIn" placeholder="Γράψε μια ερώτηση..." />' +
+                     '<button class="action-btn" onclick="sendChat()">Αποστολή</button>' +
+                     '<button class="action-btn alt" onclick="quickChat()">Έτοιμη Ερώτηση</button>' +
+                     '</div>';
+    }
+  },
+  {
+    title: "2. Προσομοιωτής AutoDraw (Σκίτσο)",
+    desc: "Σχεδίασε με το δάχτυλο ή το ποντίκι και δες την AI να αντικαθιστά το σκίτσο σου με έτοιμο σχέδιο!",
+    task: "<b>Αποστολή:</b> 1. Σχεδίασε με το δάχτυλό σου ένα απλό σκίτσο στον καμβά.<br>2. Πάτα <b>«Αναγνώριση Μοτίβου 🔍»</b>.<br>3. <b>Πάτα μία πρόταση (π.χ. ☀️ Ήλιος ή 🌳 Δέντρο)</b> και δες την AI να ζωγραφίζει το τέλειο σχέδιο στον καμβά!",
+    init: function(el) {
+      el.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center">' +
+                     '<div class="canvas-wrap"><canvas id="drawCanvas" width="300" height="240"></canvas></div>' +
+                     '<div style="margin-top:12px;display:flex;gap:8px">' +
+                     '<button class="action-btn" onclick="aiDetectDrawing()">Αναγνώριση Μοτίβου 🔍</button>' +
+                     '<button class="action-btn alt" onclick="clearCanvas()">Καθαρισμός</button>' +
+                     '</div>' +
+                     '<div style="margin-top:14px;font-size:13.5px;font-weight:bold;color:var(--ink)">Προτάσεις της AI (Μοτίβα):</div>' +
+                     '<div class="ai-suggestions" id="sugList"><span style="color:#64748b;font-size:13px">Σχεδίασε κάτι με το δάχτυλο και πάτα Αναγνώριση!</span></div>' +
+                     '</div>';
+      setupDrawingCanvas();
+    }
+  },
+  {
+    title: "3. Εκπαίδευση AI: Γάτα ή Σκύλος;",
+    desc: "Τροφοδότησε την AI με δεδομένα για να μάθει να ξεχωρίζει τα ζώα.",
+    task: "<b>Αποστολή:</b> Για να μάθει η εφαρμογή μηχανικής μάθησης, χρειάζεται πολλά παραδείγματα (σελ. 74). Πάτα το κουμπί <b>«Τροφοδότηση με 100 φωτογραφίες»</b> και μετά <b>«Έλεγχος Νέας Εικόνας»</b>!",
+    init: function(el) {
+      el.innerHTML = '<div style="text-align:center">' +
+                     '<p style="font-size:14px;color:var(--ink)">Κατάσταση εκπαίδευσης: <b id="trainStatus" style="color:var(--bad)">0 φωτογραφίες (Χωρίς εκπαίδευση)</b></p>' +
+                     '<div style="display:inline-block;padding:16px;background:#fff;border:2px dashed #cbd5e1;border-radius:10px;margin-bottom:12px">' +
+                     '<div id="sampleImg" style="font-size:55px">❓</div>' +
+                     '<div id="sampleTxt" style="font-size:13.5px;font-weight:bold;margin-top:6px;color:#475569">Άγνωστη εικόνα</div>' +
+                     '</div><br>' +
+                     '<button class="action-btn" id="btnTrain" onclick="trainAI()">Τροφοδότηση με 100 φωτογραφίες 🐱🐶</button> ' +
+                     '<button class="action-btn alt" id="btnTest" style="display:none" onclick="testAI()">Έλεγχος Νέας Εικόνας 🔍</button>' +
+                     '</div>';
+    }
+  },
+  {
+    title: "4. Πώς Προτείνει Ταινίες η Ψηφιακή TV;",
+    desc: "Κατανόησε πώς οι προτιμήσεις του χρήστη γίνονται δεδομένα εκπαίδευσης.",
+    task: "<b>Αποστολή:</b> Όταν η οικογένεια του Ήρωνα βαθμολογεί θετικά ταινίες κινουμένων σχεδίων (σελ. 73), η AI καταγράφει τα δεδομένα. Διάλεξε <b>3 ταινίες που σου αρέσουν</b> πατώντας 👍 και δες τι θα σου προτείνει!",
+    init: function(el) {
+      var movies = ["Περιπέτεια στο Διάστημα 🚀", "Τα Ζωάκια του Δάσους 🐾", "Ο Μικρός Εξερευνητής 🧭", "Η Μαγική Πολιτεία 🏰"];
+      var html = '<p style="font-size:13.5px;margin-bottom:12px">Επίλεξε 3 ταινίες που σου αρέσουν:</p><div class="vote-grid">';
+      movies.forEach(function(m, idx) {
+        html += '<div class="vote-card"><h4>' + m + '</h4>' +
+                '<button class="tool-btn" id="mv_' + idx + '" onclick="likeMovie(' + idx + ', \'' + m + '\')">👍 Μου αρέσει</button>' +
+                '</div>';
+      });
+      html += '</div>';
+      el.innerHTML = html;
+    }
+  },
+  {
+    title: "5. Το Παιχνίδι των Συνδρομητών (σελ. 75)",
+    desc: "Εφάρμοσε τον πραγματικό αλγόριθμο πρότασης ταινίας της τάξης.",
+    task: "<b>Αποστολή:</b> Ο 4ος (νέος) παίκτης ψήφισε ότι του αρέσει η ταινία: <b>«Ο μικρός πρίγκιπας»</b>. Βρες στους παλιούς παίκτες ποιοι ψήφισαν την ίδια ταινία και πάτα <b>«Εκτέλεση Αλγορίθμου Σύστασης»</b>!",
+    init: function(el) {
+      el.innerHTML = '<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px">' +
+                     '<div class="vote-card" style="flex:1;min-width:180px">' +
+                     '<h4>👤 Παίκτης 1 (Παλιός)</h4>' +
+                     '<div>✓ Ο μικρός πρίγκιπας</div>' +
+                     '<div>✓ Πινόκιο</div>' +
+                     '</div>' +
+                     '<div class="vote-card" style="flex:1;min-width:180px">' +
+                     '<h4>👤 Παίκτης 2 (Παλιός)</h4>' +
+                     '<div>✓ Ο μικρός πρίγκιπας</div>' +
+                     '<div>✓ Πινόκιο</div>' +
+                     '</div>' +
+                     '<div class="vote-card" style="flex:1;min-width:180px">' +
+                     '<h4>👤 Παίκτης 3 (Παλιός)</h4>' +
+                     '<div>✓ Περιπέτεια στον Άρη</div>' +
+                     '</div>' +
+                     '<div class="vote-card" style="flex:1;min-width:180px;border-color:var(--gold);background:#fbf7ec">' +
+                     '<h4>⭐ Νέος Συνδρομητής</h4>' +
+                     '<div><b>Του αρέσει:</b> Ο μικρός πρίγκιπας</div>' +
+                     '</div>' +
+                     '</div>' +
+                     '<div style="text-align:center">' +
+                     '<button class="action-btn" onclick="runMovieAlgorithm()">Εκτέλεση Αλγορίθμου Σύστασης 🎬</button>' +
+                     '</div>';
+    }
+  },
+  {
+    title: "6. Ανίχνευση Μοτίβων & Χαρακτηριστικών",
+    desc: "Βρες ποια στοιχεία αναλύει η μηχανική μάθηση σε μια φωτογραφία.",
+    task: "<b>Αποστολή:</b> Για να αναγνωρίσει η AI ένα πρόσωπο ή ένα αντικείμενο, ψάχνει συγκεκριμένα κοινά χαρακτηριστικά (σελ. 74). Πάτα πάνω στα <b>3 σωστά χαρακτηριστικά</b> που χρησιμοποιεί η AI για να αναγνωρίσει μια γάτα!",
+    init: function(el) {
+      var traits = [
+        { name: "Σχήμα και απόσταση αφτιών", correct: true },
+        { name: "Όνομα που της έδωσε ο ιδιοκτήτης", correct: false },
+        { name: "Μέγεθος και σχήμα ματιών", correct: true },
+        { name: "Τιμή αγοράς του ζώου", correct: false },
+        { name: "Σχήμα μουσούδας και μουστάκια", correct: true },
+        { name: "Αν κοιμάται τα πρωινά", correct: false }
+      ];
+      var html = '<div class="vote-grid" id="traitGrid">';
+      traits.forEach(function(t, idx) {
+        html += '<div class="vote-option" id="tr_' + idx + '" onclick="toggleTrait(' + idx + ', ' + t.correct + ')">' +
+                t.name + ' <span id="chk_' + idx + '">⬜</span></div>';
+      });
+      html += '</div>';
+      el.innerHTML = html;
+    }
+  },
+  {
+    title: "7. Η Δύναμη του Όγκου Δεδομένων",
+    desc: "Δες πώς η AI γίνεται πιο έξυπνη όταν έχει περισσότερα δεδομένα.",
+    task: "<b>Αποστολή:</b> Σελίδα 74: 'Φαντάσου πόσο καλύτερες αποφάσεις παίρνει η AI με χιλιάδες δεδομένα!'. Σύρε τον μετρητή δεδομένων από το 10 στο <b>10.000 δεδομένα</b> και δες πώς αυξάνεται η ακρίβεια της AI!",
+    init: function(el) {
+      el.innerHTML = '<div style="text-align:center;padding:10px">' +
+                     '<p style="font-size:15px;color:var(--ink)">Πλήθος δεδομένων εκπαίδευσης: <b id="lblDataCount" style="color:var(--good);font-size:18px">10</b></p>' +
+                     '<input type="range" id="dataSlider" min="10" max="10000" step="100" value="10" style="width:85%;cursor:pointer" oninput="updateDataVolume(this.value)" /><br><br>' +
+                     '<div style="font-size:16px;font-weight:bold">Ακρίβεια προβλέψεων AI: <span id="lblAccuracy" style="color:var(--bad)">30% (Πολλά λάθη)</span></div>' +
+                     '</div>';
+    }
+  },
+  {
+    title: "8. Μεγάλος Έλεγχος AI & Machine Learning",
+    desc: "Ολοκλήρωσε τη σύνοψη του μαθήματος 20.",
+    task: "<b>Αποστολή:</b> Απάντησε στη βασική ερώτηση του μαθήματος: Τι κάνουν τα συστήματα τεχνητής νοημοσύνης για να παίρνουν σωστές αποφάσεις;",
+    init: function(el) {
+      el.innerHTML = '<div style="display:flex;flex-direction:column;gap:8px">' +
+                     '<button class="action-btn alt" onclick="answerFinal(false)">Α. Μαντεύουν στην τύχη χωρίς να κοιτάνε δεδομένα</button>' +
+                     '<button class="action-btn alt" onclick="answerFinal(true)">Β. Εκπαιδεύονται με μεγάλο όγκο δεδομένων και βρίσκουν κοινά μοτίβα</button>' +
+                     '<button class="action-btn alt" onclick="answerFinal(false)">Γ. Κάνουν μόνο αριθμητικές πράξεις πρόσθεσης</button>' +
+                     '</div>';
+    }
+  }
+];
+
+function initMenu() {
+  var menu = document.getElementById("menuView");
+  menu.innerHTML = "";
+  activities.forEach(function(act, idx) {
+    var c = document.createElement("div");
+    c.className = "card";
+    c.onclick = function() { loadActivity(idx); };
+    c.innerHTML = '<span class="num-tag">' + (idx + 1) + '</span>' +
+                  '<h3>' + act.title + '</h3>' +
+                  '<p>' + act.desc + '</p>' +
+                  '<span class="tag">▶ Έναρξη δραστηριότητας</span>';
+    menu.appendChild(c);
+  });
+}
+
+function showMenu() {
+  document.getElementById("menuView").style.display = "grid";
+  document.getElementById("actView").style.display = "none";
+}
+
+function loadActivity(idx) {
+  curIndex = idx;
+  var act = activities[idx];
+  document.getElementById("menuView").style.display = "none";
+  document.getElementById("actView").style.display = "block";
+
+  document.getElementById("taskDesc").innerHTML = act.task;
+  var fb = document.getElementById("fbMsg");
+  fb.textContent = "";
+  fb.style.display = "none";
+  document.getElementById("nextArea").innerHTML = "";
+
+  var simArea = document.getElementById("simArea");
+  simArea.innerHTML = "";
+  act.init(simArea);
+}
+
+function setSuccess(msg) {
+  var fb = document.getElementById("fbMsg");
+  fb.textContent = msg;
+  fb.className = "feedback good";
+  fb.style.display = "block";
+
+  var nextArea = document.getElementById("nextArea");
+  if (!nextArea.hasChildNodes()) {
+    var nb = document.createElement("button");
+    nb.className = "next-btn";
+    if (curIndex < activities.length - 1) {
+      nb.textContent = "Επόμενη δραστηριότητα ▶";
+      nb.onclick = function() { loadActivity(curIndex + 1); };
+    } else {
+      nb.textContent = "🎉 Συγχαρητήρια! Ολοκλήρωσες το Μάθημα 20! Πίσω στο μενού";
+      nb.onclick = showMenu;
+    }
+    nextArea.appendChild(nb);
+  }
+}
+
+function setError(msg) {
+  var fb = document.getElementById("fbMsg");
+  fb.textContent = msg;
+  fb.className = "feedback bad";
+  fb.style.display = "block";
+}
+
+function sendChat() {
+  var txt = document.getElementById("chatIn").value.trim();
+  if (!txt) return;
+  var logs = document.getElementById("chatLogs");
+  logs.innerHTML += '<div class="chat-msg msg-user">' + txt + '</div>';
+  document.getElementById("chatIn").value = "";
+  setTimeout(function() {
+    logs.innerHTML += '<div class="chat-msg msg-ai">Για την έκδοση κάρτας βιβλιοθήκης χρειάζεται ταυτότητα ή βεβαίωση γονέα. Μπορείς να υποβάλεις αίτηση στο gov.gr!</div>';
+    logs.scrollTop = logs.scrollHeight;
+    setSuccess("✓ Μπράβο! Το chatbot (ψηφιακός βοηθός) επεξεργάστηκε την ερώτησή σου και απάντησε όπως ένας άνθρωπος!");
+  }, 600);
+}
+function quickChat() {
+  document.getElementById("chatIn").value = "Πώς εκδίδω κάρτα βιβλιοθήκης;";
+  sendChat();
+}
+
+var isDrawing = false;
+function setupDrawingCanvas() {
+  var canvas = document.getElementById("drawCanvas");
+  if (!canvas) return;
+  var ctx = canvas.getContext("2d");
+  ctx.strokeStyle = "#1F3C63";
+  ctx.lineWidth = 5;
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+
+  function getPos(e) {
+    var rect = canvas.getBoundingClientRect();
+    var scaleX = canvas.width / rect.width;
+    var scaleY = canvas.height / rect.height;
+    var clientX = e.clientX;
+    var clientY = e.clientY;
+
+    if (e.touches && e.touches.length > 0) {
+      clientX = e.touches[0].clientX;
+      clientY = e.touches[0].clientY;
+    }
+
+    return {
+      x: (clientX - rect.left) * scaleX,
+      y: (clientY - rect.top) * scaleY
+    };
+  }
+
+  function start(e) {
+    e.preventDefault();
+    isDrawing = true;
+    var pos = getPos(e);
+    ctx.beginPath();
+    ctx.moveTo(pos.x, pos.y);
+  }
+
+  function move(e) {
+    if (!isDrawing) return;
+    e.preventDefault();
+    var pos = getPos(e);
+    ctx.lineTo(pos.x, pos.y);
+    ctx.stroke();
+  }
+
+  function end(e) {
+    if (!isDrawing) return;
+    e.preventDefault();
+    isDrawing = false;
+  }
+
+  if (window.PointerEvent) {
+    canvas.addEventListener("pointerdown", start);
+    canvas.addEventListener("pointermove", move);
+    canvas.addEventListener("pointerup", end);
+    canvas.addEventListener("pointercancel", end);
+  } else {
+    canvas.addEventListener("touchstart", start, { passive: false });
+    canvas.addEventListener("touchmove", move, { passive: false });
+    canvas.addEventListener("touchend", end, { passive: false });
+    canvas.addEventListener("mousedown", start);
+    canvas.addEventListener("mousemove", move);
+    canvas.addEventListener("mouseup", end);
+    canvas.addEventListener("mouseleave", end);
+  }
+}
+
+function clearCanvas() {
+  var canvas = document.getElementById("drawCanvas");
+  if (!canvas) return;
+  var ctx = canvas.getContext("2d");
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  document.getElementById("sugList").innerHTML = '<span style="color:#64748b;font-size:13px">Σχεδίασε κάτι με το δάχτυλο και πάτα Αναγνώριση!</span>';
+}
+
+function aiDetectDrawing() {
+  var sugList = document.getElementById("sugList");
+  sugList.innerHTML = '<span class="sug-pill" onclick="pickSug(this, \'sun\')">☀️ Ήλιος</span>' +
+                      '<span class="sug-pill" onclick="pickSug(this, \'tree\')">🌳 Δέντρο</span>' +
+                      '<span class="sug-pill" onclick="pickSug(this, \'house\')">🏠 Σπίτι</span>' +
+                      '<span class="sug-pill" onclick="pickSug(this, \'car\')">🚗 Αυτοκίνητο</span>';
+  setSuccess("✓ Η AI ανέλυσε τις γραμμές σου (μοτίβο) και αναγνώρισε πιθανά αντικείμενα! Πάτησε πάνω σε μία από τις προτάσεις (π.χ. ☀️ Ήλιος) για να το ζωγραφίσει!");
+}
+
+function pickSug(btn, shape) {
+  document.querySelectorAll(".sug-pill").forEach(function(p){ p.classList.remove("active"); });
+  btn.classList.add("active");
+
+  var canvas = document.getElementById("drawCanvas");
+  if (!canvas) return;
+  var ctx = canvas.getContext("2d");
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  if (shape === "sun") {
+    ctx.save();
+    ctx.fillStyle = "#F59E0B";
+    ctx.strokeStyle = "#D97706";
+    ctx.lineWidth = 4;
+    var cx = 150, cy = 120, r = 40;
+    
+    for (var i = 0; i < 12; i++) {
+      var angle = (i * Math.PI) / 6;
+      var x1 = cx + Math.cos(angle) * (r + 10);
+      var y1 = cy + Math.sin(angle) * (r + 10);
+      var x2 = cx + Math.cos(angle) * (r + 30);
+      var y2 = cy + Math.sin(angle) * (r + 30);
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.stroke();
+    }
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.fillStyle = "#78350F";
+    ctx.beginPath();
+    ctx.arc(cx - 14, cy - 8, 4, 0, Math.PI * 2);
+    ctx.arc(cx + 14, cy - 8, 4, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(cx, cy + 6, 16, 0.2, Math.PI - 0.2);
+    ctx.stroke();
+    ctx.restore();
+
+  } else if (shape === "tree") {
+    ctx.save();
+    ctx.fillStyle = "#854D0E";
+    ctx.fillRect(135, 140, 30, 70);
+    ctx.fillStyle = "#16A34A";
+    ctx.beginPath();
+    ctx.arc(150, 110, 55, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(115, 125, 40, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(185, 125, 40, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+
+  } else if (shape === "house") {
+    ctx.save();
+    ctx.fillStyle = "#FDE68A";
+    ctx.strokeStyle = "#1F3C63";
+    ctx.lineWidth = 4;
+    ctx.fillRect(90, 110, 120, 95);
+    ctx.strokeRect(90, 110, 120, 95);
+    ctx.fillStyle = "#EF4444";
+    ctx.beginPath();
+    ctx.moveTo(80, 110);
+    ctx.lineTo(150, 50);
+    ctx.lineTo(220, 110);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+    ctx.fillStyle = "#78350F";
+    ctx.fillRect(135, 150, 30, 55);
+    ctx.strokeRect(135, 150, 30, 55);
+    ctx.fillStyle = "#BFDBFE";
+    ctx.fillRect(100, 125, 25, 25);
+    ctx.strokeRect(100, 125, 25, 25);
+    ctx.restore();
+
+  } else if (shape === "car") {
+    ctx.save();
+    ctx.fillStyle = "#3B82F6";
+    ctx.strokeStyle = "#1F3C63";
+    ctx.lineWidth = 4;
+    ctx.fillRect(70, 130, 160, 45);
+    ctx.strokeRect(70, 130, 160, 45);
+    ctx.fillRect(110, 95, 80, 35);
+    ctx.strokeRect(110, 95, 80, 35);
+    ctx.fillStyle = "#1E293B";
+    ctx.beginPath();
+    ctx.arc(105, 175, 16, 0, Math.PI * 2);
+    ctx.arc(195, 175, 16, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  setSuccess("🎉 ΤΕΛΕΙΑ! Όπως στο AutoDraw της Google, η AI αναγνώρισε το μοτίβο και αντικατέστησε το πρόχειρο σκίτσο με το έτοιμο καθαρό σχέδιο: " + btn.textContent + "!");
+}
+
+var trained = false;
+function trainAI() {
+  trained = true;
+  document.getElementById("trainStatus").textContent = "100 φωτογραφίες (Εκπαιδεύτηκε!)";
+  document.getElementById("trainStatus").style.color = "var(--good)";
+  document.getElementById("btnTrain").style.display = "none";
+  document.getElementById("btnTest").style.display = "inline-block";
+  setSuccess("✓ Η εφαρμογή τροφοδοτήθηκε με 50 γάτες και 50 σκύλους και έμαθε τα κοινά μοτίβα! Τώρα πάτα Έλεγχος Νέας Εικόνας!");
+}
+function testAI() {
+  if (!trained) return;
+  document.getElementById("sampleImg").textContent = "🐱";
+  document.getElementById("sampleTxt").textContent = "Αναγνωρίστηκε: Γάτα (βεβαιότητα 98%)!";
+  setSuccess("🎉 Καταπληκτικά! Η AI αναγνώρισε το σχήμα των ματιών και τα μουστάκια και αποφάσισε σωστά ότι πρόκειται για γάτα!");
+}
+
+var likedCount = 0;
+function likeMovie(idx, title) {
+  var btn = document.getElementById("mv_" + idx);
+  if (!btn || btn.disabled) return;
+  btn.disabled = true;
+  btn.textContent = "❤️ Σου αρέσει!";
+  btn.style.background = "var(--goodbg)";
+  btn.style.color = "var(--good)";
+  likedCount++;
+  if (likedCount >= 3) {
+    setSuccess("🎉 Μπράβο! Η AI κατέγραψε τα δεδομένα σου και σου προτείνει: 'Η Μαγική Περιπέτεια στο Δάσος' (ταιριάζει 95% στα γούστα σου)!");
+  }
+}
+
+function runMovieAlgorithm() {
+  setSuccess("🎉 Συγχαρητήρια! Ο αλγόριθμος βρήκε ότι στους παίκτες 1 και 2 άρεσε 'Ο μικρός πρίγκιπας' και στους δύο άρεσε επίσης και ο 'Πινόκιο'. Άρα στον νέο παίκτη προτείνουμε τον Πινόκιο!");
+}
+
+var selectedTraits = 0;
+function toggleTrait(idx, isCorr) {
+  var el = document.getElementById("tr_" + idx);
+  var chk = document.getElementById("chk_" + idx);
+  if (isCorr) {
+    el.classList.add("liked");
+    chk.textContent = "✅";
+    selectedTraits++;
+    if (selectedTraits >= 3) {
+      setSuccess("🎉 Άριστα! Η AI αναλύει σχήμα αφτιών, μάτια και μουσούδα για να αναγνωρίσει τα ζώα, και όχι άσχετες πληροφορίες!");
+    }
+  } else {
+    setError("✗ Αυτή η πληροφορία δεν φαίνεται στην εικόνα και δεν βοηθάει την AI να αναγνωρίσει το ζώο!");
+  }
+}
+
+function updateDataVolume(val) {
+  document.getElementById("lblDataCount").textContent = val;
+  var acc = document.getElementById("lblAccuracy");
+  var num = parseInt(val);
+  if (num < 1000) {
+    acc.textContent = "35% (Χαμηλή ακρίβεια - λίγα δεδομένα)";
+    acc.style.color = "var(--bad)";
+  } else if (num < 5000) {
+    acc.textContent = "75% (Καλή ακρίβεια)";
+    acc.style.color = "var(--gold)";
+  } else {
+    acc.textContent = "99% (Εξαιρετική ακρίβεια - πλούσια εκπαίδευση!)";
+    acc.style.color = "var(--good)";
+    setSuccess("🎉 Εξαιρετικά! Όσο περισσότερα δεδομένα δίνουμε στην εφαρμογή, τόσο πιο έξυπνη και ακριβής γίνεται στις αποφάσεις της!");
+  }
+}
+
+function answerFinal(isCorrect) {
+  if (isCorrect) {
+    setSuccess("🎉 ΣΩΣΤΑ! Τα συστήματα τεχνητής νοημοσύνης και μηχανικής μάθησης εκπαιδεύονται με μεγάλο όγκο δεδομένων και μαθαίνουν να αναγνωρίζουν μοτίβα!");
+  } else {
+    setError("✗ Λάθος! Ξανασκέψου πώς λειτουργεί η μηχανική μάθηση με βάση το βιβλίο!");
+  }
+}
+
+initMenu();
+</script>
+</body>
+</html>
