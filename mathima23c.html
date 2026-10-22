@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Μάθημα 23: Αποθήκευση & Ανάκτηση Αρχείων</title>
+<style>
+:root{
+  --bg:#f4f7fb;
+  --primary:#2563eb;
+  --primary-dark:#1d4ed8;
+  --accent:#0ea5e9;
+  --card-bg:#ffffff;
+  --text:#0f172a;
+  --text-muted:#64748b;
+  --success:#10b981;
+  --success-bg:#ecfdf5;
+  --warn:#f59e0b;
+  --warn-bg:#fffbeb;
+  --danger:#ef4444;
+  --danger-bg:#fef2f2;
+  --radius:16px;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Segoe UI',system-ui,-apple-system,sans-serif;
+  padding:16px 12px 50px;
+}
+.container{max-width:960px;margin:0 auto}
+
+/* HEADER */
+.hero{
+  background:linear-gradient(135deg, #1e3a8a 0%, #2563eb 50%, #0ea5e9 100%);
+  color:#fff;
+  border-radius:var(--radius);
+  padding:22px 20px;
+  display:flex;
+  align-items:center;
+  gap:16px;
+  box-shadow:0 10px 25px -5px rgba(37,99,235,.35);
+  margin-bottom:22px;
+}
+.hero-icon{
+  width:60px;height:60px;background:rgba(255,255,255,.2);
+  border-radius:14px;display:flex;align-items:center;justify-content:center;
+  font-size:32px;flex-shrink:0;backdrop-filter:blur(4px);border:1px solid rgba(255,255,255,.3);
+}
+.hero h1{margin:0;font-size:22px;font-weight:800;letter-spacing:-.3px}
+.hero p{margin:4px 0 0;font-size:13.5px;opacity:.92}
+
+/* CARDS GRID */
+#gridMenu{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:15px}
+.mission-card{
+  background:var(--card-bg);
+  border-radius:var(--radius);
+  padding:18px 16px;
+  border:2px solid transparent;
+  cursor:pointer;
+  transition:all .2s ease;
+  box-shadow:0 4px 12px rgba(15,23,42,.05);
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+}
+.mission-card:hover{
+  border-color:var(--accent);
+  transform:translateY(-3px);
+  box-shadow:0 12px 24px rgba(37,99,235,.15);
+}
+.m-badge{
+  width:32px;height:32px;border-radius:10px;background:var(--primary);
+  color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center;
+  font-size:13px;margin-bottom:10px;
+}
+.mission-card h3{margin:0 0 6px;font-size:15px;color:var(--text);font-weight:700}
+.mission-card p{margin:0 0 12px;font-size:12.5px;color:var(--text-muted);line-height:1.35}
+.m-tag{
+  align-self:flex-start;
+  padding:4px 10px;background:#e0f2fe;color:var(--primary);
+  border-radius:20px;font-size:11.5px;font-weight:700;
+}
+
+/* PLAYGROUND / ACTIVE MISSION */
+#actBox{
+  background:var(--card-bg);
+  border-radius:var(--radius);
+  padding:22px;
+  box-shadow:0 8px 24px rgba(0,0,0,.06);
+}
+.nav-bar{
+  display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px;
+}
+.btn-return{
+  background:#f1f5f9;border:none;color:var(--text);
+  padding:8px 16px;border-radius:10px;font-weight:700;
+  cursor:pointer;font-size:13px;transition:.15s;
+}
+.btn-return:hover{background:#e2e8f0}
+.sub-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.sub-tab{
+  padding:7px 14px;border-radius:20px;font-size:12.5px;font-weight:700;
+  background:#f1f5f9;border:1px solid #cbd5e1;cursor:pointer;transition:.15s;
+}
+.sub-tab:hover{background:#e2e8f0}
+.sub-tab.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+
+.instruction-banner{
+  background:#f8fafc;border-left:5px solid var(--accent);
+  padding:14px 16px;border-radius:0 10px 10px 0;
+  margin-bottom:18px;font-size:14px;color:#334155;line-height:1.45;
+}
+
+/* DIALOG & SIMULATOR STYLES */
+.os-window{
+  background:#ffffff;border:2px solid #cbd5e1;border-radius:12px;
+  overflow:hidden;box-shadow:0 8px 22px rgba(0,0,0,.08);margin-bottom:16px;
+}
+.os-titlebar{
+  background:#f1f5f9;padding:9px 14px;display:flex;align-items:center;
+  justify-content:space-between;border-bottom:1px solid #cbd5e1;font-size:13px;font-weight:700;
+}
+.os-body{padding:18px}
+
+.form-group{margin-bottom:14px}
+.form-label{display:block;font-size:13px;font-weight:700;color:#475569;margin-bottom:6px}
+.input-field{
+  width:100%;padding:9px 12px;border:1.5px solid #cbd5e1;border-radius:8px;
+  font-size:14px;outline:none;font-family:inherit;
+}
+.input-field:focus{border-color:var(--primary);box-shadow:0 0 0 2px rgba(37,99,235,.15)}
+
+.folder-tree{
+  display:flex;flex-direction:column;gap:6px;background:#f8fafc;border:1px solid #e2e8f0;
+  border-radius:8px;padding:10px;margin-bottom:12px;max-height:160px;overflow-y:auto;
+}
+.folder-item{
+  display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:6px;
+  font-size:13px;cursor:pointer;user-select:none;
+}
+.folder-item:hover{background:#e2e8f0}
+.folder-item.selected{background:#dbeafe;color:var(--primary);font-weight:700}
+
+.file-item{
+  display:flex;align-items:center;justify-content:space-between;padding:8px 12px;
+  border:1px solid #e2e8f0;border-radius:8px;background:#fff;margin-bottom:6px;cursor:pointer;
+}
+.file-item:hover{border-color:var(--primary);background:#f0f7ff}
+.file-item.selected{border-color:var(--primary);background:#dbeafe}
+
+/* BUTTONS */
+.btn-primary{
+  background:var(--primary);color:#fff;border:none;padding:10px 18px;border-radius:8px;
+  font-weight:700;font-size:13.5px;cursor:pointer;
+}
+.btn-primary:hover{background:var(--primary-dark)}
+.btn-secondary{
+  background:#f1f5f9;color:var(--text);border:1px solid #cbd5e1;padding:9px 16px;
+  border-radius:8px;font-weight:700;font-size:13.5px;cursor:pointer;
+}
+.btn-secondary:hover{background:#e2e8f0}
+
+/* CARDS FOR QUIZZES & DETECTORS */
+.choice-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-bottom:12px}
+.choice-card{
+  background:#fff;border:2px solid #e2e8f0;border-radius:10px;padding:12px 14px;
+  cursor:pointer;font-size:13.5px;font-weight:700;transition:.15s;text-align:center;
+}
+.choice-card:hover{border-color:var(--primary);background:#f8fafc}
+.choice-card.correct{background:var(--success-bg);border-color:var(--success);color:#065f46}
+.choice-card.wrong{background:var(--danger-bg);border-color:var(--danger);color:#991b1b}
+
+/* FEEDBACK & ACTIONS */
+.feedback-box{
+  padding:12px 16px;border-radius:10px;font-weight:700;font-size:14px;
+  margin:14px 0;display:none;
+}
+.feedback-box.good{background:var(--success-bg);color:#065f46;border:1px solid #a7f3d0}
+.feedback-box.bad{background:var(--danger-bg);color:#991b1b;border:1px solid #fecaca}
+.action-cta{
+  background:linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+  color:#fff;border:none;padding:12px 24px;border-radius:12px;
+  font-size:14px;font-weight:800;cursor:pointer;margin-top:14px;
+}
+.action-cta:hover{opacity:.95}
+</style>
+</head>
+<body>
+<div class="container">
+  <!-- HERO HEADER -->
+  <div class="hero">
+    <div class="hero-icon">💾</div>
+    <div>
+      <h1>Μάθημα 23: Αποθήκευση & Ανάκτηση Ψηφιακών Αρχείων</h1>
+      <p>Ονοματοδοσία, απαγορευμένοι χαρακτήρες, φάκελοι, «Αποθήκευση ως» και άνοιγμα αρχείων — Ε΄ Δημοτικού</p>
+    </div>
+  </div>
+
+  <!-- MENU VIEW -->
+  <div id="gridMenu"></div>
+
+  <!-- ACTIVE MISSION VIEW -->
+  <div id="actBox" style="display:none">
+    <div class="nav-bar">
+      <button class="btn-return" onclick="showMenu()">← Επιστροφή στο Μενού</button>
+      <span id="missionBadge" class="m-tag">Αποστολή</span>
+    </div>
+    <div class="sub-tabs" id="subTabsBar"></div>
+    <div class="instruction-banner" id="bannerDesc"></div>
+    <div id="missionWorkspace"></div>
+    <div class="feedback-box" id="fbMsg"></div>
+    <div id="nextArea"></div>
+  </div>
+</div>
+
+<script>
+var curAct = 0;
+var curSub = 0;
+
+var activities = [
+  // ACT 1: Το Προεπιλεγμένο Όνομα & Η Πρώτη Αποθήκευση
+  {
+    title: "1. Το Προεπιλεγμένο Όνομα",
+    desc: "Από το 'Άτιτλο 1' στο κατάλληλο όνομα για την εργασία σου.",
+    subs: [
+      {
+        name: "Επίπεδο 1: Ποιο είναι το όνομα;",
+        task: "<b>Αποστολή 1/3:</b> Όταν ξεκινάς ένα νέο έγγραφο στον κειμενογράφο (σελ. 83), ποιο προσωρινό όνομα του δίνει ο υπολογιστής;",
+        render: function(box) {
+          renderQuiz(box, [
+            { t: "📄 Άτιτλο 1", ok: true, exp: "Σωστά! Το αρχικό έγγραφο ονομάζεται αυτόματα 'Άτιτλο 1'." },
+            { t: "📄 Τελική Εργασία", ok: false, exp: "Όχι, πρέπει να το ονομάσουμε εμείς." },
+            { t: "📄 Google.docx", ok: false, exp: "Όχι." }
+          ]);
+        }
+      },
+      {
+        name: "Επίπεδο 2: Προσομοιωτής Μετονομασίας",
+        task: "<b>Αποστολή 2/3:</b> Ο Ήρωνας και η Υπατία έγραψαν για τα ζώα (σελ. 84). Σβήσε το 'Άτιτλο 1', γράψε <b>Απειλούμενα ζώα</b> στο πεδίο και πάτα <b>Αποθήκευση</b>!",
+        render: function(box) {
+          box.innerHTML = 
+            '<div class="os-window">' +
+              '<div class="os-titlebar"><span>💾 Αποθήκευση ως</span><span>✕</span></div>' +
+              '<div class="os-body">' +
+                '<div class="form-group">' +
+                  '<label class="form-label">Όνομα αρχείου:</label>' +
+                  '<input type="text" class="input-field" id="simFileName" value="Άτιτλο 1" />' +
+                '</div>' +
+                '<button class="btn-primary" onclick="submitNameSim()">Αποθήκευση</button>' +
+              '</div>' +
+            '</div>';
+        }
+      },
+      {
+        name: "Επίπεδο 3: Γιατί δίνουμε σωστό όνομα;",
+        task: "<b>Αποστολή 3/3:</b> Για ποιον λόγο είναι απαραίτητο να δίνουμε κατάλληλο όνομα στο αρχείο μας;",
+        render: function(box) {
+          renderQuiz(box, [
+            { t: "Για να μπορούμε να το ανακτήσουμε (να το βρούμε) εύκολα όποτε το χρειαστούμε!", ok: true, exp: "Μπράβο! Το σωστό όνομα βοηθάει στην άμεση ανάκτηση (σελ. 83)." },
+            { t: "Για να εκτυπωθεί πιο γρήγορα", ok: false, exp: "Όχι." },
+            { t: "Για να μεγαλώσει η μνήμη του υπολογιστή", ok: false, exp: "Όχι." }
+          ]);
+        }
+      }
+    ]
+  },
+
+  // ACT 2: «Αποθήκευση» vs «Αποθήκευση ως»
+  {
+    title: "2. Αποθήκευση vs Αποθήκευση ως",
+    desc: "Μάθε τη διαφορά ανάμεσα στις δύο εντολές του μενού Αρχείο.",
+    subs: [
+      {
+        name: "Επίπεδο 1: Συντομεύσεις Πληκτρολογίου",
+        task: "<b>Αποστολή 1/3:</b> Ποιος συνδυασμός πλήκτρων εκτελεί γρήγορα την απλή «Αποθήκευση» (σελ. 83);",
+        render: function(box) {
+          renderQuiz(box, [
+            { t: "⌨️ Ctrl + S", ok: true, exp: "Σωστά! Το Ctrl+S αποθηκεύει άμεσα τις αλλαγές." },
+            { t: "⌨️ Ctrl + P", ok: false, exp: "Το Ctrl+P είναι για εκτύπωση (Print)." },
+            { t: "⌨️ Ctrl + Z", ok: false, exp: "Το Ctrl+Z είναι για αναίρεση." }
+          ]);
+        }
+      },
+      {
+        name: "Επίπεδο 2: Πότε πατάμε «Αποθήκευση ως»;",
+        task: "<b>Αποστολή 2/3:</b> Πότε χρησιμοποιούμε την εντολή «Αποθήκευση ως...» (σελ. 84);",
+        render: function(box) {
+          renderQuiz(box, [
+            { t: "Όταν θέλουμε να αλλάξουμε το όνομα ή τη θέση (φάκελο) του αρχείου", ok: true, exp: "Ακριβώς! Μας επιτρέπει να αλλάξουμε όνομα και τοποθεσία." },
+            { t: "Όταν θέλουμε να σβήσουμε τον υπολογιστή", ok: false, exp: "Όχι." },
+            { t: "Όταν δεν θέλουμε να σώσουμε τίποτα", ok: false, exp: "Όχι." }
+          ]);
+        }
+      },
+      {
+        name: "Επίπεδο 3: Προσομοιωτής Ενημέρωσης",
+        task: "<b>Αποστολή 3/3:</b> Δουλεύεις στο ήδη αποθηκευμένο αρχείο και πρόσθεσες μια νέα παράγραφο. Πάτα το σωστό κουμπί για να σώσεις τις αλλαγές στο ίδιο αρχείο!",
+        render: function(box) {
+          box.innerHTML = 
+            '<div style="text-align:center;padding:16px">' +
+              '<div style="font-size:15px;margin-bottom:14px">Αρχείο: <b>Απειλούμενα ζώα.odt</b> (έγιναν νέες αλλαγές)</div>' +
+              '<div style="display:flex;gap:12px;justify-content:center">' +
+                '<button class="btn-primary" onclick="pickSaveAction(true)">💾 Απλή Αποθήκευση (Save)</button>' +
+                '<button class="btn-secondary" onclick="pickSaveAction(false)">📁 Αποθήκευση ως (Save As)</button>' +
+              '</div>' +
+            '</div>';
+        }
+      }
+    ]
+  },
+
+  // ACT 3: Οι Απαγορευμένοι Χαρακτήρες
+  {
+    title: "3. Απαγορευμένοι Χαρακτήρες",
+    desc: "Ποια σύμβολα δεν επιτρέπονται στα ονόματα αρχείων;",
+    subs: [
+      {
+        name: "Επίπεδο 1: Ο Κανόνας του Βιβλίου",
+        task: "<b>Αποστολή 1/3:</b> Σύμφωνα με τη σελίδα 84, ποιοι από τους παρακάτω χαρακτήρες ΑΠΑΓΟΡΕΥΟΝΤΑΙ στα ονόματα αρχείων;",
+        render: function(box) {
+          renderQuiz(box, [
+            { t: "🚫 < > : \" / \\ | ? *", ok: true, exp: "Σωστά! Αυτοί οι χαρακτήρες χρησιμοποιούνται από το σύστημα και απαγορεύονται!" },
+            { t: "✅ Αριθμοί 1 2 3", ok: false, exp: "Οι αριθμοί επιτρέπονται κανονικά." },
+            { t: "✅ Κενό διάστημα", ok: false, exp: "Το κενό διάστημα επιτρέπεται." }
+          ]);
+        }
+      },
+      {
+        name: "Επίπεδο 2: Προσομοιωτής Σφάλματος",
+        task: "<b>Αποστολή 2/3:</b> Δοκίμασε να πληκτρολογήσεις ένα απαγορευμένο σύμβολο (π.χ. <b>Εργασία<1></b> ή <b>ΤΠΕ:Scratch</b>) και πάτα <b>Έλεγχος</b> για να δεις το μήνυμα λάθους!",
+        render: function(box) {
+          box.innerHTML = 
+            '<div class="os-window">' +
+              '<div class="os-titlebar"><span>Έλεγχος Εγκυρότητας Ονόματος</span></div>' +
+              '<div class="os-body">' +
+                '<div class="form-group">' +
+                  '<label class="form-label">Δοκίμασε ένα όνομα:</label>' +
+                  '<input type="text" class="input-field" id="badCharInput" placeholder="π.χ. Εργασία:1 ή Ζώα<>..." />' +
+                '</div>' +
+                '<button class="btn-primary" onclick="testBadChars()">Έλεγχος Ονόματος</button>' +
+              '</div>' +
+            '</div>';
+        }
+      },
+      {
+        name: "Επίπεδο 3: Τι θα συμβεί;",
+        task: "<b>Αποστολή 3/3:</b> Τι θα συμβεί αν προσπαθήσεις να πατήσεις 'Αποθήκευση' χρησιμοποιώντας απαγορευμένο χαρακτήρα (σελ. 85);",
+        render: function(box) {
+          renderQuiz(box, [
+            { t: "Το αρχείο δεν θα αποθηκευτεί και θα εμφανιστεί μήνυμα λάθους!", ok: true, exp: "Ακριβώς! Ο υπολογιστής ειδοποιεί ότι 'Το όνομα αρχείου δεν είναι έγκυρο' (σελ. 85)." },
+            { t: "Θα σβηστεί ο σκληρός δίσκος", ok: false, exp: "Όχι, φυσικά." },
+            { t: "Θα αλλάξει η γλώσσα του υπολογιστή", ok: false, exp: "Όχι." }
+          ]);
+        }
+      }
+    ]
+  },
+
+  // ACT 4: Αποδεκτά ή Μη Αποδεκτά Ονόματα; (σελ. 85)
+  {
+    title: "4. Έγκυρα & Μη Έγκυρα Ονόματα",
+    desc: "Έλεγξε τα παραδείγματα της σχολικής άσκησης.",
+    subs: [
+      {
+        name: "Επίπεδο 1: ΚΑΤΕΡΙΝΑ<>",
+        task: "<b>Αποστολή 1/3:</b> Το όνομα αρχείου <b>«ΚΑΤΕΡΙΝΑ<>»</b> είναι αποδεκτό ή μη αποδεκτό;",
+        render: function(box) {
+          renderQuiz(box, [
+            { t: "❌ Μη αποδεκτό (περιέχει τα σύμβολα < και >)", ok: true, exp: "Σωστά! Τα σύμβολα < και > απαγορεύονται αυστηρά." },
+            { t: "✔️ Αποδεκτό", ok: false, exp: "Λάθος! Περιέχει απαγορευμένους χαρακτήρες." }
+          ]);
+        }
+      },
+      {
+        name: "Επίπεδο 2: ΤΠΕ:Scratch",
+        task: "<b>Αποστολή 2/3:</b> Το όνομα αρχείου <b>«ΤΠΕ:Scratch»</b> είναι αποδεκτό;",
+        render: function(box) {
+          renderQuiz(box, [
+            { t: "❌ Μη αποδεκτό (περιέχει την άνω-κάτω τελεία :)", ok: true, exp: "Μπράβο! Η άνω-κάτω τελεία (:) δεν επιτρέπεται στα ονόματα αρχείων." },
+            { t: "✔️ Αποδεκτό", ok: false, exp: "Λάθος! Η άνω-κάτω τελεία απαγορεύεται." }
+          ]);
+        }
+      },
+      {
+        name: "Επίπεδο 3: Robot & ΑΣΚΗΣΗ-ΙΣΤΟΡΙΑ",
+        task: "<b>Αποστολή 3/3:</b> Το όνομα αρχείου <b>«ΑΣΚΗΣΗ-ΙΣΤΟΡΙΑ»</b> είναι αποδεκτό;",
+        render: function(box) {
+          renderQuiz(box, [
+            { t: "✔️ Αποδεκτό (η παύλα - επιτρέπεται κανονικά!)", ok: true, exp: "Τέλεια! Η παύλα επιτρέπεται στα ονόματα αρχείων." },
+            { t: "❌ Μη αποδεκτό", ok: false, exp: "Λάθος! Η παύλα είναι έγκυρος χαρακτήρας." }
+          ]);
+        }
+      }
+    ]
+  },
+
+  // ACT 5: Τοποθεσίες & Ο Προεπιλεγμένος Φάκελος
+  {
+    title: "5. Τοποθεσίες & Φάκελος Έγγραφα",
+    desc: "Πού αποθηκεύονται αυτόματα τα ψηφιακά μας αρχεία;",
+    subs: [
+      {
+        name: "Επίπεδο 1: Ο Προεπιλεγμένος Φάκελος",
+        task: "<b>Αποστολή 1/3:</b> Όταν αποθηκεύεις ένα νέο έγγραφο χωρίς να αλλάξεις φάκελο, πού αποθηκεύεται αυτόματα (σελ. 85);",
+        render: function(box) {
+          renderQuiz(box, [
+            { t: "📁 Στον φάκελο «Έγγραφα» (Documents)", ok: true, exp: "Σωστά! Ο φάκελος 'Έγγραφα' είναι η προεπιλεγμένη τοποθεσία στον δίσκο." },
+            { t: "🗑️ Στον κάδο ανακύκλωσης", ok: false, exp: "Όχι." },
+            { t: "🔌 Στο πληκτρολόγιο", ok: false, exp: "Όχι." }
+          ]);
+        }
+      },
+      {
+        name: "Επίπεδο 2: Προσομοιωτής Επιλογής Φακέλου",
+        task: "<b>Αποστολή 2/3:</b> Θέλουμε να αποθηκεύσουμε την εργασία στον φάκελο <b>«Ε τάξη»</b>. Κάνε κλικ στον φάκελο <b>«Ε τάξη»</b> και πάτα <b>Επιλογή</b>!",
+        render: function(box) {
+          box.innerHTML = 
+            '<div class="os-window">' +
+              '<div class="os-titlebar"><span>Επιλογή φακέλου αποθήκευσης</span></div>' +
+              '<div class="os-body">' +
+                '<div class="folder-tree">' +
+                  '<div class="folder-item" id="f_desk" onclick="pickFolder(\'f_desk\')">🖥️ Επιφάνεια εργασίας</div>' +
+                  '<div class="folder-item" id="f_docs" onclick="pickFolder(\'f_docs\')">📁 Έγγραφα</div>' +
+                  '<div class="folder-item" id="f_class" onclick="pickFolder(\'f_class\')" style="margin-left:16px">📁 Ε τάξη</div>' +
+                  '<div class="folder-item" id="f_pics" onclick="pickFolder(\'f_pics\')">🖼️ Εικόνες</div>' +
+                '</div>' +
+                '<button class="btn-primary" onclick="confirmFolder()">Επιλογή Φακέλου</button>' +
+              '</div>' +
+            '</div>';
+        }
+      },
+      {
+        name: "Επίπεδο 3: Αν δεν βρίσκεις το αρχείο σου;",
+        task: "<b>Αποστολή 3/3:</b> Αν ανοίξεις τα 'Έγγραφα' και δεν βρίσκεις την εργασία σου, τι σημαίνει (σελ. 86);",
+        render: function(box) {
+          renderQuiz(box, [
+            { t: "Ότι την έχεις αποθηκεύσει κατά λάθος σε άλλον φάκελο!", ok: true, exp: "Ακριβώς! Χρησιμοποιούμε την προβολή φακέλων για να την αναζητήσουμε (σελ. 86)." },
+            { t: "Ότι χάλασε ο υπολογιστής", ok: false, exp: "Όχι." },
+            { t: "Ότι άλλαξε γλώσσα το αρχείο", ok: false, exp: "Όχι." }
+          ]);
+        }
+      }
+    ]
+  },
+
+  // ACT 6: Η Ειδοποίηση Τροποποίησης (Το Κουμπί Αποθήκευσης Αλλάζει)
+  {
+    title: "6. Ειδοποίηση Αλλαγών",
+    desc: "Πώς σε προειδοποιεί η εφαρμογή ότι έκανες νέες αλλαγές;",
+    subs: [
+      {
+        name: "Επίπεδο 1: Το Εικονίδιο Αλλάζει!",
+        task: "<b>Αποστολή 1/3:</b> Σύμφωνα με τη σελίδα 84, τι συμβαίνει στο εικονίδιο της δισκέτας στην εργαλειοθήκη όταν κάνεις αλλαγές στο κείμενο;",
+        render: function(box) {
+          renderQuiz(box, [
+            { t: "Αλλάζει μορφή (εμφανίζει σημάδι/χρώμα) για να σου θυμίσει να αποθηκεύσεις!", ok: true, exp: "Σωστά! Η εφαρμογή σε ενημερώνει ότι υπάρχουν μη αποθηκευμένες αλλαγές (σελ. 84)." },
+            { t: "Εξαφανίζεται ολόκληρη η οθόνη", ok: false, exp: "Όχι." },
+            { t: "Αρχίζει να παίζει μουσική", ok: false, exp: "Όχι." }
+          ]);
+        }
+      },
+      {
+        name: "Επίπεδο 2: Προσομοιωτής Πληκτρολόγησης & Σήμανσης",
+        task: "<b>Αποστολή 2/3:</b> Πληκτρολόγησε κάτι στο έγγραφο. Δες πώς το κουμπί της δισκέτας ανάβει με κόκκινη κουκκίδα! Πάτα το κουμπί για να σώσεις τις αλλαγές!",
+        render: function(box) {
+          box.innerHTML = 
+            '<div class="os-window">' +
+              '<div class="os-titlebar">' +
+                '<span>LibreOffice Writer</span>' +
+                '<button class="tool-btn" id="saveIconBtn" onclick="clickSimSave()" style="border:1px solid #cbd5e1;padding:3px 10px;border-radius:4px;cursor:pointer">💾 <span id="saveDot"></span></button>' +
+              '</div>' +
+              '<div class="os-body">' +
+                '<textarea class="input-field" id="docText" rows="3" placeholder="Γράψε εδώ μια λέξη..." oninput="onDocType()"></textarea>' +
+              '</div>' +
+            '</div>';
+        }
+      },
+      {
+        name: "Επίπεδο 3: Τι θα γίνει αν κλείσεις χωρίς αποθήκευση;",
+        task: "<b>Αποστολή 3/3:</b> Αν κλείσεις την εφαρμογή ενώ το κουμπί δείχνει μη αποθηκευμένες αλλαγές;",
+        render: function(box) {
+          renderQuiz(box, [
+            { t: "Ο υπολογιστής θα εμφανίσει προειδοποιητικό παράθυρο για να μην τις χάσεις!", ok: true, exp: "Μπράβο! Το πρόγραμμα ρωτάει: 'Θέλετε να αποθηκεύσετε τις αλλαγές;'." },
+            { t: "Το έγγραφο διαγράφεται οριστικά", ok: false, exp: "Όχι." },
+            { t: "Δεν σε ρωτάει τίποτα", ok: false, exp: "Όχι." }
+          ]);
+        }
+      }
+    ]
+  },
+
+  // ACT 7: Ανάκτηση Αρχείου (Άνοιγμα / Ctrl+O)
+  {
+    title: "7. Ανάκτηση Αρχείου (Άνοιγμα)",
+    desc: "Βρες και άνοιξε ένα αρχείο που είχες αποθηκεύσει στο παρελθόν.",
+    subs: [
+      {
+        name: "Επίπεδο 1: Βήματα Ανάκτησης",
+        task: "<b>Αποστολή 1/3:</b> Ποια διαδρομή στο μενού ακολουθούμε για να ανοίξουμε ένα παλιό αρχείο (σελ. 86);",
+        render: function(box) {
+          renderQuiz(box, [
+            { t: "📂 Αρχείο ➔ Άνοιγμα (Ctrl + O)", ok: true, exp: "Σωστά! Μενού Αρχείο ➔ Άνοιγμα (Open)." },
+            { t: "❌ Αρχείο ➔ Έξοδος", ok: false, exp: "Αυτό κλείνει το πρόγραμμα." },
+            { t: "✂️ Επεξεργασία ➔ Αποκοπή", ok: false, exp: "Όχι." }
+          ]);
+        }
+      },
+      {
+        name: "Επίπεδο 2: Προσομοιωτής Παραθύρου «Άνοιγμα»",
+        task: "<b>Αποστολή 2/3:</b> Η Υπατία ψάχνει την εργασία <b>«Ιστορική εξέλιξη του λογισμικού.docx»</b> (σελ. 86). Κάνε κλικ στο αρχείο και πάτα <b>Άνοιγμα</b>!",
+        render: function(box) {
+          box.innerHTML = 
+            '<div class="os-window">' +
+              '<div class="os-titlebar"><span>📂 Άνοιγμα αρχείου</span><span>Φάκελος: Έγγραφα</span></div>' +
+              '<div class="os-body">' +
+                '<div id="fileListSim">' +
+                  '<div class="file-item" onclick="selectSimFile(this, \'f1\')">📁 ΕΡΓΑΣΙΕΣ Δ ΤΑΞΗΣ</div>' +
+                  '<div class="file-item" onclick="selectSimFile(this, \'target\')">📄 Ιστορική εξέλιξη του λογισμικού.docx</div>' +
+                  '<div class="file-item" onclick="selectSimFile(this, \'f2\')">📄 Στάδιο πανηγυριού.docx</div>' +
+                '</div>' +
+                '<div style="margin-top:12px;text-align:right">' +
+                  '<button class="btn-primary" onclick="confirmOpenFile()">Άνοιγμα</button>' +
+                '</div>' +
+              '</div>' +
+            '</div>';
+        }
+      },
+      {
+        name: "Επίπεδο 3: Με ποιον άλλον τρόπο ανοίγει;",
+        task: "<b>Αποστολή 3/3:</b> Εκτός από το κουμπί 'Άνοιγμα', πώς αλλιώς ανοίγουμε αμέσως ένα αρχείο από τη λίστα;",
+        render: function(box) {
+          renderQuiz(box, [
+            { t: "🖱️ Κάνοντας διπλό κλικ (double click) πάνω του!", ok: true, exp: "Ακριβώς! Με διπλό κλικ το αρχείο ανοίγει κατευθείαν (σελ. 86)." },
+            { t: "Πατώντας το πλήκτρο Space 10 φορές", ok: false, exp: "Όχι." },
+            { t: "Κουνώντας γρήγορα το ποντίκι", ok: false, exp: "Όχι." }
+          ]);
+        }
+      }
+    ]
+  },
+
+  // ACT 8: Διαχείριση Αρχείων σε Όλες τις Εφαρμογές
+  {
+    title: "8. Master Διαχείρισης Αρχείων",
+    desc: "Η ίδια μέθοδος αποθήκευσης σε κείμενα, παρουσιάσεις και υπολογιστικά φύλλα.",
+    subs: [
+      {
+        name: "Επίπεδο 1: Ισχύει παντού;",
+        task: "<b>Αποστολή 1/3:</b> Σύμφωνα με τη σελίδα 86, ο τρόπος αποθήκευσης και ανοίγματος είναι ίδιος και στις παρουσιάσεις και στα υπολογιστικά φύλλα;",
+        render: function(box) {
+          renderQuiz(box, [
+            { t: "✔️ Ναι! Όλες οι εφαρμογές χρησιμοποιούν τις ίδιες εντολές (Αποθήκευση, Άνοιγμα)", ok: true, exp: "Μπράβο! Ο χειρισμός αρχείων είναι ενιαίος σε όλες τις εφαρμογές." },
+            { t: "❌ Όχι, κάθε πρόγραμμα έχει τελείως διαφορετικά κουμπιά", ok: false, exp: "Λάθος." }
+          ]);
+        }
+      },
+      {
+        name: "Επίπεδο 2: Προσομοιωτής Νέας Παρουσίασης",
+        task: "<b>Αποστολή 2/3:</b> Φτιάχνεις παρουσίαση (σελ. 87). Επίλεξε το μενού <b>Αρχείο</b> και πάτα <b>Αποθήκευση</b>!",
+        render: function(box) {
+          box.innerHTML = 
+            '<div class="os-window">' +
+              '<div class="os-titlebar" style="background:#fef3c7;color:#92400e"><span>LibreOffice Impress (Παρουσιάσεις)</span></div>' +
+              '<div style="background:#e2e8f0;padding:6px 12px;display:flex;gap:12px;font-size:13px;font-weight:bold">' +
+                '<span style="cursor:pointer;color:var(--primary)" onclick="clickAppMenu()">📁 Αρχείο ▾</span>' +
+                '<span>Επεξεργασία</span><span>Προβολή</span><span>Εισαγωγή</span>' +
+              '</div>' +
+              '<div id="appDropdown" style="display:none;position:absolute;background:#fff;border:1px solid #cbd5e1;border-radius:6px;box-shadow:0 4px 12px rgba(0,0,0,.15);padding:6px;font-size:13px;z-index:10;margin-left:12px">' +
+                '<div style="padding:6px 14px;cursor:pointer" onclick="pickAppSave()">💾 Αποθήκευση (Ctrl+S)</div>' +
+                '<div style="padding:6px 14px;cursor:pointer">📂 Άνοιγμα (Ctrl+O)</div>' +
+              '</div>' +
+              '<div class="os-body" style="text-align:center;min-height:90px">' +
+                '<div style="font-size:14px;color:#64748b;margin-top:10px">Διαφάνεια 1: Απειλούμενα ζώα</div>' +
+              '</div>' +
+            '</div>';
+        }
+      },
+      {
+        name: "Επίπεδο 3: Τελικός Έπαινος Master",
+        task: "<b>Αποστολή 3/3:</b> Ολοκλήρωσε τη βασική γνώση: Ποιο είναι το μεγαλύτερο όφελος της σωστής αποθήκευσης και ανάκτησης;",
+        render: function(box) {
+          renderQuiz(box, [
+            { t: "Δεν χάνουμε ποτέ την εργασία μας και την έχουμε διαθέσιμη όποτε τη χρειαζόμαστε!", ok: true, exp: "ΤΕΛΕΙΑ! Έγινες αυθεντικός Master στη Διαχείριση Ψηφιακών Αρχείων!" },
+            { t: "Γεμίζουμε γρήγορα τον υπολογιστή", ok: false, exp: "Όχι." },
+            { t: "Κάνουμε τον υπολογιστή να λειτουργεί χωρίς ρεύμα", ok: false, exp: "Όχι." }
+          ]);
+        }
+      }
+    ]
+  }
+];
+
+function initMenu() {
+  var m = document.getElementById("gridMenu");
+  m.innerHTML = "";
+  activities.forEach(function(act, idx) {
+    var c = document.createElement("div");
+    c.className = "mission-card";
+    c.onclick = function() { loadActivity(idx, 0); };
+    c.innerHTML = 
+      '<div>' +
+        '<div class="m-badge">' + (idx + 1) + '</div>' +
+        '<h3>' + act.title + '</h3>' +
+        '<p>' + act.desc + '</p>' +
+      '</div>' +
+      '<span class="m-tag">3 Επίπεδα ➔</span>';
+    m.appendChild(c);
+  });
+}
+
+function showMenu() {
+  document.getElementById("gridMenu").style.display = "grid";
+  document.getElementById("actBox").style.display = "none";
+}
+
+function loadActivity(actIdx, subIdx) {
+  curAct = actIdx;
+  curSub = subIdx;
+  var act = activities[actIdx];
+  var sub = act.subs[subIdx];
+
+  document.getElementById("gridMenu").style.display = "none";
+  document.getElementById("actBox").style.display = "block";
+
+  document.getElementById("missionBadge").textContent = "Αποστολή " + (actIdx + 1) + " / " + activities.length;
+
+  var tabs = document.getElementById("subTabsBar");
+  tabs.innerHTML = "";
+  act.subs.forEach(function(s, k) {
+    var b = document.createElement("button");
+    b.className = "sub-tab" + (k === subIdx ? " active" : "");
+    b.textContent = s.name;
+    b.onclick = function() { loadActivity(actIdx, k); };
+    tabs.appendChild(b);
+  });
+
+  document.getElementById("bannerDesc").innerHTML = sub.task;
+  var fb = document.getElementById("fbMsg");
+  fb.textContent = "";
+  fb.style.display = "none";
+  document.getElementById("nextArea").innerHTML = "";
+
+  var ws = document.getElementById("missionWorkspace");
+  ws.innerHTML = "";
+  sub.render(ws);
+}
+
+function setSuccess(msg) {
+  var fb = document.getElementById("fbMsg");
+  fb.textContent = msg;
+  fb.className = "feedback-box good";
+  fb.style.display = "block";
+
+  var nextArea = document.getElementById("nextArea");
+  if (!nextArea.hasChildNodes()) {
+    var nb = document.createElement("button");
+    nb.className = "action-cta";
+    var act = activities[curAct];
+    if (curSub < act.subs.length - 1) {
+      nb.textContent = "Επόμενο επίπεδο (" + (curSub + 2) + "/3) ▶";
+      nb.onclick = function() { loadActivity(curAct, curSub + 1); };
+    } else if (curAct < activities.length - 1) {
+      nb.textContent = "Επόμενη αποστολή ▶";
+      nb.onclick = function() { loadActivity(curAct + 1, 0); };
+    } else {
+      nb.textContent = "🏆 Συγχαρητήρια! Ολοκλήρωσες και τα 24 επίπεδα του Μαθήματος 23! Επιστροφή στο Μενού";
+      nb.onclick = showMenu;
+    }
+    nextArea.appendChild(nb);
+  }
+}
+
+function setError(msg) {
+  var fb = document.getElementById("fbMsg");
+  fb.textContent = msg;
+  fb.className = "feedback-box bad";
+  fb.style.display = "block";
+}
+
+function renderQuiz(box, choices) {
+  box.innerHTML = '<div class="choice-grid"></div>';
+  var grid = box.querySelector(".choice-grid");
+  choices.forEach(function(c) {
+    var d = document.createElement("div");
+    d.className = "choice-card";
+    d.textContent = c.t;
+    d.onclick = function() {
+      if (c.ok) {
+        d.classList.add("correct");
+        setSuccess(c.exp);
+      } else {
+        d.classList.add("wrong");
+        setError(c.exp);
+      }
+    };
+    grid.appendChild(d);
+  });
+}
+
+function submitNameSim() {
+  var val = document.getElementById("simFileName").value.trim();
+  if (val.toLowerCase() === "απειλούμενα ζώα") {
+    setSuccess("🎉 Άψογα! Αντικατέστησες το 'Άτιτλο 1' με ένα ουσιαστικό όνομα που περιγράφει την εργασία!");
+  } else if (val === "Άτιτλο 1") {
+    setError("✗ Σβήσε το προσωρινό όνομα 'Άτιτλο 1' και γράψε: Απειλούμενα ζώα");
+  } else {
+    setSuccess("✓ Πολύ ωραίο όνομα! Το αρχείο αποθηκεύτηκε ως '" + val + "'!");
+  }
+}
+
+function pickSaveAction(isSave) {
+  if (isSave) {
+    setSuccess("✓ Σωστά! Εφόσον το αρχείο έχει ήδη όνομα, πατάμε απλή 'Αποθήκευση' και οι αλλαγές σώζονται αμέσως στο ίδιο αρχείο!");
+  } else {
+    setError("✗ Η 'Αποθήκευση ως' χρειάζεται μόνο αν θες να αλλάξεις όνομα ή φάκελο. Εδώ αρκεί η απλή Αποθήκευση!");
+  }
+}
+
+function testBadChars() {
+  var val = document.getElementById("badCharInput").value;
+  var badRegex = /[<>:"/\\\\|?*]/;
+  if (badRegex.test(val)) {
+    setSuccess("⚠️ Μήνυμα Συστήματος: «Το όνομα αρχείου δεν είναι έγκυρο! Περιέχει απαγορευμένο χαρακτήρα.» Μπράβο, είδες ακριβώς πώς σε προστατεύει ο υπολογιστής (σελ. 85)!");
+  } else if (val.trim() === "") {
+    setError("✗ Γράψε ένα όνομα που να περιέχει κάποιο σύμβολο όπως <, >, :, / ή *.");
+  } else {
+    setError("✗ Το όνομα '" + val + "' είναι έγκυρο! Δοκίμασε να βάλεις ένα από τα απαγορευμένα: < > : \" / \\ | ? *");
+  }
+}
+
+var selFolderId = null;
+function pickFolder(id) {
+  document.querySelectorAll(".folder-item").forEach(function(el){ el.classList.remove("selected"); });
+  document.getElementById(id).classList.add("selected");
+  selFolderId = id;
+}
+function confirmFolder() {
+  if (selFolderId === "f_class") {
+    setSuccess("🎉 Μπράβο! Το αρχείο θα αποθηκευτεί ακριβώς στον φάκελο 'Ε τάξη'!");
+  } else {
+    setError("✗ Επίλεξε τον φάκελο 'Ε τάξη' κάνοντας κλικ επάνω του!");
+  }
+}
+
+var hasTyped = false;
+function onDocType() {
+  hasTyped = true;
+  document.getElementById("saveDot").innerHTML = "<span style='color:red;font-size:16px'>●</span>";
+  setError("Πρόσεξε: Στο εικονίδιο της δισκέτας εμφανίστηκε κόκκινη κουκκίδα! Υπάρχουν μη αποθηκευμένες αλλαγές. Πάτα τη δισκέτα!");
+}
+function clickSimSave() {
+  if (hasTyped) {
+    document.getElementById("saveDot").innerHTML = "";
+    setSuccess("🎉 Τέλεια! Πάτησες Αποθήκευση, η κόκκινη κουκκίδα έσβησε και οι αλλαγές σου σώθηκαν με ασφάλεια!");
+  } else {
+    setError("Γράψε πρώτα κάτι στο πλαίσιο κειμένου για να γίνουν αλλαγές!");
+  }
+}
+
+var selectedFileKey = null;
+function selectSimFile(el, key) {
+  document.querySelectorAll(".file-item").forEach(function(f){ f.classList.remove("selected"); });
+  el.classList.add("selected");
+  selectedFileKey = key;
+}
+function confirmOpenFile() {
+  if (selectedFileKey === "target") {
+    setSuccess("🎉 Άριστα! Επέλεξες το αρχείο 'Ιστορική εξέλιξη του λογισμικού.docx' και άνοιξε αμέσως στην οθόνη σου!");
+  } else {
+    setError("✗ Κάνε κλικ στο αρχείο 'Ιστορική εξέλιξη του λογισμικού.docx' και πάτα Άνοιγμα!");
+  }
+}
+
+function clickAppMenu() {
+  var dd = document.getElementById("appDropdown");
+  dd.style.display = (dd.style.display === "none") ? "block" : "none";
+}
+function pickAppSave() {
+  document.getElementById("appDropdown").style.display = "none";
+  setSuccess("🎉 Εξαιρετικά! Αποθήκευσες την παρουσίαση ακριβώς με τον ίδιο τρόπο που έμαθες στα κείμενα!");
+}
+
+initMenu();
+</script>
+</body>
+</html>
