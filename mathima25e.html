@@ -2,602 +2,1337 @@
 <html lang="el">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Κουίζ - Μάθημα 25: Ιστολόγια & Συνεργασία στο Διαδίκτυο</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Μάθημα 25 – Super Διαδραστικές Δραστηριότητες</title>
 <style>
-:root{
-  --bg:#f0fdf4;
-  --card-bg:#ffffff;
-  --primary:#059669;
-  --primary-hover:#047857;
-  --accent:#0284c7;
-  --text:#064e3b;
-  --text-muted:#047857;
-  --success:#15803d;
-  --success-bg:#dcfce7;
-  --error:#b91c1c;
-  --error-bg:#fee2e2;
-}
-*{box-sizing:border-box}
-body{
-  margin:0;
-  background:var(--bg);
-  color:var(--text);
-  font-family:'Segoe UI',system-ui,sans-serif;
-  padding:16px 12px 50px;
-  font-size:18px;
-}
-.container{max-width:820px;margin:0 auto}
-
-/* HEADER */
-.header-box{
-  background:linear-gradient(135deg, #059669 0%, #10b981 50%, #0284c7 100%);
-  color:#fff;
-  border-radius:20px;
-  padding:24px 20px;
-  text-align:center;
-  box-shadow:0 8px 24px rgba(5,150,105,.25);
-  margin-bottom:20px;
-}
-.header-box h1{margin:0;font-size:26px;font-weight:900}
-.header-box p{margin:8px 0 0;font-size:16px;opacity:.95}
-
-/* MENU GRID */
-#menuView{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px}
-.topic-card{
-  background:#fff;
-  border:3px solid #bbf7d0;
-  border-radius:18px;
-  padding:20px;
-  cursor:pointer;
-  transition:all .2s ease;
-  box-shadow:0 4px 14px rgba(0,0,0,.05);
-}
-.topic-card:hover{
-  border-color:var(--accent);
-  transform:translateY(-3px);
-  box-shadow:0 10px 22px rgba(2,132,199,.2);
-}
-.topic-badge{
-  display:inline-block;
-  background:var(--primary);
-  color:#fff;
-  font-size:14px;
-  font-weight:900;
-  padding:4px 12px;
-  border-radius:20px;
-  margin-bottom:8px;
-}
-.topic-card h2{margin:6px 0;font-size:20px;color:#064e3b}
-.topic-card p{margin:0;font-size:15px;color:#047857;line-height:1.4}
-
-/* QUIZ STAGE */
-#quizView{
-  background:#fff;
-  border:3px solid #86efac;
-  border-radius:22px;
-  padding:24px 20px;
-  box-shadow:0 8px 30px rgba(0,0,0,.07);
-}
-.nav-bar{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-bottom:18px;
-}
-.btn-back{
-  background:#dcfce7;
-  border:2px solid #86efac;
-  color:#065f46;
-  padding:10px 18px;
-  border-radius:12px;
-  font-weight:900;
-  cursor:pointer;
-  font-size:16px;
-}
-.btn-back:hover{background:#bbf7d0}
-.progress-tag{
-  background:#e0f2fe;
-  color:#0369a1;
-  font-size:15px;
-  font-weight:900;
-  padding:6px 14px;
-  border-radius:16px;
-}
-
-/* BIG READABLE QUESTION BOX */
-.q-box{
-  background:#f0fdf4;
-  border-left:8px solid var(--primary);
-  border-radius:12px;
-  padding:18px 20px;
-  margin-bottom:22px;
-}
-.q-title{font-size:21px;font-weight:900;color:#064e3b;line-height:1.4}
-.q-hint{font-size:15px;color:#047857;margin-top:6px;font-style:italic}
-
-/* BIG OPTIONS BUTTONS */
-.options-list{display:flex;flex-direction:column;gap:14px}
-.opt-btn{
-  background:#ffffff;
-  border:3px solid #bbf7d0;
-  border-radius:16px;
-  padding:16px 20px;
-  font-size:18px;
-  font-weight:800;
-  text-align:left;
-  cursor:pointer;
-  transition:all .15s ease;
-  line-height:1.35;
-  color:#064e3b;
-}
-.opt-btn:hover{
-  border-color:var(--primary);
-  background:#f0fdf4;
-  transform:scale(1.01);
-}
-.opt-btn.correct{
-  background:var(--success-bg) !important;
-  border-color:var(--success) !important;
-  color:var(--success) !important;
-}
-.opt-btn.wrong{
-  background:var(--error-bg) !important;
-  border-color:var(--error) !important;
-  color:var(--error) !important;
-}
-
-/* FEEDBACK & NEXT */
-.feedback-box{
-  padding:16px 20px;
-  border-radius:14px;
-  font-size:17px;
-  font-weight:800;
-  line-height:1.45;
-  margin-top:20px;
-  display:none;
-}
-.feedback-box.good{background:var(--success-bg);color:#15803d;border:2px solid #86efac}
-.feedback-box.bad{background:var(--error-bg);color:#b91c1c;border:2px solid #fca5a5}
-
-.next-btn{
-  background:linear-gradient(135deg, #059669 0%, #0284c7 100%);
-  color:#fff;
-  border:none;
-  padding:16px 28px;
-  border-radius:16px;
-  font-size:18px;
-  font-weight:900;
-  cursor:pointer;
-  margin-top:16px;
-  display:inline-block;
-  box-shadow:0 6px 18px rgba(5,150,105,.3);
-}
-.next-btn:hover{opacity:.95}
+  @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap');
+  
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  
+  body {
+    font-family: 'Fredoka', sans-serif;
+    background: linear-gradient(160deg, #1a1a2e 0%, #16213e 40%, #0f3460 100%);
+    min-height: 100vh;
+    padding: 15px;
+    color: #333;
+  }
+  
+  .container { max-width: 980px; margin: 0 auto; }
+  
+  header {
+    text-align: center;
+    margin-bottom: 25px;
+    color: white;
+  }
+  
+  header h1 {
+    font-size: 2rem;
+    margin-bottom: 8px;
+    text-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  }
+  
+  header p { opacity: 0.9; font-size: 1.05rem; }
+  
+  .progress-bar {
+    background: rgba(255,255,255,0.15);
+    border-radius: 20px;
+    height: 14px;
+    margin: 20px auto 30px;
+    max-width: 400px;
+    overflow: hidden;
+  }
+  
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #00b894, #55efc4);
+    width: 0%;
+    transition: width 0.5s ease;
+    border-radius: 20px;
+  }
+  
+  .main-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 25px;
+  }
+  
+  .nav-btn {
+    background: rgba(255,255,255,0.12);
+    color: white;
+    border: 2px solid rgba(255,255,255,0.25);
+    border-radius: 50px;
+    padding: 10px 18px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.25s;
+  }
+  
+  .nav-btn:hover, .nav-btn.active {
+    background: #6c5ce7;
+    border-color: #a29bfe;
+    transform: scale(1.05);
+  }
+  
+  .nav-btn.completed {
+    background: #00b894;
+    border-color: #55efc4;
+  }
+  
+  .activity-panel {
+    display: none;
+    background: white;
+    border-radius: 24px;
+    padding: 28px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+    animation: fadeUp 0.4s ease;
+  }
+  
+  .activity-panel.active { display: block; }
+  
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  .act-title {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+  
+  .act-num {
+    background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+    color: white;
+    width: 52px;
+    height: 52px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 700;
+  }
+  
+  .act-title h2 { font-size: 1.4rem; color: #2d3436; }
+  
+  /* Sub-tabs */
+  .sub-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 22px;
+    flex-wrap: wrap;
+  }
+  
+  .sub-tab {
+    background: #f1f2f6;
+    border: none;
+    border-radius: 12px;
+    padding: 10px 16px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: #636e72;
+  }
+  
+  .sub-tab.active {
+    background: #6c5ce7;
+    color: white;
+    font-weight: 600;
+  }
+  
+  .sub-tab.done {
+    background: #00b894;
+    color: white;
+  }
+  
+  .sub-content { display: none; }
+  .sub-content.active { display: block; animation: fadeUp 0.3s; }
+  
+  /* Common interactive elements */
+  .instruction {
+    background: #f8f9fa;
+    border-left: 5px solid #6c5ce7;
+    padding: 14px 18px;
+    border-radius: 12px;
+    margin-bottom: 18px;
+    font-size: 1.05rem;
+    line-height: 1.5;
+  }
+  
+  .btn-check {
+    background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 12px 28px;
+    font-family: inherit;
+    font-size: 1.05rem;
+    cursor: pointer;
+    margin-top: 15px;
+    transition: transform 0.2s;
+  }
+  
+  .btn-check:hover { transform: scale(1.05); }
+  
+  .feedback-box {
+    margin-top: 15px;
+    padding: 14px 18px;
+    border-radius: 12px;
+    font-weight: 600;
+    display: none;
+  }
+  
+  .feedback-box.show { display: block; animation: fadeUp 0.3s; }
+  .feedback-box.ok { background: #d4edda; color: #155724; }
+  .feedback-box.no { background: #f8d7da; color: #721c24; }
+  
+  /* SORTABLE */
+  .sort-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .sort-item {
+    background: #f1f2f6;
+    border: 2px solid #dfe6e9;
+    border-radius: 14px;
+    padding: 14px 18px;
+    cursor: grab;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: all 0.2s;
+    user-select: none;
+  }
+  
+  .sort-item:active { cursor: grabbing; }
+  .sort-item.dragging { opacity: 0.5; transform: scale(0.98); }
+  .sort-item.correct-pos { border-color: #00b894; background: #d4edda; }
+  
+  .sort-num {
+    background: #6c5ce7;
+    color: white;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  
+  /* MATCHING */
+  .match-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  
+  .match-item {
+    background: #f1f2f6;
+    border: 3px solid transparent;
+    border-radius: 14px;
+    padding: 14px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.25s;
+    font-size: 0.98rem;
+  }
+  
+  .match-item:hover { background: #dfe6e9; }
+  .match-item.selected { border-color: #6c5ce7; background: #e8e4ff; }
+  .match-item.matched { border-color: #00b894; background: #d4edda; pointer-events: none; }
+  .match-item.wrong-temp { border-color: #e17055; background: #f8d7da; }
+  
+  /* CLICK BUILD / SIMULATION */
+  .sim-area {
+    background: #f8f9fa;
+    border-radius: 16px;
+    padding: 20px;
+    min-height: 180px;
+    position: relative;
+  }
+  
+  .sim-btn {
+    background: white;
+    border: 2px solid #6c5ce7;
+    border-radius: 12px;
+    padding: 12px 18px;
+    font-family: inherit;
+    font-size: 1rem;
+    cursor: pointer;
+    margin: 6px;
+    transition: all 0.2s;
+  }
+  
+  .sim-btn:hover { background: #e8e4ff; transform: scale(1.03); }
+  .sim-btn.used { background: #d4edda; border-color: #00b894; pointer-events: none; }
+  
+  .sim-result {
+    margin-top: 15px;
+    padding: 12px;
+    background: white;
+    border-radius: 12px;
+    border: 2px dashed #b2bec3;
+    min-height: 50px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+  }
+  
+  .sim-chip {
+    background: #6c5ce7;
+    color: white;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+  }
+  
+  /* TRUE / FALSE CARDS */
+  .tf-card {
+    background: #f1f2f6;
+    border-radius: 16px;
+    padding: 18px;
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+  }
+  
+  .tf-btns { display: flex; gap: 8px; }
+  
+  .tf-btn {
+    border: none;
+    border-radius: 10px;
+    padding: 10px 16px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .tf-btn.yes { background: #00b894; color: white; }
+  .tf-btn.no { background: #e17055; color: white; }
+  .tf-btn:hover { transform: scale(1.08); }
+  .tf-btn.selected-ok { box-shadow: 0 0 0 3px #55efc4; }
+  .tf-btn.selected-no { box-shadow: 0 0 0 3px #fab1a0; }
+  
+  /* DRAG DROP TARGET */
+  .drop-zone {
+    border: 3px dashed #b2bec3;
+    border-radius: 16px;
+    min-height: 80px;
+    padding: 15px;
+    margin: 10px 0;
+    background: #fafafa;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    transition: all 0.2s;
+  }
+  
+  .drop-zone.over { border-color: #6c5ce7; background: #e8e4ff; }
+  
+  .drag-source {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 15px;
+  }
+  
+  .drag-chip {
+    background: #6c5ce7;
+    color: white;
+    padding: 10px 16px;
+    border-radius: 12px;
+    cursor: grab;
+    user-select: none;
+    transition: transform 0.15s;
+  }
+  
+  .drag-chip:active { cursor: grabbing; transform: scale(0.95); }
+  .drag-chip.placed { opacity: 0.4; pointer-events: none; }
+  
+  /* Final score */
+  .final-score {
+    background: white;
+    border-radius: 24px;
+    padding: 30px;
+    text-align: center;
+    margin-top: 30px;
+    display: none;
+  }
+  
+  .final-score.show { display: block; animation: fadeUp 0.5s; }
+  
+  .big-score {
+    font-size: 3.5rem;
+    font-weight: 700;
+    color: #00b894;
+    margin: 10px 0;
+  }
+  
+  .stars { font-size: 2.2rem; letter-spacing: 4px; }
+  
+  .reset-all {
+    background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 14px 32px;
+    font-family: inherit;
+    font-size: 1.1rem;
+    cursor: pointer;
+    margin-top: 18px;
+  }
+  
+  .reset-all:hover { transform: scale(1.05); }
+  
+  /* Helper */
+  .hint {
+    font-size: 0.9rem;
+    color: #636e72;
+    margin-top: 8px;
+  }
 </style>
 </head>
 <body>
 <div class="container">
-  <!-- HEADER -->
-  <div class="header-box">
-    <h1>🌐 Μάθημα 25: Ιστολόγια & Συνεργασία στο Διαδίκτυο</h1>
-    <p>8 Ενότητες · 24 Ερωτήσεις (Τυχαία σειρά απαντήσεων) — Ε΄ Δημοτικού</p>
+  <header>
+    <h1>🎬 Μάθημα 25 – Super Διαδραστικό!</h1>
+    <p>8 δραστηριότητες × 3 υποδραστηριότητες = 24 μικρά παιχνίδια</p>
+    <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+  </header>
+
+  <div class="main-nav" id="mainNav"></div>
+
+  <!-- ==================== ACTIVITY 1 ==================== -->
+  <div class="activity-panel" id="act1">
+    <div class="act-title"><div class="act-num">1</div><h2>Βίντεο από το YouTube</h2></div>
+    <div class="sub-tabs">
+      <button class="sub-tab active" onclick="showSub(1,1)">① Βάλε σε σειρά</button>
+      <button class="sub-tab" onclick="showSub(1,2)">② Κλικ & Αντιγραφή</button>
+      <button class="sub-tab" onclick="showSub(1,3)">③ Ταιριάζω</button>
+    </div>
+
+    <div class="sub-content active" id="s1-1">
+      <div class="instruction">Σύρε τις κάρτες στη σωστή σειρά για να εισάγεις ένα βίντεο από το YouTube στην παρουσίαση!</div>
+      <ul class="sort-list" id="sort1">
+        <li class="sort-item" draggable="true" data-order="3"><span class="sort-num">?</span> Επικόλλησε τον σύνδεσμο στη διαφάνεια</li>
+        <li class="sort-item" draggable="true" data-order="1"><span class="sort-num">?</span> Βρες το βίντεο στο YouTube</li>
+        <li class="sort-item" draggable="true" data-order="2"><span class="sort-num">?</span> Κάνε δεξί κλικ → «Αντιγραφή διεύθυνσης URL»</li>
+      </ul>
+      <button class="btn-check" onclick="checkSort(1)">Έλεγχος σειράς</button>
+      <div class="feedback-box" id="fb1-1"></div>
+    </div>
+
+    <div class="sub-content" id="s1-2">
+      <div class="instruction">Πάτησε τα κουμπιά με τη σωστή σειρά για να «αντιγράψεις» το URL του βίντεο!</div>
+      <div class="sim-area" id="sim1">
+        <button class="sim-btn" data-step="1" onclick="simClick(this,1)">🎥 Βίντεο: Οροσειρές της Ελλάδας</button>
+        <button class="sim-btn" data-step="2" onclick="simClick(this,1)">🖱️ Δεξί κλικ</button>
+        <button class="sim-btn" data-step="3" onclick="simClick(this,1)">📋 Αντιγραφή URL</button>
+        <button class="sim-btn" data-step="4" onclick="simClick(this,1)">📌 Επικόλληση στη διαφάνεια</button>
+        <div class="sim-result" id="simRes1">Τα βήματα που έκανες θα εμφανιστούν εδώ...</div>
+      </div>
+      <div class="feedback-box" id="fb1-2"></div>
+    </div>
+
+    <div class="sub-content" id="s1-3">
+      <div class="instruction">Ταιριάζει κάθε ενέργεια με το σωστό αποτέλεσμα! Κάνε κλικ σε μία αριστερά και μετά σε μία δεξιά.</div>
+      <div class="match-grid" id="match1">
+        <div class="match-item" data-pair="a" onclick="matchSelect(this,1)">Αντιγραφή URL</div>
+        <div class="match-item" data-pair="b" onclick="matchSelect(this,1)">Το βίντεο εμφανίζεται στη διαφάνεια</div>
+        <div class="match-item" data-pair="c" onclick="matchSelect(this,1)">Επικόλληση στη διαφάνεια</div>
+        <div class="match-item" data-pair="a" onclick="matchSelect(this,1)">Αποθηκεύεται ο σύνδεσμος στη μνήμη</div>
+        <div class="match-item" data-pair="b" onclick="matchSelect(this,1)">Εμφάνιση βίντεο</div>
+        <div class="match-item" data-pair="c" onclick="matchSelect(this,1)">Το βίντεο μπαίνει στην παρουσίαση</div>
+      </div>
+      <div class="feedback-box" id="fb1-3"></div>
+    </div>
   </div>
 
-  <!-- MENU VIEW -->
-  <div id="menuView"></div>
+  <!-- ==================== ACTIVITY 2 ==================== -->
+  <div class="activity-panel" id="act2">
+    <div class="act-title"><div class="act-num">2</div><h2>Ήχος από τον υπολογιστή</h2></div>
+    <div class="sub-tabs">
+      <button class="sub-tab active" onclick="showSub(2,1)">① Βάλε σε σειρά</button>
+      <button class="sub-tab" onclick="showSub(2,2)">② Σύρε τα αρχεία</button>
+      <button class="sub-tab" onclick="showSub(2,3)">③ Σωστό ή Λάθος</button>
+    </div>
 
-  <!-- QUIZ VIEW -->
-  <div id="quizView" style="display:none">
-    <div class="nav-bar">
-      <button class="btn-back" onclick="showMenu()">← Πίσω στο Μενού</button>
-      <span class="progress-tag" id="progTag">Ερώτηση 1 / 3</span>
+    <div class="sub-content active" id="s2-1">
+      <div class="instruction">Βάλε σε σωστή σειρά τα βήματα για να εισάγεις αρχείο ήχου από τον υπολογιστή σου.</div>
+      <ul class="sort-list" id="sort2">
+        <li class="sort-item" draggable="true" data-order="2"><span class="sort-num">?</span> Επέλεξε «Ήχος»</li>
+        <li class="sort-item" draggable="true" data-order="4"><span class="sort-num">?</span> Κάνε διπλό κλικ στο αρχείο .mp3</li>
+        <li class="sort-item" draggable="true" data-order="1"><span class="sort-num">?</span> Πήγαινε στο μενού Εισαγωγή</li>
+        <li class="sort-item" draggable="true" data-order="3"><span class="sort-num">?</span> Βρες τον φάκελο με τα αρχεία σου</li>
+      </ul>
+      <button class="btn-check" onclick="checkSort(2)">Έλεγχος σειράς</button>
+      <div class="feedback-box" id="fb2-1"></div>
     </div>
-    <div class="q-box">
-      <div class="q-title" id="qText">Ερώτηση εδώ...</div>
-      <div class="q-hint" id="qHint"></div>
+
+    <div class="sub-content" id="s2-2">
+      <div class="instruction">Σύρε τα σωστά αρχεία μέσα στην παρουσίαση! (μόνο ήχος και βίντεο)</div>
+      <div class="drag-source" id="dragSrc2">
+        <div class="drag-chip" draggable="true" data-ok="1">🎵 δάσος.mp3</div>
+        <div class="drag-chip" draggable="true" data-ok="0">📄 εργασία.docx</div>
+        <div class="drag-chip" draggable="true" data-ok="1">🎬 ζώα.mp4</div>
+        <div class="drag-chip" draggable="true" data-ok="0">📊 βαθμοί.xlsx</div>
+        <div class="drag-chip" draggable="true" data-ok="1">🔊 πουλιά.wav</div>
+      </div>
+      <div class="drop-zone" id="drop2" ondragover="allowDrop(event)" ondrop="dropItem(event,2)" ondragleave="leaveDrop(event)">
+        Ρίξε εδώ τα αρχεία ήχου & βίντεο
+      </div>
+      <button class="btn-check" onclick="checkDrop(2)">Έλεγχος</button>
+      <div class="feedback-box" id="fb2-2"></div>
     </div>
-    <div class="options-list" id="optsList"></div>
-    <div class="feedback-box" id="fbMsg"></div>
-    <div id="nextArea"></div>
+
+    <div class="sub-content" id="s2-3">
+      <div class="instruction">Πες αν οι προτάσεις είναι Σωστές ή Λάθος!</div>
+      <div class="tf-card" data-ans="yes">
+        <span>Μπορώ να εισάγω ήχο από τον υπολογιστή μου χωρίς ίντερνετ.</span>
+        <div class="tf-btns">
+          <button class="tf-btn yes" onclick="tfAnswer(this,'yes')">Σωστό</button>
+          <button class="tf-btn no" onclick="tfAnswer(this,'no')">Λάθος</button>
+        </div>
+      </div>
+      <div class="tf-card" data-ans="no">
+        <span>Τα αρχεία ήχου από τον υπολογιστή παίζουν μόνο αν έχω Wi-Fi.</span>
+        <div class="tf-btns">
+          <button class="tf-btn yes" onclick="tfAnswer(this,'yes')">Σωστό</button>
+          <button class="tf-btn no" onclick="tfAnswer(this,'no')">Λάθος</button>
+        </div>
+      </div>
+      <div class="tf-card" data-ans="yes">
+        <span>Η διαδρομή είναι: Εισαγωγή → Ήχος ή Βίντεο.</span>
+        <div class="tf-btns">
+          <button class="tf-btn yes" onclick="tfAnswer(this,'yes')">Σωστό</button>
+          <button class="tf-btn no" onclick="tfAnswer(this,'no')">Λάθος</button>
+        </div>
+      </div>
+      <div class="feedback-box" id="fb2-3"></div>
+    </div>
+  </div>
+
+  <!-- ==================== ACTIVITY 3 ==================== -->
+  <div class="activity-panel" id="act3">
+    <div class="act-title"><div class="act-num">3</div><h2>Αναφορά πηγής</h2></div>
+    <div class="sub-tabs">
+      <button class="sub-tab active" onclick="showSub(3,1)">① Γιατί το κάνουμε;</button>
+      <button class="sub-tab" onclick="showSub(3,2)">② Συμπλήρωσε</button>
+      <button class="sub-tab" onclick="showSub(3,3)">③ Ταιριάζω</button>
+    </div>
+
+    <div class="sub-content active" id="s3-1">
+      <div class="instruction">Κάνε κλικ στους λόγους για τους οποίους πρέπει να αναφέρουμε την πηγή ενός βίντεο ή ήχου.</div>
+      <div class="sim-area">
+        <button class="sim-btn" data-good="1" onclick="reasonClick(this,3)">🙏 Σεβασμός στον δημιουργό</button>
+        <button class="sim-btn" data-good="0" onclick="reasonClick(this,3)">🎨 Να γίνει πιο όμορφη η παρουσίαση</button>
+        <button class="sim-btn" data-good="1" onclick="reasonClick(this,3)">📜 Είναι σωστό και τίμιο</button>
+        <button class="sim-btn" data-good="0" onclick="reasonClick(this,3)">🚀 Να τρέχει πιο γρήγορα ο υπολογιστής</button>
+        <button class="sim-btn" data-good="1" onclick="reasonClick(this,3)">🔍 Να μπορεί κάποιος να βρει την αρχική πηγή</button>
+        <div class="sim-result" id="simRes3">Οι σωστοί λόγοι θα εμφανιστούν εδώ...</div>
+      </div>
+      <button class="btn-check" onclick="checkReasons(3)">Έλεγχος</button>
+      <div class="feedback-box" id="fb3-1"></div>
+    </div>
+
+    <div class="sub-content" id="s3-2">
+      <div class="instruction">Σύρε τις λέξεις για να συμπληρώσεις τη φράση!</div>
+      <div class="drag-source" id="dragSrc3">
+        <div class="drag-chip" draggable="true" data-word="δημιουργό">δημιουργό</div>
+        <div class="drag-chip" draggable="true" data-word="πηγή">πηγή</div>
+        <div class="drag-chip" draggable="true" data-word="αναφέρουμε">αναφέρουμε</div>
+      </div>
+      <p style="font-size:1.15rem; margin:15px 0;">
+        Όταν χρησιμοποιούμε βίντεο ή ήχο κάποιου άλλου, πρέπει να 
+        <span class="drop-zone" id="drop3a" style="display:inline-flex; min-height:40px; min-width:120px; vertical-align:middle;" ondragover="allowDrop(event)" ondrop="dropWord(event,'drop3a')" ondragleave="leaveDrop(event)"></span>
+        την 
+        <span class="drop-zone" id="drop3b" style="display:inline-flex; min-height:40px; min-width:100px; vertical-align:middle;" ondragover="allowDrop(event)" ondrop="dropWord(event,'drop3b')" ondragleave="leaveDrop(event)"></span>
+        και να λέμε ποιος είναι ο 
+        <span class="drop-zone" id="drop3c" style="display:inline-flex; min-height:40px; min-width:120px; vertical-align:middle;" ondragover="allowDrop(event)" ondrop="dropWord(event,'drop3c')" ondragleave="leaveDrop(event)"></span>.
+      </p>
+      <button class="btn-check" onclick="checkWords(3)">Έλεγχος</button>
+      <div class="feedback-box" id="fb3-2"></div>
+    </div>
+
+    <div class="sub-content" id="s3-3">
+      <div class="instruction">Ταιριάζει κάθε κακή πρακτική με το σωστό «γιατί είναι κακό».</div>
+      <div class="match-grid" id="match3">
+        <div class="match-item" data-pair="x" onclick="matchSelect(this,3)">Δεν γράφω την πηγή</div>
+        <div class="match-item" data-pair="y" onclick="matchSelect(this,3)">Κλέβω τη δουλειά κάποιου</div>
+        <div class="match-item" data-pair="z" onclick="matchSelect(this,3)">Βάζω βίντεο χωρίς άδεια</div>
+        <div class="match-item" data-pair="x" onclick="matchSelect(this,3)">Δεν σέβομαι τον δημιουργό</div>
+        <div class="match-item" data-pair="y" onclick="matchSelect(this,3)">Είναι σαν αντιγραφή</div>
+        <div class="match-item" data-pair="z" onclick="matchSelect(this,3)">Μπορεί να είναι παράνομο</div>
+      </div>
+      <div class="feedback-box" id="fb3-3"></div>
+    </div>
+  </div>
+
+  <!-- ==================== ACTIVITY 4 ==================== -->
+  <div class="activity-panel" id="act4">
+    <div class="act-title"><div class="act-num">4</div><h2>Πλεονεκτήματα Διαδικτύου</h2></div>
+    <div class="sub-tabs">
+      <button class="sub-tab active" onclick="showSub(4,1)">① Διάλεξε τα σωστά</button>
+      <button class="sub-tab" onclick="showSub(4,2)">② Σύρε στα κουτιά</button>
+      <button class="sub-tab" onclick="showSub(4,3)">③ Σωστό / Λάθος</button>
+    </div>
+
+    <div class="sub-content active" id="s4-1">
+      <div class="instruction">Πάτησε μόνο τα πραγματικά πλεονεκτήματα του βίντεο από το διαδίκτυο!</div>
+      <div class="sim-area">
+        <button class="sim-btn" data-good="1" onclick="reasonClick(this,4)">🔍 Εύκολη εύρεση πολλών αρχείων</button>
+        <button class="sim-btn" data-good="0" onclick="reasonClick(this,4)">📴 Δουλεύει χωρίς ίντερνετ</button>
+        <button class="sim-btn" data-good="1" onclick="reasonClick(this,4)">🎁 Πολλά δωρεάν περιεχόμενα</button>
+        <button class="sim-btn" data-good="0" onclick="reasonClick(this,4)">💾 Καταλαμβάνει πολύ χώρο στον δίσκο</button>
+        <button class="sim-btn" data-good="1" onclick="reasonClick(this,4)">⚡ Γρήγορη πρόσβαση</button>
+        <div class="sim-result" id="simRes4">Τα πλεονεκτήματα που διάλεξες...</div>
+      </div>
+      <button class="btn-check" onclick="checkReasons(4)">Έλεγχος</button>
+      <div class="feedback-box" id="fb4-1"></div>
+    </div>
+
+    <div class="sub-content" id="s4-2">
+      <div class="instruction">Σύρε κάθε χαρακτηριστικό στο σωστό κουτί!</div>
+      <div class="drag-source" id="dragSrc4">
+        <div class="drag-chip" draggable="true" data-box="pro">Εύκολη εύρεση</div>
+        <div class="drag-chip" draggable="true" data-box="con">Χρειάζεται ίντερνετ</div>
+        <div class="drag-chip" draggable="true" data-box="pro">Ποικιλία δωρεάν υλικού</div>
+        <div class="drag-chip" draggable="true" data-box="con">Η ποιότητα εξαρτάται από τη σύνδεση</div>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
+        <div>
+          <strong style="color:#00b894;">✅ Πλεονεκτήματα</strong>
+          <div class="drop-zone" id="dropPro4" ondragover="allowDrop(event)" ondrop="dropBox(event,'pro',4)" ondragleave="leaveDrop(event)"></div>
+        </div>
+        <div>
+          <strong style="color:#e17055;">❌ Μειονεκτήματα</strong>
+          <div class="drop-zone" id="dropCon4" ondragover="allowDrop(event)" ondrop="dropBox(event,'con',4)" ondragleave="leaveDrop(event)"></div>
+        </div>
+      </div>
+      <button class="btn-check" onclick="checkBoxes(4)">Έλεγχος</button>
+      <div class="feedback-box" id="fb4-2"></div>
+    </div>
+
+    <div class="sub-content" id="s4-3">
+      <div class="instruction">Σωστό ή Λάθος;</div>
+      <div class="tf-card" data-ans="yes">
+        <span>Από το διαδίκτυο βρίσκουμε εύκολα πολλά βίντεο.</span>
+        <div class="tf-btns">
+          <button class="tf-btn yes" onclick="tfAnswer(this,'yes')">Σωστό</button>
+          <button class="tf-btn no" onclick="tfAnswer(this,'no')">Λάθος</button>
+        </div>
+      </div>
+      <div class="tf-card" data-ans="no">
+        <span>Τα βίντεο από το διαδίκτυο παίζουν πάντα χωρίς ίντερνετ.</span>
+        <div class="tf-btns">
+          <button class="tf-btn yes" onclick="tfAnswer(this,'yes')">Σωστό</button>
+          <button class="tf-btn no" onclick="tfAnswer(this,'no')">Λάθος</button>
+        </div>
+      </div>
+      <div class="tf-card" data-ans="yes">
+        <span>Η ποιότητα αναπαραγωγής εξαρτάται από τη σύνδεση.</span>
+        <div class="tf-btns">
+          <button class="tf-btn yes" onclick="tfAnswer(this,'yes')">Σωστό</button>
+          <button class="tf-btn no" onclick="tfAnswer(this,'no')">Λάθος</button>
+        </div>
+      </div>
+      <div class="feedback-box" id="fb4-3"></div>
+    </div>
+  </div>
+
+  <!-- ==================== ACTIVITY 5 ==================== -->
+  <div class="activity-panel" id="act5">
+    <div class="act-title"><div class="act-num">5</div><h2>Πλεονεκτήματα τοπικών αρχείων</h2></div>
+    <div class="sub-tabs">
+      <button class="sub-tab active" onclick="showSub(5,1)">① Διάλεξε</button>
+      <button class="sub-tab" onclick="showSub(5,2)">② Σύρε στα κουτιά</button>
+      <button class="sub-tab" onclick="showSub(5,3)">③ Βάλε σε σειρά</button>
+    </div>
+
+    <div class="sub-content active" id="s5-1">
+      <div class="instruction">Ποια είναι πλεονεκτήματα όταν βάζουμε αρχεία από τον υπολογιστή μας;</div>
+      <div class="sim-area">
+        <button class="sim-btn" data-good="1" onclick="reasonClick(this,5)">📶 Παίζει χωρίς ίντερνετ</button>
+        <button class="sim-btn" data-good="0" onclick="reasonClick(this,5)">🌐 Χρειάζεται πάντα σύνδεση</button>
+        <button class="sim-btn" data-good="1" onclick="reasonClick(this,5)">🎥 Συνήθως καλύτερη ποιότητα</button>
+        <button class="sim-btn" data-good="0" onclick="reasonClick(this,5)">📦 Δεν πιάνει καθόλου χώρο</button>
+        <button class="sim-btn" data-good="1" onclick="reasonClick(this,5)">🎛️ Έχουμε πλήρη έλεγχο του αρχείου</button>
+        <div class="sim-result" id="simRes5">Τα πλεονεκτήματα που διάλεξες...</div>
+      </div>
+      <button class="btn-check" onclick="checkReasons(5)">Έλεγχος</button>
+      <div class="feedback-box" id="fb5-1"></div>
+    </div>
+
+    <div class="sub-content" id="s5-2">
+      <div class="instruction">Σύρε κάθε χαρακτηριστικό στο σωστό κουτί (Τοπικό αρχείο).</div>
+      <div class="drag-source" id="dragSrc5">
+        <div class="drag-chip" draggable="true" data-box="pro">Χωρίς ίντερνετ</div>
+        <div class="drag-chip" draggable="true" data-box="con">Πιάνει χώρο στον δίσκο</div>
+        <div class="drag-chip" draggable="true" data-box="pro">Καλύτερη ποιότητα</div>
+        <div class="drag-chip" draggable="true" data-box="con">Δύσκολη κοινοποίηση</div>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
+        <div>
+          <strong style="color:#00b894;">✅ Πλεονεκτήματα</strong>
+          <div class="drop-zone" id="dropPro5" ondragover="allowDrop(event)" ondrop="dropBox(event,'pro',5)" ondragleave="leaveDrop(event)"></div>
+        </div>
+        <div>
+          <strong style="color:#e17055;">❌ Μειονεκτήματα</strong>
+          <div class="drop-zone" id="dropCon5" ondragover="allowDrop(event)" ondrop="dropBox(event,'con',5)" ondragleave="leaveDrop(event)"></div>
+        </div>
+      </div>
+      <button class="btn-check" onclick="checkBoxes(5)">Έλεγχος</button>
+      <div class="feedback-box" id="fb5-2"></div>
+    </div>
+
+    <div class="sub-content" id="s5-3">
+      <div class="instruction">Βάλε σε σειρά: Πότε προτιμάμε τοπικό αρχείο;</div>
+      <ul class="sort-list" id="sort5">
+        <li class="sort-item" draggable="true" data-order="2"><span class="sort-num">?</span> Όταν θέλουμε υψηλή ποιότητα</li>
+        <li class="sort-item" draggable="true" data-order="1"><span class="sort-num">?</span> Όταν δεν έχουμε ίντερνετ</li>
+        <li class="sort-item" draggable="true" data-order="3"><span class="sort-num">?</span> Όταν θέλουμε πλήρη έλεγχο</li>
+      </ul>
+      <button class="btn-check" onclick="checkSort(5)">Έλεγχος</button>
+      <div class="feedback-box" id="fb5-3"></div>
+    </div>
+  </div>
+
+  <!-- ==================== ACTIVITY 6 ==================== -->
+  <div class="activity-panel" id="act6">
+    <div class="act-title"><div class="act-num">6</div><h2>Κειμενογράφος & Παρουσιάσεις</h2></div>
+    <div class="sub-tabs">
+      <button class="sub-tab active" onclick="showSub(6,1)">① Ταιριάζω</button>
+      <button class="sub-tab" onclick="showSub(6,2)">② Σύρε στο σωστό</button>
+      <button class="sub-tab" onclick="showSub(6,3)">③ Σωστό / Λάθος</button>
+    </div>
+
+    <div class="sub-content active" id="s6-1">
+      <div class="instruction">Ταιριάζει κάθε χρήση με την κατάλληλη εφαρμογή!</div>
+      <div class="match-grid" id="match6">
+        <div class="match-item" data-pair="p" onclick="matchSelect(this,6)">Κάνω την παρουσίαση πιο ζωντανή</div>
+        <div class="match-item" data-pair="w" onclick="matchSelect(this,6)">Κάνω το κείμενο πιο ενδιαφέρον</div>
+        <div class="match-item" data-pair="p" onclick="matchSelect(this,6)">Εφαρμογή παρουσιάσεων</div>
+        <div class="match-item" data-pair="w" onclick="matchSelect(this,6)">Κειμενογράφος</div>
+        <div class="match-item" data-pair="b" onclick="matchSelect(this,6)">Μπορώ και στις δύο</div>
+        <div class="match-item" data-pair="b" onclick="matchSelect(this,6)">Εισαγωγή βίντεο & ήχου</div>
+      </div>
+      <div class="feedback-box" id="fb6-1"></div>
+    </div>
+
+    <div class="sub-content" id="s6-2">
+      <div class="instruction">Σύρε κάθε πρόταση στο σωστό πρόγραμμα!</div>
+      <div class="drag-source" id="dragSrc6">
+        <div class="drag-chip" draggable="true" data-box="word">Θέλω το κείμενό μου πιο ενδιαφέρον</div>
+        <div class="drag-chip" draggable="true" data-box="ppt">Θέλω να κεντρίσω την προσοχή του κοινού</div>
+        <div class="drag-chip" draggable="true" data-box="both">Μπορώ να βάλω βίντεο και στις δύο</div>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px;">
+        <div>
+          <strong>📝 Κειμενογράφος</strong>
+          <div class="drop-zone" id="dropWord6" ondragover="allowDrop(event)" ondrop="dropBox(event,'word',6)" ondragleave="leaveDrop(event)"></div>
+        </div>
+        <div>
+          <strong>📊 Παρουσίαση</strong>
+          <div class="drop-zone" id="dropPpt6" ondragover="allowDrop(event)" ondrop="dropBox(event,'ppt',6)" ondragleave="leaveDrop(event)"></div>
+        </div>
+        <div>
+          <strong>🔄 Και τα δύο</strong>
+          <div class="drop-zone" id="dropBoth6" ondragover="allowDrop(event)" ondrop="dropBox(event,'both',6)" ondragleave="leaveDrop(event)"></div>
+        </div>
+      </div>
+      <button class="btn-check" onclick="checkBoxes(6)">Έλεγχος</button>
+      <div class="feedback-box" id="fb6-2"></div>
+    </div>
+
+    <div class="sub-content" id="s6-3">
+      <div class="instruction">Σωστό ή Λάθος;</div>
+      <div class="tf-card" data-ans="yes">
+        <span>Μπορώ να εισάγω βίντεο και στον κειμενογράφο και στην παρουσίαση.</span>
+        <div class="tf-btns">
+          <button class="tf-btn yes" onclick="tfAnswer(this,'yes')">Σωστό</button>
+          <button class="tf-btn no" onclick="tfAnswer(this,'no')">Λάθος</button>
+        </div>
+      </div>
+      <div class="tf-card" data-ans="no">
+        <span>Στην παρουσίαση τα βίντεο χρησιμοποιούνται μόνο για να γεμίσουν χώρο.</span>
+        <div class="tf-btns">
+          <button class="tf-btn yes" onclick="tfAnswer(this,'yes')">Σωστό</button>
+          <button class="tf-btn no" onclick="tfAnswer(this,'no')">Λάθος</button>
+        </div>
+      </div>
+      <div class="tf-card" data-ans="yes">
+        <span>Στον κειμενογράφο τα πολυμέσα κάνουν το κείμενο πιο ενδιαφέρον.</span>
+        <div class="tf-btns">
+          <button class="tf-btn yes" onclick="tfAnswer(this,'yes')">Σωστό</button>
+          <button class="tf-btn no" onclick="tfAnswer(this,'no')">Λάθος</button>
+        </div>
+      </div>
+      <div class="feedback-box" id="fb6-3"></div>
+    </div>
+  </div>
+
+  <!-- ==================== ACTIVITY 7 ==================== -->
+  <div class="activity-panel" id="act7">
+    <div class="act-title"><div class="act-num">7</div><h2>Βίντεο από το ΠΣΔ (sch.gr)</h2></div>
+    <div class="sub-tabs">
+      <button class="sub-tab active" onclick="showSub(7,1)">① Βρες τη διεύθυνση</button>
+      <button class="sub-tab" onclick="showSub(7,2)">② Βάλε σε σειρά</button>
+      <button class="sub-tab" onclick="showSub(7,3)">③ Ταιριάζω</button>
+    </div>
+
+    <div class="sub-content active" id="s7-1">
+      <div class="instruction">Ποια είναι η σωστή διεύθυνση για εκπαιδευτικά βίντεο του Πανελλήνιου Σχολικού Δικτύου; Κάνε κλικ!</div>
+      <div class="sim-area">
+        <button class="sim-btn" data-good="0" onclick="singleChoice(this,7)">🌐 www.youtube.com</button>
+        <button class="sim-btn" data-good="1" onclick="singleChoice(this,7)">🏫 https://video.sch.gr/</button>
+        <button class="sim-btn" data-good="0" onclick="singleChoice(this,7)">🛒 www.skroutz.gr</button>
+        <button class="sim-btn" data-good="0" onclick="singleChoice(this,7)">🎮 www.roblox.com</button>
+      </div>
+      <div class="feedback-box" id="fb7-1"></div>
+    </div>
+
+    <div class="sub-content" id="s7-2">
+      <div class="instruction">Βάλε σε σειρά τα βήματα για να χρησιμοποιήσεις βίντεο από το video.sch.gr</div>
+      <ul class="sort-list" id="sort7">
+        <li class="sort-item" draggable="true" data-order="3"><span class="sort-num">?</span> Επικόλλησε τον σύνδεσμο στην παρουσίαση</li>
+        <li class="sort-item" draggable="true" data-order="1"><span class="sort-num">?</span> Πήγαινε στο https://video.sch.gr/</li>
+        <li class="sort-item" draggable="true" data-order="2"><span class="sort-num">?</span> Βρες και άνοιξε το βίντεο που θέλεις</li>
+      </ul>
+      <button class="btn-check" onclick="checkSort(7)">Έλεγχος</button>
+      <div class="feedback-box" id="fb7-2"></div>
+    </div>
+
+    <div class="sub-content" id="s7-3">
+      <div class="instruction">Ταιριάζει!</div>
+      <div class="match-grid" id="match7">
+        <div class="match-item" data-pair="s" onclick="matchSelect(this,7)">video.sch.gr</div>
+        <div class="match-item" data-pair="y" onclick="matchSelect(this,7)">YouTube</div>
+        <div class="match-item" data-pair="s" onclick="matchSelect(this,7)">Υπηρεσία Πανελλήνιου Σχολικού Δικτύου</div>
+        <div class="match-item" data-pair="y" onclick="matchSelect(this,7)">Δημοφιλής ιστοσελίδα βίντεο</div>
+        <div class="match-item" data-pair="e" onclick="matchSelect(this,7)">Εκπαιδευτικά βίντεο για σχολεία</div>
+        <div class="match-item" data-pair="e" onclick="matchSelect(this,7)">Κατάλληλα για μαθήματα</div>
+      </div>
+      <div class="feedback-box" id="fb7-3"></div>
+    </div>
+  </div>
+
+  <!-- ==================== ACTIVITY 8 ==================== -->
+  <div class="activity-panel" id="act8">
+    <div class="act-title"><div class="act-num">8</div><h2>Γιατί πολυμέσα στην παρουσίαση;</h2></div>
+    <div class="sub-tabs">
+      <button class="sub-tab active" onclick="showSub(8,1)">① Διάλεξε λόγους</button>
+      <button class="sub-tab" onclick="showSub(8,2)">② Σύρε</button>
+      <button class="sub-tab" onclick="showSub(8,3)">③ Σωστό / Λάθος</button>
+    </div>
+
+    <div class="sub-content active" id="s8-1">
+      <div class="instruction">Γιατί βάζουμε ήχο και βίντεο σε μια παρουσίαση; Διάλεξε τους σωστούς λόγους!</div>
+      <div class="sim-area">
+        <button class="sim-btn" data-good="1" onclick="reasonClick(this,8)">✨ Να κεντρίσουμε την προσοχή</button>
+        <button class="sim-btn" data-good="0" onclick="reasonClick(this,8)">😴 Να κοιμηθεί το κοινό</button>
+        <button class="sim-btn" data-good="1" onclick="reasonClick(this,8)">🎬 Να γίνει πιο ζωντανή</button>
+        <button class="sim-btn" data-good="0" onclick="reasonClick(this,8)">📦 Να γεμίσουμε τον δίσκο</button>
+        <button class="sim-btn" data-good="1" onclick="reasonClick(this,8)">👀 Να κρατήσουμε το ενδιαφέρον</button>
+        <div class="sim-result" id="simRes8">Οι λόγοι που διάλεξες...</div>
+      </div>
+      <button class="btn-check" onclick="checkReasons(8)">Έλεγχος</button>
+      <div class="feedback-box" id="fb8-1"></div>
+    </div>
+
+    <div class="sub-content" id="s8-2">
+      <div class="instruction">Σύρε τις σωστές φράσεις μέσα στο κουτί «Καλές λόγοι»!</div>
+      <div class="drag-source" id="dragSrc8">
+        <div class="drag-chip" draggable="true" data-ok="1">Κεντράρει την προσοχή</div>
+        <div class="drag-chip" draggable="true" data-ok="0">Κάνει τον υπολογιστή πιο αργό</div>
+        <div class="drag-chip" draggable="true" data-ok="1">Κάνει την παρουσίαση ζωντανή</div>
+        <div class="drag-chip" draggable="true" data-ok="0">Χρειάζεται πάντα ίντερνετ</div>
+        <div class="drag-chip" draggable="true" data-ok="1">Κρατάει το ενδιαφέρον του κοινού</div>
+      </div>
+      <div class="drop-zone" id="drop8" ondragover="allowDrop(event)" ondrop="dropItem(event,8)" ondragleave="leaveDrop(event)">
+        Καλές λόγοι για πολυμέσα
+      </div>
+      <button class="btn-check" onclick="checkDrop(8)">Έλεγχος</button>
+      <div class="feedback-box" id="fb8-2"></div>
+    </div>
+
+    <div class="sub-content" id="s8-3">
+      <div class="instruction">Σωστό ή Λάθος σύμφωνα με το μάθημα;</div>
+      <div class="tf-card" data-ans="yes">
+        <span>Τα πολυμέσα κάνουν την παρουσίαση πιο ζωντανή.</span>
+        <div class="tf-btns">
+          <button class="tf-btn yes" onclick="tfAnswer(this,'yes')">Σωστό</button>
+          <button class="tf-btn no" onclick="tfAnswer(this,'no')">Λάθος</button>
+        </div>
+      </div>
+      <div class="tf-card" data-ans="yes">
+        <span>Σκοπός είναι να κεντρίσουμε την προσοχή του κοινού.</span>
+        <div class="tf-btns">
+          <button class="tf-btn yes" onclick="tfAnswer(this,'yes')">Σωστό</button>
+          <button class="tf-btn no" onclick="tfAnswer(this,'no')">Λάθος</button>
+        </div>
+      </div>
+      <div class="tf-card" data-ans="no">
+        <span>Όσο περισσότερα εφέ βάλουμε, τόσο καλύτερα (ακόμα και αν είναι υπερβολικά).</span>
+        <div class="tf-btns">
+          <button class="tf-btn yes" onclick="tfAnswer(this,'yes')">Σωστό</button>
+          <button class="tf-btn no" onclick="tfAnswer(this,'no')">Λάθος</button>
+        </div>
+      </div>
+      <div class="feedback-box" id="fb8-3"></div>
+    </div>
+  </div>
+
+  <!-- FINAL SCORE -->
+  <div class="final-score" id="finalScore">
+    <h2>🎉 Συγχαρητήρια!</h2>
+    <div class="stars" id="stars">☆☆☆☆☆☆☆☆</div>
+    <div class="big-score" id="scoreText">0 / 24</div>
+    <p id="finalMsg" style="font-size:1.2rem; margin-top:10px;"></p>
+    <button class="reset-all" onclick="location.reload()">🔄 Ξαναπαίξε από την αρχή</button>
   </div>
 </div>
 
 <script>
-var curTopic = 0;
-var curQ = 0;
-var hasAnswered = false;
-var currentShuffledOpts = [];
+  // ========== STATE ==========
+  let completedSubs = {}; // key: "1-1", value: true
+  let totalSubs = 24;
+  let currentAct = 1;
 
-var quizData = [
-  // 1. Τι είναι το Ιστολόγιο (Blog)
-  {
-    title: "1. Τι είναι το Ιστολόγιο (Blog)",
-    desc: "Η έννοια του διαδικτυακού ημερολογίου.",
-    questions: [
-      {
-        q: "Τι είναι ένα ιστολόγιο (blog) στο διαδίκτυο;",
-        hint: "Σκέψου τις λέξεις web και log (ημερολόγιο).",
-        opts: [
-          { t: "📝 Ένα διαδικτυακό ημερολόγιο όπου δημοσιεύονται άρθρα και απόψεις!", ok: true, exp: "Σωστά! Η λέξη blog προέρχεται από το weblog και σημαίνει ψηφιακό ημερολόγιο." },
-          { t: "Ένα πρόγραμμα για να σβήνουμε αρχεία από τον υπολογιστή", ok: false, exp: "Όχι, το ιστολόγιο είναι ιστοσελίδα δημοσίευσης άρθρων." },
-          { t: "Ένα εξάρτημα της οθόνης", ok: false, exp: "Όχι, είναι διαδικτυακή υπηρεσία." }
-        ]
-      },
-      {
-        q: "Πώς εμφανίζονται τα άρθρα (αναρτήσεις) σε ένα ιστολόγιο;",
-        hint: "Ποιο άρθρο βλέπουμε πρώτο επάνω;",
-        opts: [
-          { t: "⏳ Με αντίστροφη χρονολογική σειρά (το πιο πρόσφατο άρθρο φαίνεται πρώτο επάνω)!", ok: true, exp: "Μπράβο! Όπως σε κάθε ημερολόγιο, η πιο πρόσφατη ανάρτηση μπαίνει στην κορυφή." },
-          { t: "Με αλφαβητική σειρά από το Ω προς το Α", ok: false, exp: "Όχι, ταξινομούνται χρονολογικά." },
-          { t: "Τυχαία κάθε φορά που ανοιγοκλείνουμε τη σελίδα", ok: false, exp: "Όχι, ακολουθούν χρονική σειρά." }
-        ]
-      },
-      {
-        q: "Πώς ονομάζεται το άτομο που γράφει και συντηρεί ένα ιστολόγιο;",
-        hint: "Στα ελληνικά λέγεται ιστολόγος.",
-        opts: [
-          { t: "✍️ Ιστολόγος (Blogger)!", ok: true, exp: "Τέλεια! Ο ιστολόγος (blogger) δημιουργεί και δημοσιεύει το περιεχόμενο." },
-          { t: "Τεχνικός δικτύων", ok: false, exp: "Όχι, αυτός φροντίζει τα καλώδια και τα ρούτερ." },
-          { t: "Φυλλομετρητής", ok: false, exp: "Φυλλομετρητής (browser) είναι το πρόγραμμα πλοήγησης." }
-        ]
-      }
-    ]
-  },
-
-  // 2. Αναρτήσεις & Περιεχόμενο (Posts)
-  {
-    title: "2. Αναρτήσεις & Πολυμέσα",
-    desc: "Κείμενο, εικόνες, βίντεο και υπερσύνδεσμοι.",
-    questions: [
-      {
-        q: "Τι μπορεί να περιλαμβάνει μια ανάρτηση (post) σε ένα σχολικό ιστολόγιο;",
-        hint: "Σκέψου όλα τα ψηφιακά μέσα.",
-        opts: [
-          { t: "🖼️ Κείμενο, φωτογραφίες, βίντεο και συνδέσμους προς άλλες ιστοσελίδες!", ok: true, exp: "Σωστά! Μια ανάρτηση μπορεί να συνδυάζει όλα τα είδη πολυμέσων." },
-          { t: "Μόνο αριθμούς χωρίς καθόλου γράμματα", ok: false, exp: "Όχι, γράφουμε κανονικά κείμενα και ιστορίες." },
-          { t: "Μόνο αρχεία που δεν ανοίγουν", ok: false, exp: "Όχι βέβαια!" }
-        ]
-      },
-      {
-        q: "Ποιο είναι το πρώτο πράγμα που γράφουμε σε μια ανάρτηση για να προσελκύσει τον αναγνώστη;",
-        hint: "Βρίσκεται στην κορυφή του άρθρου.",
-        opts: [
-          { t: "📌 Έναν σύντομο, ενδιαφέροντα και ξεκάθαρο τίτλο!", ok: true, exp: "Μπράβο! Ο τίτλος δίνει αμέσως να καταλάβει ο αναγνώστης περί τίνος πρόκειται." },
-          { t: "Τη λέξη ΤΕΛΟΣ", ok: false, exp: "Αυτό μπαίνει στο τέλος, όχι στην αρχή!" },
-          { t: "Όλο το κείμενο με κεφαλαία και χωρίς κενά", ok: false, exp: "Όχι, αυτό κουράζει και θεωρείται αγένεια στο διαδίκτυο." }
-        ]
-      },
-      {
-        q: "Πότε είναι ορατή μια ανάρτηση στους επισκέπτες του ιστολογίου;",
-        hint: "Ποιο κουμπί πρέπει να πατήσουμε;",
-        opts: [
-          { t: "🚀 Μόλις πατήσουμε το κουμπί «Δημοσίευση» (Publish)!", ok: true, exp: "Ακριβώς! Μέχρι να πατήσουμε Δημοσίευση, μένει ως Πρόχειρο (Draft) που βλέπουμε μόνο εμείς." },
-          { t: "Αμέσως μόλις ανοίξουμε τον υπολογιστή", ok: false, exp: "Όχι, πρέπει πρώτα να γραφτεί και να δημοσιευτεί." },
-          { t: "Ποτέ, μένει κρυφή για πάντα", ok: false, exp: "Όχι, σκοπός του ιστολογίου είναι η κοινοποίηση." }
-        ]
-      }
-    ]
-  },
-
-  // 3. Σχόλια & Αλληλεπίδραση (Comments)
-  {
-    title: "3. Σχόλια & Αλληλεπίδραση",
-    desc: "Διάλογος με τους αναγνώστες και ανταλλαγή απόψεων.",
-    questions: [
-      {
-        q: "Τι επιτρέπει στους αναγνώστες η περιοχή των σχολίων κάτω από κάθε άρθρο;",
-        hint: "Σκέψου τη συζήτηση.",
-        opts: [
-          { t: "💬 Να εκφράσουν τη γνώμη τους, να κάνουν ερωτήσεις και να συζητήσουν ευγενικά!", ok: true, exp: "Σωστά! Τα σχόλια κάνουν το ιστολόγιο διαδραστικό μέσο επικοινωνίας." },
-          { t: "Να σβήσουν το άρθρο του συγγραφέα", ok: false, exp: "Όχι, μόνο ο δημιουργός διαχειρίζεται το άρθρο." },
-          { t: "Να αλλάξουν τους κωδικούς του ιστολογίου", ok: false, exp: "Όχι βέβαια!" }
-        ]
-      },
-      {
-        q: "Τι είναι η «Έγκριση σχολίων» (Συντονισμός / Moderation) από τον διαχειριστή;",
-        hint: "Προστατεύει το σχολικό blog από προσβλητικά μηνύματα.",
-        opts: [
-          { t: "🛡️ Ο έλεγχος του σχολίου πριν δημοσιευτεί, ώστε να προστατεύεται η σελίδα από αγένειες!", ok: true, exp: "Μπράβο! Ο υπεύθυνος διαβάζει τα σχόλια και εγκρίνει μόνο τα ευγενικά και σχετικά." },
-          { t: "Ένας τρόπος να στέλνουμε διαφημίσεις", ok: false, exp: "Όχι." },
-          { t: "Αυτόματη διαγραφή όλων των επισκεπτών", ok: false, exp: "Όχι." }
-        ]
-      },
-      {
-        q: "Πώς πρέπει να απαντάμε σε ένα σχόλιο με το οποίο διαφωνούμε;",
-        hint: "Σκέψου τους κανόνες καλής συμπεριφοράς.",
-        opts: [
-          { t: "🤝 Με επιχειρήματα, ηρεμία και απόλυτο σεβασμό στην άλλη άποψη!", ok: true, exp: "Τέλεια! Η ευγένεια και ο σεβασμός είναι βασικοί κανόνες επικοινωνίας (netiquette)." },
-          { t: "Με θυμό, φωνές και άσχημες λέξεις", ok: false, exp: "Ποτέ! Η προσβολή άλλων χρηστών απαγορεύεται." },
-          { t: "Γράφοντας ψέματα", ok: false, exp: "Όχι, είμαστε πάντα ειλικρινείς και ευγενικοί." }
-        ]
-      }
-    ]
-  },
-
-  // 4. Κανόνες Ευγένειας στο Διαδίκτυο (Netiquette)
-  {
-    title: "4. Διαδικτυακή Ευγένεια (Netiquette)",
-    desc: "Κανόνες καλής συμπεριφοράς όταν επικοινωνούμε online.",
-    questions: [
-      {
-        q: "Τι σημαίνει όταν γράφουμε ένα σχόλιο ή μήνυμα με ΟΛΑ ΚΕΦΑΛΑΙΑ ΓΡΑΜΜΑΤΑ;",
-        hint: "Στον ψηφιακό κόσμο ισοδυναμεί με ήχο.",
-        opts: [
-          { t: "📢 Ότι ΦΩΝΑΖΟΥΜΕ δυνατά και θεωρείται αγένεια!", ok: true, exp: "Σωστά! Τα κεφαλαία στο ίντερνετ δείχνουν ότι φωνάζουμε και πρέπει να τα αποφεύγουμε." },
-          { t: "Ότι γράφουμε πολύ σωστά και επίσημα", ok: false, exp: "Όχι, είναι σαν να ουρλιάζουμε στον άλλον." },
-          { t: "Ότι τελείωσε η μπαταρία του πληκτρολογίου", ok: false, exp: "Όχι." }
-        ]
-      },
-      {
-        q: "Ποια από τις παρακάτω συμπεριφορές είναι ΣΩΣΤΗ σε ένα ιστολόγιο;",
-        hint: "Σκέψου τι θα έκανες και στην τάξη σου.",
-        opts: [
-          { t: "✅ Χρησιμοποιούμε ευγενικές λέξεις ('ευχαριστώ', 'παρακαλώ') και προσέχουμε την ορθογραφία!", ok: true, exp: "Μπράβο! Ο σεβασμός και η προσεγμένη γλώσσα δείχνουν πολιτισμό." },
-          { t: "Κοροϊδεύουμε τα λάθη των συμμαθητών μας", ok: false, exp: "Αυτό είναι απαράδεκτο και λέγεται διαδικτυακός εκφοβισμός." },
-          { t: "Γράφουμε άσχετα μηνύματα πολλές φορές (spam)", ok: false, exp: "Όχι, το spam ενοχλεί όλους τους αναγνώστες." }
-        ]
-      },
-      {
-        q: "Τι κάνουμε αν δούμε ένα προσβλητικό ή απειλητικό σχόλιο;",
-        hint: "Ποιον πρέπει να ενημερώσουμε;",
-        opts: [
-          { t: "👨‍🏫 Ενημερώνουμε αμέσως τον δάσκαλο ή τους γονείς μας χωρίς να απαντήσουμε στον επιτιθέμενο!", ok: true, exp: "Ακριβώς! Δεν εμπλεκόμαστε σε καβγάδες, ενημερώνουμε αμέσως έναν ενήλικα." },
-          { t: "Απαντάμε με χειρότερες βρισιές", ok: false, exp: "Ποτέ! Αυτό μεγαλώνει το πρόβλημα." },
-          { t: "Το κρατάμε μυστικό και στενοχωριόμαστε μόνοι μας", ok: false, exp: "Όχι, πάντα ζητάμε βοήθεια από δασκάλους ή γονείς." }
-        ]
-      }
-    ]
-  },
-
-  // 5. Ασφάλεια & Προσωπικά Δεδομένα στο Blog
-  {
-    title: "5. Ασφάλεια & Προσωπικά Δεδομένα",
-    desc: "Ποιες πληροφορίες ΔΕΝ δημοσιεύουμε ποτέ στο διαδίκτυο.",
-    questions: [
-      {
-        q: "Ποια από τις παρακάτω πληροφορίες ΔΕΝ πρέπει να δημοσιεύσεις ΠΟΤΕ σε ένα ιστολόγιο;",
-        hint: "Αφορά την προσωπική σου ασφάλεια.",
-        opts: [
-          { t: "🔒 Τη διεύθυνση του σπιτιού σου, το τηλέφωνό σου και τους κωδικούς σου!", ok: true, exp: "Σωστά! Τα προσωπικά δεδομένα δεν κοινοποιούνται ποτέ δημόσια." },
-          { t: "Ένα ποίημα που έγραψες για την άνοιξη", ok: false, exp: "Αυτό επιτρέπεται και είναι πολύ όμορφο να το μοιραστείς." },
-          { t: "Μια ζωγραφιά ενός ζώου που έφτιαξες", ok: false, exp: "Αυτό είναι κατάλληλο για δημοσίευση." }
-        ]
-      },
-      {
-        q: "Επιτρέπεται να ανεβάσουμε φωτογραφίες συμμαθητών μας στο σχολικό blog χωρίς άδεια;",
-        hint: "Σκέψου τη συγκατάθεση των γονέων.",
-        opts: [
-          { t: "🚫 Όχι! Απαιτείται πάντα η άδεια των ίδιων των παιδιών και των γονέων τους!", ok: true, exp: "Μπράβο! Η εικόνα του προσώπου είναι ευαίσθητο προσωπικό δεδομένο." },
-          { t: "Ναι, μπορούμε να ανεβάζουμε όποιον θέλουμε χωρίς να ρωτήσουμε", ok: false, exp: "Όχι, αυτό παραβιάζει την ιδιωτικότητα των άλλων." },
-          { t: "Μόνο αν η φωτογραφία είναι ασπρόμαυρη", ok: false, exp: "Όχι, ισχύει για όλες τις φωτογραφίες προσώπων." }
-        ]
-      },
-      {
-        q: "Ποιο είναι το πιο ασφαλές όνομα χρήστη (ψευδώνυμο) για να υπογράφεις στα σχολικά blogs;",
-        hint: "Καλύτερα να μη φαίνεται το πλήρες ονοματεπώνυμο.",
-        opts: [
-          { t: "⭐ Το μικρό σου όνομα μόνο (π.χ. 'Νίκος') ή ένα ουδέτερο ψευδώνυμο της ομάδας!", ok: true, exp: "Ακριβώς! Δεν γράφουμε ολόκληρο το επίθετο ούτε προσωπικά στοιχεία ταυτότητας." },
-          { t: "Το ονοματεπώνυμο, η ηλικία και η διεύθυνση κατοικίας σου", ok: false, exp: "Ποτέ! Αυτό είναι πολύ επικίνδυνο." }
-        ]
-      }
-    ]
-  },
-
-  // 6. Πνευματική Ιδιοκτησία & Πηγές (Copyright)
-  {
-    title: "6. Σεβασμός στην Πνευματική Ιδιοκτησία",
-    desc: "Πώς χρησιμοποιούμε εικόνες και κείμενα άλλων νόμιμα.",
-    questions: [
-      {
-        q: "Όταν βρίσκουμε μια ωραία εικόνα στο Google, μπορούμε να την βάλουμε στο blog λέγοντας ότι την τραβήξαμε εμείς;",
-        hint: "Σκέψου ποιος κουράστηκε για να τη δημιουργήσει.",
-        opts: [
-          { t: "❌ Όχι! Ανήκει στον δημιουργό της και πρέπει να αναφέρουμε την πηγή ή να έχει ελεύθερη άδεια!", ok: true, exp: "Σωστά! Ο σεβασμός στα πνευματικά δικαιώματα (copyright) είναι βασική ψηφιακή υποχρέωση." },
-          { t: "Ναι, ό,τι υπάρχει στο ίντερνετ γίνεται αυτόματα δικό μας", ok: false, exp: "Όχι, το διαδίκτυο δεν σημαίνει έλλειψη πνευματικών δικαιωμάτων!" }
-        ]
-      },
-      {
-        q: "Τι είναι οι άδειες Creative Commons (CC) που βρίσκουμε σε πολλές εικόνες;",
-        hint: "Επιτρέπουν στους δημιουργούς να μοιράζονται το έργο τους.",
-        opts: [
-          { t: "🎨 Άδειες που μας επιτρέπουν να χρησιμοποιούμε νόμιμα εικόνες, συνήθως αναφέροντας τον δημιουργό!", ok: true, exp: "Μπράβο! Οι άδειες Creative Commons δίνουν σαφείς οδηγίες για το πώς μπορούμε να μοιραστούμε ένα έργο." },
-          { t: "Ένας ιός που καταστρέφει το blog", ok: false, exp: "Όχι βέβαια!" }
-        ]
-      },
-      {
-        q: "Πώς αναφέρουμε σωστά την πηγή μιας πληροφορίας στην ανάρτησή μας;",
-        hint: "Πού παραπέμπουμε τον αναγνώστη;",
-        opts: [
-          { t: "🔗 Βάζοντας ενεργό σύνδεσμο (link) προς την αρχική ιστοσελίδα και το όνομα του συγγραφέα!", ok: true, exp: "Τέλεια! Έτσι ο αναγνώστης μπορεί να επισκεφτεί την πηγή και να διαβάσει περισσότερα." },
-          { t: "Κρύβοντας από πού τη βρήκαμε", ok: false, exp: "Όχι, η απόκρυψη πηγής θεωρείται λογοκλοπή." }
-        ]
-      }
-    ]
-  },
-
-  // 7. Συνεργασία σε Ομάδες (Collaborative Blogging)
-  {
-    title: "7. Ομαδική Συνεργασία στο Blog",
-    desc: "Πώς δουλεύουμε όλοι μαζί για ένα κοινό αποτέλεσμα.",
-    questions: [
-      {
-        q: "Ποιο είναι το μεγάλο πλεονέκτημα ενός σχολικού ιστολογίου τάξης;",
-        hint: "Σκέψου τη συμμετοχή όλων των παιδιών.",
-        opts: [
-          { t: "🤝 Μπορούμε να συνεργαστούμε όλοι μαζί, γράφοντας και μοιράζοντας τις εργασίες μας με όλο το σχολείο!", ok: true, exp: "Σωστά! Το ιστολόγιο προάγει τη συνεργασία, την ομαδικότητα και την κοινοποίηση της γνώσης." },
-          { t: "Ότι δεν χρειάζεται να διαβάζει κανείς", ok: false, exp: "Όχι, αντίθετα διαβάζουμε και γράφουμε περισσότερο!" }
-        ]
-      },
-      {
-        q: "Ποιοι ρόλοι μπορούν να μοιραστούν στην ομάδα ενός blog;",
-        hint: "Σκέψου τι χρειάζεται μια καλή ανάρτηση.",
-        opts: [
-          { t: "👥 Άλλος γράφει το κείμενο, άλλος βρίσκει εικόνες, άλλος διορθώνει τα λάθη και άλλος απαντά στα σχόλια!", ok: true, exp: "Μπράβο! Ο καταμερισμός ρόλων κάνει την ομάδα αποτελεσματική και δημιουργική." },
-          { t: "Ένας κάνει τα πάντα και οι άλλοι κοιτούν", ok: false, exp: "Όχι, σε μια ομάδα συμμετέχουν ισότιμα όλα τα μέλη!" }
-        ]
-      },
-      {
-        q: "Τι κάνουμε πριν πατήσουμε 'Δημοσίευση' σε ένα ομαδικό άρθρο;",
-        hint: "Σκέψου τον έλεγχο ποιότητας.",
-        opts: [
-          { t: "🔍 Το διαβάζουμε όλοι μαζί προσεκτικά για να διορθώσουμε τυχόν ορθογραφικά λάθη!", ok: true, exp: "Ακριβώς! Ο τελικός έλεγχος εξασφαλίζει ότι το άρθρο είναι άψογο πριν το δει το κοινό." },
-          { t: "Το σβήνουμε και φεύγουμε", ok: false, exp: "Όχι βέβαια!" }
-        ]
-      }
-    ]
-  },
-
-  // 8. Master Ιστολόγος (Τελικός Έλεγχος)
-  {
-    title: "8. Master Ιστολόγος",
-    desc: "Ολοκλήρωσε το κουίζ και πάρε τον τίτλο του Υπεύθυνου Blogger!",
-    questions: [
-      {
-        q: "Ποια είναι τα 3 βασικά συστατικά ενός επιτυχημένου σχολικού ιστολογίου;",
-        hint: "Σκέψου όσα έμαθες στο μάθημα 25.",
-        opts: [
-          { t: "🌟 Ενδιαφέροντα άρθρα, ευγενική επικοινωνία στα σχόλια και σεβασμός στην ασφάλεια όλων!", ok: true, exp: "Σωστά! Αυτή είναι η συνταγή για ένα υπέροχο και ασφαλές σχολικό blog!" },
-          { t: "Πολλές διαφημίσεις και κρυμμένα μηνύματα", ok: false, exp: "Όχι, τα σχολικά ιστολόγια δεν έχουν διαφημίσεις." }
-        ]
-      },
-      {
-        q: "Σε ποια επίσημη εκπαιδευτική πλατφόρμα στην Ελλάδα μπορούν τα σχολεία να έχουν ασφαλές ιστολόγιο;",
-        hint: "Ανήκει στο Πανελλήνιο Σχολικό Δίκτυο.",
-        opts: [
-          { t: "🏫 Στα Ιστολόγια του Πανελλήνιου Σχολικού Δικτύου (blogs.sch.gr)!", ok: true, exp: "Μπράβο! Το blogs.sch.gr παρέχει ασφαλές εκπαιδευτικό περιβάλλον για όλους τους μαθητές και εκπαιδευτικούς." },
-          { t: "Σε ξένες διαφημιστικές σελίδες", ok: false, exp: "Όχι, το σχολικό δίκτυο είναι το επίσημο και ασφαλές." }
-        ]
-      },
-      {
-        q: "Τελική ερώτηση: Ποιο είναι το μεγαλύτερο μάθημα από τη δημιουργία ενός ιστολογίου;",
-        hint: "Πώς σε βοηθά ως πολίτη του διαδικτύου;",
-        opts: [
-          { t: "🏆 Μαθαίνουμε να είμαστε υπεύθυνοι, δημιουργικοί και θετικοί ψηφιακοί πολίτες!", ok: true, exp: "🎉 ΣΥΓΧΑΡΗΤΗΡΙΑ! Ολοκλήρωσες όλες τις ερωτήσεις του Μαθήματος 25 και είσαι πλέον ένας Υπεύθυνος Master Ιστολόγος!" },
-          { t: "Ότι πρέπει να περνάμε όλη τη μέρα μπροστά σε μια οθόνη", ok: false, exp: "Όχι, κρατάμε πάντα ισορροπία ανάμεσα στον ψηφιακό και τον πραγματικό κόσμο!" }
-        ]
-      }
-    ]
+  // ========== INIT ==========
+  function init() {
+    const nav = document.getElementById('mainNav');
+    for (let i = 1; i <= 8; i++) {
+      const btn = document.createElement('button');
+      btn.className = 'nav-btn' + (i === 1 ? ' active' : '');
+      btn.textContent = i;
+      btn.onclick = () => showAct(i);
+      btn.id = 'nav' + i;
+      nav.appendChild(btn);
+    }
+    showAct(1);
+    initSortables();
   }
-];
 
-// Fisher-Yates array shuffle so correct option is at a RANDOM position every time
-function shuffleArray(arr) {
-  var a = arr.slice();
-  for (var i = a.length - 1; i > 0; i--) {
-    var j = Math.floor(Math.random() * (i + 1));
-    var temp = a[i];
-    a[i] = a[j];
-    a[j] = temp;
+  function showAct(n) {
+    document.querySelectorAll('.activity-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('act' + n).classList.add('active');
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('nav' + n).classList.add('active');
+    currentAct = n;
+    // show first sub
+    showSub(n, 1);
   }
-  return a;
-}
 
-function initMenu() {
-  var m = document.getElementById("menuView");
-  m.innerHTML = "";
-  quizData.forEach(function(item, idx) {
-    var c = document.createElement("div");
-    c.className = "topic-card";
-    c.onclick = function() { startTopic(idx); };
-    c.innerHTML = '<span class="topic-badge">Ενότητα ' + (idx + 1) + '</span>' +
-                  '<h2>' + item.title + '</h2>' +
-                  '<p>' + item.desc + '</p>';
-    m.appendChild(c);
-  });
-}
+  function showSub(act, sub) {
+    const panel = document.getElementById('act' + act);
+    panel.querySelectorAll('.sub-content').forEach(c => c.classList.remove('active'));
+    panel.querySelectorAll('.sub-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('s' + act + '-' + sub).classList.add('active');
+    panel.querySelectorAll('.sub-tab')[sub - 1].classList.add('active');
+  }
 
-function showMenu() {
-  document.getElementById("menuView").style.display = "grid";
-  document.getElementById("quizView").style.display = "none";
-}
+  function markDone(act, sub) {
+    const key = act + '-' + sub;
+    if (completedSubs[key]) return;
+    completedSubs[key] = true;
+    // mark tab
+    const panel = document.getElementById('act' + act);
+    panel.querySelectorAll('.sub-tab')[sub - 1].classList.add('done');
+    // check if all 3 of this act done
+    if (completedSubs[act+'-1'] && completedSubs[act+'-2'] && completedSubs[act+'-3']) {
+      document.getElementById('nav' + act).classList.add('completed');
+    }
+    updateProgress();
+  }
 
-function startTopic(idx) {
-  curTopic = idx;
-  curQ = 0;
-  document.getElementById("menuView").style.display = "none";
-  document.getElementById("quizView").style.display = "block";
-  loadQuestion();
-}
+  function updateProgress() {
+    const done = Object.keys(completedSubs).length;
+    const pct = (done / totalSubs) * 100;
+    document.getElementById('progress').style.width = pct + '%';
+    if (done === totalSubs) {
+      document.getElementById('finalScore').classList.add('show');
+      document.getElementById('scoreText').textContent = done + ' / ' + totalSubs;
+      let stars = '';
+      for (let i = 0; i < 8; i++) stars += done >= (i+1)*3 ? '⭐' : '☆';
+      document.getElementById('stars').textContent = stars;
+      document.getElementById('finalMsg').textContent = done === 24 
+        ? 'Τέλεια! Είσαι master του ψηφιακού περιεχομένου! 🚀' 
+        : 'Πολύ καλή δουλειά!';
+    }
+  }
 
-function loadQuestion() {
-  hasAnswered = false;
-  var topic = quizData[curTopic];
-  var qData = topic.questions[curQ];
-
-  document.getElementById("progTag").textContent = "Ερώτηση " + (curQ + 1) + " / " + topic.questions.length;
-  document.getElementById("qText").textContent = qData.q;
-  document.getElementById("qHint").textContent = qData.hint ? "💡 " + qData.hint : "";
-
-  var fb = document.getElementById("fbMsg");
-  fb.textContent = "";
-  fb.style.display = "none";
-  document.getElementById("nextArea").innerHTML = "";
-
-  var optsBox = document.getElementById("optsList");
-  optsBox.innerHTML = "";
-
-  // SHUFFLE THE OPTIONS DYNAMICALLY! Correct answer will NOT always be first!
-  currentShuffledOpts = shuffleArray(qData.opts);
-
-  currentShuffledOpts.forEach(function(opt) {
-    var btn = document.createElement("button");
-    btn.className = "opt-btn";
-    btn.textContent = opt.t;
-    btn.onclick = function() { checkAnswer(btn, opt); };
-    optsBox.appendChild(btn);
-  });
-}
-
-function checkAnswer(btn, opt) {
-  if (hasAnswered) return;
-  hasAnswered = true;
-
-  var fb = document.getElementById("fbMsg");
-  fb.style.display = "block";
-
-  if (opt.ok) {
-    btn.classList.add("correct");
-    fb.className = "feedback-box good";
-    fb.textContent = "🎉 ΣΩΣΤΟ! " + opt.exp;
-  } else {
-    btn.classList.add("wrong");
-    fb.className = "feedback-box bad";
-    fb.textContent = "✗ ΠΡΟΣΟΧΗ: " + opt.exp;
-    // Highlight correct
-    var buttons = document.querySelectorAll(".opt-btn");
-    currentShuffledOpts.forEach(function(o, idx) {
-      if (o.ok && buttons[idx]) buttons[idx].classList.add("correct");
+  // ========== SORTABLE ==========
+  function initSortables() {
+    document.querySelectorAll('.sort-list').forEach(list => {
+      list.querySelectorAll('.sort-item').forEach(item => {
+        item.addEventListener('dragstart', e => {
+          item.classList.add('dragging');
+          e.dataTransfer.setData('text/plain', '');
+        });
+        item.addEventListener('dragend', () => item.classList.remove('dragging'));
+      });
+      list.addEventListener('dragover', e => {
+        e.preventDefault();
+        const after = getDragAfter(list, e.clientY);
+        const dragging = list.querySelector('.dragging');
+        if (!dragging) return;
+        if (after == null) list.appendChild(dragging);
+        else list.insertBefore(dragging, after);
+      });
     });
   }
 
-  // Next Button
-  var nextArea = document.getElementById("nextArea");
-  var nb = document.createElement("button");
-  nb.className = "next-btn";
-  var topic = quizData[curTopic];
-
-  if (curQ < topic.questions.length - 1) {
-    nb.textContent = "Επόμενη Ερώτηση (" + (curQ + 2) + "/3) ▶";
-    nb.onclick = function() {
-      curQ++;
-      loadQuestion();
-    };
-  } else if (curTopic < quizData.length - 1) {
-    nb.textContent = "Επόμενη Ενότητα (" + (curTopic + 2) + "/8) ▶";
-    nb.onclick = function() {
-      curTopic++;
-      curQ = 0;
-      loadQuestion();
-    };
-  } else {
-    nb.textContent = "🏆 Συγχαρητήρια! Τέλος Κουίζ! Επιστροφή στο Μενού";
-    nb.onclick = showMenu;
+  function getDragAfter(list, y) {
+    const els = [...list.querySelectorAll('.sort-item:not(.dragging)')];
+    return els.reduce((closest, child) => {
+      const box = child.getBoundingClientRect();
+      const offset = y - box.top - box.height / 2;
+      if (offset < 0 && offset > closest.offset) return { offset, element: child };
+      return closest;
+    }, { offset: Number.NEGATIVE_INFINITY }).element;
   }
-  nextArea.appendChild(nb);
-}
 
-initMenu();
+  function checkSort(act) {
+    const list = document.getElementById('sort' + act);
+    const items = [...list.querySelectorAll('.sort-item')];
+    let ok = true;
+    items.forEach((item, i) => {
+      const order = parseInt(item.dataset.order);
+      if (order !== i + 1) ok = false;
+      else item.classList.add('correct-pos');
+    });
+    const fb = document.getElementById('fb' + act + '-1') || document.getElementById('fb' + act + '-3') || document.getElementById('fb' + act + '-2');
+    // find correct feedback id
+    const sub = list.closest('.sub-content').id.split('-')[1];
+    const fbel = document.getElementById('fb' + act + '-' + sub);
+    if (ok) {
+      fbel.className = 'feedback-box ok show';
+      fbel.textContent = '🎉 Τέλεια σειρά! Μπράβο!';
+      markDone(act, parseInt(sub));
+    } else {
+      fbel.className = 'feedback-box no show';
+      fbel.textContent = 'Όχι ακόμα... Δοκίμασε να αλλάξεις τη σειρά!';
+      items.forEach(it => it.classList.remove('correct-pos'));
+    }
+  }
+
+  // ========== SIM CLICK SEQUENCE ==========
+  const simSteps = {};
+  function simClick(btn, act) {
+    if (!simSteps[act]) simSteps[act] = [];
+    const step = parseInt(btn.dataset.step);
+    const expected = simSteps[act].length + 1;
+    if (step === expected) {
+      btn.classList.add('used');
+      simSteps[act].push(step);
+      document.getElementById('simRes' + act).innerHTML = simSteps[act].map(s => {
+        const labels = {1:'🎥 Βίντεο', 2:'🖱️ Δεξί κλικ', 3:'📋 Αντιγραφή', 4:'📌 Επικόλληση'};
+        return `<span class="sim-chip">${labels[s]}</span>`;
+      }).join('');
+      if (simSteps[act].length === 4) {
+        const fb = document.getElementById('fb' + act + '-2');
+        fb.className = 'feedback-box ok show';
+        fb.textContent = '🎉 Τέλεια! Έκανες όλα τα βήματα με τη σωστή σειρά!';
+        markDone(act, 2);
+      }
+    } else {
+      btn.style.animation = 'shake 0.3s';
+      setTimeout(() => btn.style.animation = '', 300);
+    }
+  }
+
+  // ========== MATCHING ==========
+  let matchSel = {};
+  function matchSelect(el, act) {
+    if (el.classList.contains('matched')) return;
+    if (!matchSel[act]) matchSel[act] = null;
+    if (matchSel[act] === null) {
+      el.classList.add('selected');
+      matchSel[act] = el;
+    } else {
+      const first = matchSel[act];
+      if (first === el) {
+        first.classList.remove('selected');
+        matchSel[act] = null;
+        return;
+      }
+      if (first.dataset.pair === el.dataset.pair) {
+        first.classList.add('matched');
+        el.classList.add('matched');
+        first.classList.remove('selected');
+        // check if all matched
+        const grid = document.getElementById('match' + act);
+        const left = grid.querySelectorAll('.match-item:not(.matched)');
+        if (left.length === 0) {
+          const sub = grid.closest('.sub-content').id.split('-')[1];
+          const fb = document.getElementById('fb' + act + '-' + sub);
+          fb.className = 'feedback-box ok show';
+          fb.textContent = '🎉 Όλα ταιριάζουν! Μπράβο!';
+          markDone(act, parseInt(sub));
+        }
+      } else {
+        first.classList.add('wrong-temp');
+        el.classList.add('wrong-temp');
+        setTimeout(() => {
+          first.classList.remove('selected', 'wrong-temp');
+          el.classList.remove('wrong-temp');
+        }, 600);
+      }
+      matchSel[act] = null;
+    }
+  }
+
+  // ========== REASON CLICK ==========
+  const reasonSelected = {};
+  function reasonClick(btn, act) {
+    if (btn.classList.contains('used')) return;
+    btn.classList.toggle('used');
+    if (!reasonSelected[act]) reasonSelected[act] = [];
+    const text = btn.textContent;
+    if (btn.classList.contains('used')) {
+      reasonSelected[act].push({text, good: btn.dataset.good === '1'});
+    } else {
+      reasonSelected[act] = reasonSelected[act].filter(r => r.text !== text);
+    }
+    document.getElementById('simRes' + act).innerHTML = reasonSelected[act].map(r => 
+      `<span class="sim-chip">${r.text}</span>`).join('') || 'Οι επιλογές σου...';
+  }
+
+  function checkReasons(act) {
+    const sel = reasonSelected[act] || [];
+    const goodOnes = sel.filter(r => r.good);
+    const badOnes = sel.filter(r => !r.good);
+    const sub = document.getElementById('simRes' + act).closest('.sub-content').id.split('-')[1];
+    const fb = document.getElementById('fb' + act + '-' + sub);
+    // expected good count depends on activity
+    const expected = {3:3, 4:3, 5:3, 8:3};
+    if (goodOnes.length === expected[act] && badOnes.length === 0) {
+      fb.className = 'feedback-box ok show';
+      fb.textContent = '🎉 Τέλεια επιλογή! Όλα σωστά!';
+      markDone(act, parseInt(sub));
+    } else {
+      fb.className = 'feedback-box no show';
+      fb.textContent = 'Κοίτα ξανά... Διάλεξε μόνο τους σωστούς λόγους!';
+    }
+  }
+
+  // ========== SINGLE CHOICE ==========
+  function singleChoice(btn, act) {
+    const area = btn.parentElement;
+    area.querySelectorAll('.sim-btn').forEach(b => b.classList.remove('used'));
+    btn.classList.add('used');
+    const fb = document.getElementById('fb' + act + '-1');
+    if (btn.dataset.good === '1') {
+      fb.className = 'feedback-box ok show';
+      fb.textContent = '🎉 Σωστά! Είναι το https://video.sch.gr/';
+      markDone(act, 1);
+    } else {
+      fb.className = 'feedback-box no show';
+      fb.textContent = 'Όχι αυτό... Ψάξε για τη σχολική υπηρεσία!';
+    }
+  }
+
+  // ========== TRUE / FALSE ==========
+  function tfAnswer(btn, choice) {
+    const card = btn.closest('.tf-card');
+    if (card.dataset.answered) return;
+    const correct = card.dataset.ans;
+    card.querySelectorAll('.tf-btn').forEach(b => b.style.opacity = '0.5');
+    btn.style.opacity = '1';
+    if (choice === correct) {
+      btn.classList.add('selected-ok');
+      card.dataset.answered = 'ok';
+    } else {
+      btn.classList.add('selected-no');
+      card.dataset.answered = 'no';
+      // highlight correct
+      card.querySelector('.tf-btn.' + correct).classList.add('selected-ok');
+    }
+    // check all cards in this sub
+    const subContent = card.closest('.sub-content');
+    const cards = subContent.querySelectorAll('.tf-card');
+    const allAnswered = [...cards].every(c => c.dataset.answered);
+    if (allAnswered) {
+      const allOk = [...cards].every(c => c.dataset.answered === 'ok');
+      const act = parseInt(subContent.id.split('-')[0].replace('s',''));
+      const sub = parseInt(subContent.id.split('-')[1]);
+      const fb = document.getElementById('fb' + act + '-' + sub);
+      if (allOk) {
+        fb.className = 'feedback-box ok show';
+        fb.textContent = '🎉 Όλα σωστά! Μπράβο!';
+        markDone(act, sub);
+      } else {
+        fb.className = 'feedback-box no show';
+        fb.textContent = 'Κάποια ήταν λάθος... Κοίτα τις πράσινες απαντήσεις!';
+        // still mark as done so they can progress
+        markDone(act, sub);
+      }
+    }
+  }
+
+  // ========== DRAG & DROP ==========
+  function allowDrop(e) { e.preventDefault(); e.currentTarget.classList.add('over'); }
+  function leaveDrop(e) { e.currentTarget.classList.remove('over'); }
+
+  function dropItem(e, act) {
+    e.preventDefault();
+    e.currentTarget.classList.remove('over');
+    const chip = document.querySelector('.drag-chip.dragging') || 
+                 [...document.querySelectorAll('.drag-chip')].find(c => c.style.opacity !== '0.4' && false);
+    // better: use dataTransfer
+  }
+
+  // Better drag implementation
+  document.querySelectorAll('.drag-chip').forEach(chip => {
+    chip.addEventListener('dragstart', e => {
+      chip.classList.add('dragging');
+      e.dataTransfer.setData('text/plain', chip.textContent);
+      e.dataTransfer.setData('ok', chip.dataset.ok || '');
+      e.dataTransfer.setData('box', chip.dataset.box || '');
+      e.dataTransfer.setData('word', chip.dataset.word || '');
+    });
+    chip.addEventListener('dragend', () => chip.classList.remove('dragging'));
+  });
+
+  function dropItem(e, act) {
+    e.preventDefault();
+    const zone = e.currentTarget;
+    zone.classList.remove('over');
+    const text = e.dataTransfer.getData('text/plain');
+    const ok = e.dataTransfer.getData('ok');
+    // find original chip and mark placed
+    const chips = document.querySelectorAll('#dragSrc' + act + ' .drag-chip');
+    chips.forEach(c => {
+      if (c.textContent === text) c.classList.add('placed');
+    });
+    const span = document.createElement('span');
+    span.className = 'sim-chip';
+    span.textContent = text;
+    span.dataset.ok = ok;
+    zone.appendChild(span);
+  }
+
+  function checkDrop(act) {
+    const zone = document.getElementById('drop' + act);
+    const chips = zone.querySelectorAll('.sim-chip');
+    let allGood = true;
+    let hasAny = false;
+    chips.forEach(c => {
+      hasAny = true;
+      if (c.dataset.ok !== '1') allGood = false;
+    });
+    // also check we didn't miss good ones? for simplicity just check placed are good
+    const sub = zone.closest('.sub-content').id.split('-')[1];
+    const fb = document.getElementById('fb' + act + '-' + sub);
+    if (hasAny && allGood) {
+      // check if all good ones were placed
+      const totalGood = document.querySelectorAll('#dragSrc' + act + ' .drag-chip[data-ok="1"]').length;
+      if (chips.length === totalGood) {
+        fb.className = 'feedback-box ok show';
+        fb.textContent = '🎉 Τέλεια! Έβαλες μόνο τα σωστά!';
+        markDone(act, parseInt(sub));
+        return;
+      }
+    }
+    fb.className = 'feedback-box no show';
+    fb.textContent = 'Κοίτα ξανά... Βάλε μόνο τα σωστά αρχεία/φράσεις!';
+  }
+
+  function dropBox(e, boxType, act) {
+    e.preventDefault();
+    const zone = e.currentTarget;
+    zone.classList.remove('over');
+    const text = e.dataTransfer.getData('text/plain');
+    const correctBox = e.dataTransfer.getData('box');
+    const chips = document.querySelectorAll('#dragSrc' + act + ' .drag-chip');
+    chips.forEach(c => { if (c.textContent === text) c.classList.add('placed'); });
+    const span = document.createElement('span');
+    span.className = 'sim-chip';
+    span.textContent = text;
+    span.dataset.box = correctBox;
+    zone.appendChild(span);
+  }
+
+  function checkBoxes(act) {
+    let ok = true;
+    // check all drop zones of this act
+    const panel = document.getElementById('act' + act);
+    const zones = panel.querySelectorAll('.drop-zone');
+    zones.forEach(zone => {
+      zone.querySelectorAll('.sim-chip').forEach(chip => {
+        // determine expected from zone id
+        let expected = '';
+        if (zone.id.includes('Pro') || zone.id.includes('pro')) expected = 'pro';
+        else if (zone.id.includes('Con') || zone.id.includes('con')) expected = 'con';
+        else if (zone.id.includes('Word') || zone.id.includes('word')) expected = 'word';
+        else if (zone.id.includes('Ppt') || zone.id.includes('ppt')) expected = 'ppt';
+        else if (zone.id.includes('Both') || zone.id.includes('both')) expected = 'both';
+        if (chip.dataset.box !== expected) ok = false;
+      });
+    });
+    const sub = panel.querySelector('.sub-content.active').id.split('-')[1];
+    const fb = document.getElementById('fb' + act + '-' + sub);
+    if (ok && panel.querySelectorAll('.sim-chip').length > 0) {
+      fb.className = 'feedback-box ok show';
+      fb.textContent = '🎉 Όλα στα σωστά κουτιά!';
+      markDone(act, parseInt(sub));
+    } else {
+      fb.className = 'feedback-box no show';
+      fb.textContent = 'Κάποια δεν είναι στο σωστό κουτί... Δοκίμασε ξανά!';
+    }
+  }
+
+  function dropWord(e, zoneId) {
+    e.preventDefault();
+    const zone = document.getElementById(zoneId);
+    zone.classList.remove('over');
+    const word = e.dataTransfer.getData('word');
+    const text = e.dataTransfer.getData('text/plain');
+    // clear previous
+    zone.innerHTML = '';
+    const span = document.createElement('span');
+    span.className = 'sim-chip';
+    span.textContent = text;
+    span.dataset.word = word;
+    zone.appendChild(span);
+    // mark original
+    document.querySelectorAll('#dragSrc3 .drag-chip').forEach(c => {
+      if (c.dataset.word === word) c.classList.add('placed');
+    });
+  }
+
+  function checkWords(act) {
+    const a = document.getElementById('drop3a').querySelector('.sim-chip');
+    const b = document.getElementById('drop3b').querySelector('.sim-chip');
+    const c = document.getElementById('drop3c').querySelector('.sim-chip');
+    const fb = document.getElementById('fb3-2');
+    if (a && b && c && a.dataset.word === 'αναφέρουμε' && b.dataset.word === 'πηγή' && c.dataset.word === 'δημιουργό') {
+      fb.className = 'feedback-box ok show';
+      fb.textContent = '🎉 Τέλεια συμπλήρωση!';
+      markDone(3, 2);
+    } else {
+      fb.className = 'feedback-box no show';
+      fb.textContent = 'Οι λέξεις δεν είναι στις σωστές θέσεις... Δοκίμασε ξανά!';
+    }
+  }
+
+  // start
+  init();
 </script>
 </body>
 </html>
