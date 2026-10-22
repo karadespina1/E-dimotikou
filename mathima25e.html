@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Κουίζ - Μάθημα 25: Ιστολόγια & Συνεργασία στο Διαδίκτυο</title>
+<style>
+:root{
+  --bg:#f0fdf4;
+  --card-bg:#ffffff;
+  --primary:#059669;
+  --primary-hover:#047857;
+  --accent:#0284c7;
+  --text:#064e3b;
+  --text-muted:#047857;
+  --success:#15803d;
+  --success-bg:#dcfce7;
+  --error:#b91c1c;
+  --error-bg:#fee2e2;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Segoe UI',system-ui,sans-serif;
+  padding:16px 12px 50px;
+  font-size:18px;
+}
+.container{max-width:820px;margin:0 auto}
+
+/* HEADER */
+.header-box{
+  background:linear-gradient(135deg, #059669 0%, #10b981 50%, #0284c7 100%);
+  color:#fff;
+  border-radius:20px;
+  padding:24px 20px;
+  text-align:center;
+  box-shadow:0 8px 24px rgba(5,150,105,.25);
+  margin-bottom:20px;
+}
+.header-box h1{margin:0;font-size:26px;font-weight:900}
+.header-box p{margin:8px 0 0;font-size:16px;opacity:.95}
+
+/* MENU GRID */
+#menuView{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px}
+.topic-card{
+  background:#fff;
+  border:3px solid #bbf7d0;
+  border-radius:18px;
+  padding:20px;
+  cursor:pointer;
+  transition:all .2s ease;
+  box-shadow:0 4px 14px rgba(0,0,0,.05);
+}
+.topic-card:hover{
+  border-color:var(--accent);
+  transform:translateY(-3px);
+  box-shadow:0 10px 22px rgba(2,132,199,.2);
+}
+.topic-badge{
+  display:inline-block;
+  background:var(--primary);
+  color:#fff;
+  font-size:14px;
+  font-weight:900;
+  padding:4px 12px;
+  border-radius:20px;
+  margin-bottom:8px;
+}
+.topic-card h2{margin:6px 0;font-size:20px;color:#064e3b}
+.topic-card p{margin:0;font-size:15px;color:#047857;line-height:1.4}
+
+/* QUIZ STAGE */
+#quizView{
+  background:#fff;
+  border:3px solid #86efac;
+  border-radius:22px;
+  padding:24px 20px;
+  box-shadow:0 8px 30px rgba(0,0,0,.07);
+}
+.nav-bar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:18px;
+}
+.btn-back{
+  background:#dcfce7;
+  border:2px solid #86efac;
+  color:#065f46;
+  padding:10px 18px;
+  border-radius:12px;
+  font-weight:900;
+  cursor:pointer;
+  font-size:16px;
+}
+.btn-back:hover{background:#bbf7d0}
+.progress-tag{
+  background:#e0f2fe;
+  color:#0369a1;
+  font-size:15px;
+  font-weight:900;
+  padding:6px 14px;
+  border-radius:16px;
+}
+
+/* BIG READABLE QUESTION BOX */
+.q-box{
+  background:#f0fdf4;
+  border-left:8px solid var(--primary);
+  border-radius:12px;
+  padding:18px 20px;
+  margin-bottom:22px;
+}
+.q-title{font-size:21px;font-weight:900;color:#064e3b;line-height:1.4}
+.q-hint{font-size:15px;color:#047857;margin-top:6px;font-style:italic}
+
+/* BIG OPTIONS BUTTONS */
+.options-list{display:flex;flex-direction:column;gap:14px}
+.opt-btn{
+  background:#ffffff;
+  border:3px solid #bbf7d0;
+  border-radius:16px;
+  padding:16px 20px;
+  font-size:18px;
+  font-weight:800;
+  text-align:left;
+  cursor:pointer;
+  transition:all .15s ease;
+  line-height:1.35;
+  color:#064e3b;
+}
+.opt-btn:hover{
+  border-color:var(--primary);
+  background:#f0fdf4;
+  transform:scale(1.01);
+}
+.opt-btn.correct{
+  background:var(--success-bg) !important;
+  border-color:var(--success) !important;
+  color:var(--success) !important;
+}
+.opt-btn.wrong{
+  background:var(--error-bg) !important;
+  border-color:var(--error) !important;
+  color:var(--error) !important;
+}
+
+/* FEEDBACK & NEXT */
+.feedback-box{
+  padding:16px 20px;
+  border-radius:14px;
+  font-size:17px;
+  font-weight:800;
+  line-height:1.45;
+  margin-top:20px;
+  display:none;
+}
+.feedback-box.good{background:var(--success-bg);color:#15803d;border:2px solid #86efac}
+.feedback-box.bad{background:var(--error-bg);color:#b91c1c;border:2px solid #fca5a5}
+
+.next-btn{
+  background:linear-gradient(135deg, #059669 0%, #0284c7 100%);
+  color:#fff;
+  border:none;
+  padding:16px 28px;
+  border-radius:16px;
+  font-size:18px;
+  font-weight:900;
+  cursor:pointer;
+  margin-top:16px;
+  display:inline-block;
+  box-shadow:0 6px 18px rgba(5,150,105,.3);
+}
+.next-btn:hover{opacity:.95}
+</style>
+</head>
+<body>
+<div class="container">
+  <!-- HEADER -->
+  <div class="header-box">
+    <h1>🌐 Μάθημα 25: Ιστολόγια & Συνεργασία στο Διαδίκτυο</h1>
+    <p>8 Ενότητες · 24 Ερωτήσεις (Τυχαία σειρά απαντήσεων) — Ε΄ Δημοτικού</p>
+  </div>
+
+  <!-- MENU VIEW -->
+  <div id="menuView"></div>
+
+  <!-- QUIZ VIEW -->
+  <div id="quizView" style="display:none">
+    <div class="nav-bar">
+      <button class="btn-back" onclick="showMenu()">← Πίσω στο Μενού</button>
+      <span class="progress-tag" id="progTag">Ερώτηση 1 / 3</span>
+    </div>
+    <div class="q-box">
+      <div class="q-title" id="qText">Ερώτηση εδώ...</div>
+      <div class="q-hint" id="qHint"></div>
+    </div>
+    <div class="options-list" id="optsList"></div>
+    <div class="feedback-box" id="fbMsg"></div>
+    <div id="nextArea"></div>
+  </div>
+</div>
+
+<script>
+var curTopic = 0;
+var curQ = 0;
+var hasAnswered = false;
+var currentShuffledOpts = [];
+
+var quizData = [
+  // 1. Τι είναι το Ιστολόγιο (Blog)
+  {
+    title: "1. Τι είναι το Ιστολόγιο (Blog)",
+    desc: "Η έννοια του διαδικτυακού ημερολογίου.",
+    questions: [
+      {
+        q: "Τι είναι ένα ιστολόγιο (blog) στο διαδίκτυο;",
+        hint: "Σκέψου τις λέξεις web και log (ημερολόγιο).",
+        opts: [
+          { t: "📝 Ένα διαδικτυακό ημερολόγιο όπου δημοσιεύονται άρθρα και απόψεις!", ok: true, exp: "Σωστά! Η λέξη blog προέρχεται από το weblog και σημαίνει ψηφιακό ημερολόγιο." },
+          { t: "Ένα πρόγραμμα για να σβήνουμε αρχεία από τον υπολογιστή", ok: false, exp: "Όχι, το ιστολόγιο είναι ιστοσελίδα δημοσίευσης άρθρων." },
+          { t: "Ένα εξάρτημα της οθόνης", ok: false, exp: "Όχι, είναι διαδικτυακή υπηρεσία." }
+        ]
+      },
+      {
+        q: "Πώς εμφανίζονται τα άρθρα (αναρτήσεις) σε ένα ιστολόγιο;",
+        hint: "Ποιο άρθρο βλέπουμε πρώτο επάνω;",
+        opts: [
+          { t: "⏳ Με αντίστροφη χρονολογική σειρά (το πιο πρόσφατο άρθρο φαίνεται πρώτο επάνω)!", ok: true, exp: "Μπράβο! Όπως σε κάθε ημερολόγιο, η πιο πρόσφατη ανάρτηση μπαίνει στην κορυφή." },
+          { t: "Με αλφαβητική σειρά από το Ω προς το Α", ok: false, exp: "Όχι, ταξινομούνται χρονολογικά." },
+          { t: "Τυχαία κάθε φορά που ανοιγοκλείνουμε τη σελίδα", ok: false, exp: "Όχι, ακολουθούν χρονική σειρά." }
+        ]
+      },
+      {
+        q: "Πώς ονομάζεται το άτομο που γράφει και συντηρεί ένα ιστολόγιο;",
+        hint: "Στα ελληνικά λέγεται ιστολόγος.",
+        opts: [
+          { t: "✍️ Ιστολόγος (Blogger)!", ok: true, exp: "Τέλεια! Ο ιστολόγος (blogger) δημιουργεί και δημοσιεύει το περιεχόμενο." },
+          { t: "Τεχνικός δικτύων", ok: false, exp: "Όχι, αυτός φροντίζει τα καλώδια και τα ρούτερ." },
+          { t: "Φυλλομετρητής", ok: false, exp: "Φυλλομετρητής (browser) είναι το πρόγραμμα πλοήγησης." }
+        ]
+      }
+    ]
+  },
+
+  // 2. Αναρτήσεις & Περιεχόμενο (Posts)
+  {
+    title: "2. Αναρτήσεις & Πολυμέσα",
+    desc: "Κείμενο, εικόνες, βίντεο και υπερσύνδεσμοι.",
+    questions: [
+      {
+        q: "Τι μπορεί να περιλαμβάνει μια ανάρτηση (post) σε ένα σχολικό ιστολόγιο;",
+        hint: "Σκέψου όλα τα ψηφιακά μέσα.",
+        opts: [
+          { t: "🖼️ Κείμενο, φωτογραφίες, βίντεο και συνδέσμους προς άλλες ιστοσελίδες!", ok: true, exp: "Σωστά! Μια ανάρτηση μπορεί να συνδυάζει όλα τα είδη πολυμέσων." },
+          { t: "Μόνο αριθμούς χωρίς καθόλου γράμματα", ok: false, exp: "Όχι, γράφουμε κανονικά κείμενα και ιστορίες." },
+          { t: "Μόνο αρχεία που δεν ανοίγουν", ok: false, exp: "Όχι βέβαια!" }
+        ]
+      },
+      {
+        q: "Ποιο είναι το πρώτο πράγμα που γράφουμε σε μια ανάρτηση για να προσελκύσει τον αναγνώστη;",
+        hint: "Βρίσκεται στην κορυφή του άρθρου.",
+        opts: [
+          { t: "📌 Έναν σύντομο, ενδιαφέροντα και ξεκάθαρο τίτλο!", ok: true, exp: "Μπράβο! Ο τίτλος δίνει αμέσως να καταλάβει ο αναγνώστης περί τίνος πρόκειται." },
+          { t: "Τη λέξη ΤΕΛΟΣ", ok: false, exp: "Αυτό μπαίνει στο τέλος, όχι στην αρχή!" },
+          { t: "Όλο το κείμενο με κεφαλαία και χωρίς κενά", ok: false, exp: "Όχι, αυτό κουράζει και θεωρείται αγένεια στο διαδίκτυο." }
+        ]
+      },
+      {
+        q: "Πότε είναι ορατή μια ανάρτηση στους επισκέπτες του ιστολογίου;",
+        hint: "Ποιο κουμπί πρέπει να πατήσουμε;",
+        opts: [
+          { t: "🚀 Μόλις πατήσουμε το κουμπί «Δημοσίευση» (Publish)!", ok: true, exp: "Ακριβώς! Μέχρι να πατήσουμε Δημοσίευση, μένει ως Πρόχειρο (Draft) που βλέπουμε μόνο εμείς." },
+          { t: "Αμέσως μόλις ανοίξουμε τον υπολογιστή", ok: false, exp: "Όχι, πρέπει πρώτα να γραφτεί και να δημοσιευτεί." },
+          { t: "Ποτέ, μένει κρυφή για πάντα", ok: false, exp: "Όχι, σκοπός του ιστολογίου είναι η κοινοποίηση." }
+        ]
+      }
+    ]
+  },
+
+  // 3. Σχόλια & Αλληλεπίδραση (Comments)
+  {
+    title: "3. Σχόλια & Αλληλεπίδραση",
+    desc: "Διάλογος με τους αναγνώστες και ανταλλαγή απόψεων.",
+    questions: [
+      {
+        q: "Τι επιτρέπει στους αναγνώστες η περιοχή των σχολίων κάτω από κάθε άρθρο;",
+        hint: "Σκέψου τη συζήτηση.",
+        opts: [
+          { t: "💬 Να εκφράσουν τη γνώμη τους, να κάνουν ερωτήσεις και να συζητήσουν ευγενικά!", ok: true, exp: "Σωστά! Τα σχόλια κάνουν το ιστολόγιο διαδραστικό μέσο επικοινωνίας." },
+          { t: "Να σβήσουν το άρθρο του συγγραφέα", ok: false, exp: "Όχι, μόνο ο δημιουργός διαχειρίζεται το άρθρο." },
+          { t: "Να αλλάξουν τους κωδικούς του ιστολογίου", ok: false, exp: "Όχι βέβαια!" }
+        ]
+      },
+      {
+        q: "Τι είναι η «Έγκριση σχολίων» (Συντονισμός / Moderation) από τον διαχειριστή;",
+        hint: "Προστατεύει το σχολικό blog από προσβλητικά μηνύματα.",
+        opts: [
+          { t: "🛡️ Ο έλεγχος του σχολίου πριν δημοσιευτεί, ώστε να προστατεύεται η σελίδα από αγένειες!", ok: true, exp: "Μπράβο! Ο υπεύθυνος διαβάζει τα σχόλια και εγκρίνει μόνο τα ευγενικά και σχετικά." },
+          { t: "Ένας τρόπος να στέλνουμε διαφημίσεις", ok: false, exp: "Όχι." },
+          { t: "Αυτόματη διαγραφή όλων των επισκεπτών", ok: false, exp: "Όχι." }
+        ]
+      },
+      {
+        q: "Πώς πρέπει να απαντάμε σε ένα σχόλιο με το οποίο διαφωνούμε;",
+        hint: "Σκέψου τους κανόνες καλής συμπεριφοράς.",
+        opts: [
+          { t: "🤝 Με επιχειρήματα, ηρεμία και απόλυτο σεβασμό στην άλλη άποψη!", ok: true, exp: "Τέλεια! Η ευγένεια και ο σεβασμός είναι βασικοί κανόνες επικοινωνίας (netiquette)." },
+          { t: "Με θυμό, φωνές και άσχημες λέξεις", ok: false, exp: "Ποτέ! Η προσβολή άλλων χρηστών απαγορεύεται." },
+          { t: "Γράφοντας ψέματα", ok: false, exp: "Όχι, είμαστε πάντα ειλικρινείς και ευγενικοί." }
+        ]
+      }
+    ]
+  },
+
+  // 4. Κανόνες Ευγένειας στο Διαδίκτυο (Netiquette)
+  {
+    title: "4. Διαδικτυακή Ευγένεια (Netiquette)",
+    desc: "Κανόνες καλής συμπεριφοράς όταν επικοινωνούμε online.",
+    questions: [
+      {
+        q: "Τι σημαίνει όταν γράφουμε ένα σχόλιο ή μήνυμα με ΟΛΑ ΚΕΦΑΛΑΙΑ ΓΡΑΜΜΑΤΑ;",
+        hint: "Στον ψηφιακό κόσμο ισοδυναμεί με ήχο.",
+        opts: [
+          { t: "📢 Ότι ΦΩΝΑΖΟΥΜΕ δυνατά και θεωρείται αγένεια!", ok: true, exp: "Σωστά! Τα κεφαλαία στο ίντερνετ δείχνουν ότι φωνάζουμε και πρέπει να τα αποφεύγουμε." },
+          { t: "Ότι γράφουμε πολύ σωστά και επίσημα", ok: false, exp: "Όχι, είναι σαν να ουρλιάζουμε στον άλλον." },
+          { t: "Ότι τελείωσε η μπαταρία του πληκτρολογίου", ok: false, exp: "Όχι." }
+        ]
+      },
+      {
+        q: "Ποια από τις παρακάτω συμπεριφορές είναι ΣΩΣΤΗ σε ένα ιστολόγιο;",
+        hint: "Σκέψου τι θα έκανες και στην τάξη σου.",
+        opts: [
+          { t: "✅ Χρησιμοποιούμε ευγενικές λέξεις ('ευχαριστώ', 'παρακαλώ') και προσέχουμε την ορθογραφία!", ok: true, exp: "Μπράβο! Ο σεβασμός και η προσεγμένη γλώσσα δείχνουν πολιτισμό." },
+          { t: "Κοροϊδεύουμε τα λάθη των συμμαθητών μας", ok: false, exp: "Αυτό είναι απαράδεκτο και λέγεται διαδικτυακός εκφοβισμός." },
+          { t: "Γράφουμε άσχετα μηνύματα πολλές φορές (spam)", ok: false, exp: "Όχι, το spam ενοχλεί όλους τους αναγνώστες." }
+        ]
+      },
+      {
+        q: "Τι κάνουμε αν δούμε ένα προσβλητικό ή απειλητικό σχόλιο;",
+        hint: "Ποιον πρέπει να ενημερώσουμε;",
+        opts: [
+          { t: "👨‍🏫 Ενημερώνουμε αμέσως τον δάσκαλο ή τους γονείς μας χωρίς να απαντήσουμε στον επιτιθέμενο!", ok: true, exp: "Ακριβώς! Δεν εμπλεκόμαστε σε καβγάδες, ενημερώνουμε αμέσως έναν ενήλικα." },
+          { t: "Απαντάμε με χειρότερες βρισιές", ok: false, exp: "Ποτέ! Αυτό μεγαλώνει το πρόβλημα." },
+          { t: "Το κρατάμε μυστικό και στενοχωριόμαστε μόνοι μας", ok: false, exp: "Όχι, πάντα ζητάμε βοήθεια από δασκάλους ή γονείς." }
+        ]
+      }
+    ]
+  },
+
+  // 5. Ασφάλεια & Προσωπικά Δεδομένα στο Blog
+  {
+    title: "5. Ασφάλεια & Προσωπικά Δεδομένα",
+    desc: "Ποιες πληροφορίες ΔΕΝ δημοσιεύουμε ποτέ στο διαδίκτυο.",
+    questions: [
+      {
+        q: "Ποια από τις παρακάτω πληροφορίες ΔΕΝ πρέπει να δημοσιεύσεις ΠΟΤΕ σε ένα ιστολόγιο;",
+        hint: "Αφορά την προσωπική σου ασφάλεια.",
+        opts: [
+          { t: "🔒 Τη διεύθυνση του σπιτιού σου, το τηλέφωνό σου και τους κωδικούς σου!", ok: true, exp: "Σωστά! Τα προσωπικά δεδομένα δεν κοινοποιούνται ποτέ δημόσια." },
+          { t: "Ένα ποίημα που έγραψες για την άνοιξη", ok: false, exp: "Αυτό επιτρέπεται και είναι πολύ όμορφο να το μοιραστείς." },
+          { t: "Μια ζωγραφιά ενός ζώου που έφτιαξες", ok: false, exp: "Αυτό είναι κατάλληλο για δημοσίευση." }
+        ]
+      },
+      {
+        q: "Επιτρέπεται να ανεβάσουμε φωτογραφίες συμμαθητών μας στο σχολικό blog χωρίς άδεια;",
+        hint: "Σκέψου τη συγκατάθεση των γονέων.",
+        opts: [
+          { t: "🚫 Όχι! Απαιτείται πάντα η άδεια των ίδιων των παιδιών και των γονέων τους!", ok: true, exp: "Μπράβο! Η εικόνα του προσώπου είναι ευαίσθητο προσωπικό δεδομένο." },
+          { t: "Ναι, μπορούμε να ανεβάζουμε όποιον θέλουμε χωρίς να ρωτήσουμε", ok: false, exp: "Όχι, αυτό παραβιάζει την ιδιωτικότητα των άλλων." },
+          { t: "Μόνο αν η φωτογραφία είναι ασπρόμαυρη", ok: false, exp: "Όχι, ισχύει για όλες τις φωτογραφίες προσώπων." }
+        ]
+      },
+      {
+        q: "Ποιο είναι το πιο ασφαλές όνομα χρήστη (ψευδώνυμο) για να υπογράφεις στα σχολικά blogs;",
+        hint: "Καλύτερα να μη φαίνεται το πλήρες ονοματεπώνυμο.",
+        opts: [
+          { t: "⭐ Το μικρό σου όνομα μόνο (π.χ. 'Νίκος') ή ένα ουδέτερο ψευδώνυμο της ομάδας!", ok: true, exp: "Ακριβώς! Δεν γράφουμε ολόκληρο το επίθετο ούτε προσωπικά στοιχεία ταυτότητας." },
+          { t: "Το ονοματεπώνυμο, η ηλικία και η διεύθυνση κατοικίας σου", ok: false, exp: "Ποτέ! Αυτό είναι πολύ επικίνδυνο." }
+        ]
+      }
+    ]
+  },
+
+  // 6. Πνευματική Ιδιοκτησία & Πηγές (Copyright)
+  {
+    title: "6. Σεβασμός στην Πνευματική Ιδιοκτησία",
+    desc: "Πώς χρησιμοποιούμε εικόνες και κείμενα άλλων νόμιμα.",
+    questions: [
+      {
+        q: "Όταν βρίσκουμε μια ωραία εικόνα στο Google, μπορούμε να την βάλουμε στο blog λέγοντας ότι την τραβήξαμε εμείς;",
+        hint: "Σκέψου ποιος κουράστηκε για να τη δημιουργήσει.",
+        opts: [
+          { t: "❌ Όχι! Ανήκει στον δημιουργό της και πρέπει να αναφέρουμε την πηγή ή να έχει ελεύθερη άδεια!", ok: true, exp: "Σωστά! Ο σεβασμός στα πνευματικά δικαιώματα (copyright) είναι βασική ψηφιακή υποχρέωση." },
+          { t: "Ναι, ό,τι υπάρχει στο ίντερνετ γίνεται αυτόματα δικό μας", ok: false, exp: "Όχι, το διαδίκτυο δεν σημαίνει έλλειψη πνευματικών δικαιωμάτων!" }
+        ]
+      },
+      {
+        q: "Τι είναι οι άδειες Creative Commons (CC) που βρίσκουμε σε πολλές εικόνες;",
+        hint: "Επιτρέπουν στους δημιουργούς να μοιράζονται το έργο τους.",
+        opts: [
+          { t: "🎨 Άδειες που μας επιτρέπουν να χρησιμοποιούμε νόμιμα εικόνες, συνήθως αναφέροντας τον δημιουργό!", ok: true, exp: "Μπράβο! Οι άδειες Creative Commons δίνουν σαφείς οδηγίες για το πώς μπορούμε να μοιραστούμε ένα έργο." },
+          { t: "Ένας ιός που καταστρέφει το blog", ok: false, exp: "Όχι βέβαια!" }
+        ]
+      },
+      {
+        q: "Πώς αναφέρουμε σωστά την πηγή μιας πληροφορίας στην ανάρτησή μας;",
+        hint: "Πού παραπέμπουμε τον αναγνώστη;",
+        opts: [
+          { t: "🔗 Βάζοντας ενεργό σύνδεσμο (link) προς την αρχική ιστοσελίδα και το όνομα του συγγραφέα!", ok: true, exp: "Τέλεια! Έτσι ο αναγνώστης μπορεί να επισκεφτεί την πηγή και να διαβάσει περισσότερα." },
+          { t: "Κρύβοντας από πού τη βρήκαμε", ok: false, exp: "Όχι, η απόκρυψη πηγής θεωρείται λογοκλοπή." }
+        ]
+      }
+    ]
+  },
+
+  // 7. Συνεργασία σε Ομάδες (Collaborative Blogging)
+  {
+    title: "7. Ομαδική Συνεργασία στο Blog",
+    desc: "Πώς δουλεύουμε όλοι μαζί για ένα κοινό αποτέλεσμα.",
+    questions: [
+      {
+        q: "Ποιο είναι το μεγάλο πλεονέκτημα ενός σχολικού ιστολογίου τάξης;",
+        hint: "Σκέψου τη συμμετοχή όλων των παιδιών.",
+        opts: [
+          { t: "🤝 Μπορούμε να συνεργαστούμε όλοι μαζί, γράφοντας και μοιράζοντας τις εργασίες μας με όλο το σχολείο!", ok: true, exp: "Σωστά! Το ιστολόγιο προάγει τη συνεργασία, την ομαδικότητα και την κοινοποίηση της γνώσης." },
+          { t: "Ότι δεν χρειάζεται να διαβάζει κανείς", ok: false, exp: "Όχι, αντίθετα διαβάζουμε και γράφουμε περισσότερο!" }
+        ]
+      },
+      {
+        q: "Ποιοι ρόλοι μπορούν να μοιραστούν στην ομάδα ενός blog;",
+        hint: "Σκέψου τι χρειάζεται μια καλή ανάρτηση.",
+        opts: [
+          { t: "👥 Άλλος γράφει το κείμενο, άλλος βρίσκει εικόνες, άλλος διορθώνει τα λάθη και άλλος απαντά στα σχόλια!", ok: true, exp: "Μπράβο! Ο καταμερισμός ρόλων κάνει την ομάδα αποτελεσματική και δημιουργική." },
+          { t: "Ένας κάνει τα πάντα και οι άλλοι κοιτούν", ok: false, exp: "Όχι, σε μια ομάδα συμμετέχουν ισότιμα όλα τα μέλη!" }
+        ]
+      },
+      {
+        q: "Τι κάνουμε πριν πατήσουμε 'Δημοσίευση' σε ένα ομαδικό άρθρο;",
+        hint: "Σκέψου τον έλεγχο ποιότητας.",
+        opts: [
+          { t: "🔍 Το διαβάζουμε όλοι μαζί προσεκτικά για να διορθώσουμε τυχόν ορθογραφικά λάθη!", ok: true, exp: "Ακριβώς! Ο τελικός έλεγχος εξασφαλίζει ότι το άρθρο είναι άψογο πριν το δει το κοινό." },
+          { t: "Το σβήνουμε και φεύγουμε", ok: false, exp: "Όχι βέβαια!" }
+        ]
+      }
+    ]
+  },
+
+  // 8. Master Ιστολόγος (Τελικός Έλεγχος)
+  {
+    title: "8. Master Ιστολόγος",
+    desc: "Ολοκλήρωσε το κουίζ και πάρε τον τίτλο του Υπεύθυνου Blogger!",
+    questions: [
+      {
+        q: "Ποια είναι τα 3 βασικά συστατικά ενός επιτυχημένου σχολικού ιστολογίου;",
+        hint: "Σκέψου όσα έμαθες στο μάθημα 25.",
+        opts: [
+          { t: "🌟 Ενδιαφέροντα άρθρα, ευγενική επικοινωνία στα σχόλια και σεβασμός στην ασφάλεια όλων!", ok: true, exp: "Σωστά! Αυτή είναι η συνταγή για ένα υπέροχο και ασφαλές σχολικό blog!" },
+          { t: "Πολλές διαφημίσεις και κρυμμένα μηνύματα", ok: false, exp: "Όχι, τα σχολικά ιστολόγια δεν έχουν διαφημίσεις." }
+        ]
+      },
+      {
+        q: "Σε ποια επίσημη εκπαιδευτική πλατφόρμα στην Ελλάδα μπορούν τα σχολεία να έχουν ασφαλές ιστολόγιο;",
+        hint: "Ανήκει στο Πανελλήνιο Σχολικό Δίκτυο.",
+        opts: [
+          { t: "🏫 Στα Ιστολόγια του Πανελλήνιου Σχολικού Δικτύου (blogs.sch.gr)!", ok: true, exp: "Μπράβο! Το blogs.sch.gr παρέχει ασφαλές εκπαιδευτικό περιβάλλον για όλους τους μαθητές και εκπαιδευτικούς." },
+          { t: "Σε ξένες διαφημιστικές σελίδες", ok: false, exp: "Όχι, το σχολικό δίκτυο είναι το επίσημο και ασφαλές." }
+        ]
+      },
+      {
+        q: "Τελική ερώτηση: Ποιο είναι το μεγαλύτερο μάθημα από τη δημιουργία ενός ιστολογίου;",
+        hint: "Πώς σε βοηθά ως πολίτη του διαδικτύου;",
+        opts: [
+          { t: "🏆 Μαθαίνουμε να είμαστε υπεύθυνοι, δημιουργικοί και θετικοί ψηφιακοί πολίτες!", ok: true, exp: "🎉 ΣΥΓΧΑΡΗΤΗΡΙΑ! Ολοκλήρωσες όλες τις ερωτήσεις του Μαθήματος 25 και είσαι πλέον ένας Υπεύθυνος Master Ιστολόγος!" },
+          { t: "Ότι πρέπει να περνάμε όλη τη μέρα μπροστά σε μια οθόνη", ok: false, exp: "Όχι, κρατάμε πάντα ισορροπία ανάμεσα στον ψηφιακό και τον πραγματικό κόσμο!" }
+        ]
+      }
+    ]
+  }
+];
+
+// Fisher-Yates array shuffle so correct option is at a RANDOM position every time
+function shuffleArray(arr) {
+  var a = arr.slice();
+  for (var i = a.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var temp = a[i];
+    a[i] = a[j];
+    a[j] = temp;
+  }
+  return a;
+}
+
+function initMenu() {
+  var m = document.getElementById("menuView");
+  m.innerHTML = "";
+  quizData.forEach(function(item, idx) {
+    var c = document.createElement("div");
+    c.className = "topic-card";
+    c.onclick = function() { startTopic(idx); };
+    c.innerHTML = '<span class="topic-badge">Ενότητα ' + (idx + 1) + '</span>' +
+                  '<h2>' + item.title + '</h2>' +
+                  '<p>' + item.desc + '</p>';
+    m.appendChild(c);
+  });
+}
+
+function showMenu() {
+  document.getElementById("menuView").style.display = "grid";
+  document.getElementById("quizView").style.display = "none";
+}
+
+function startTopic(idx) {
+  curTopic = idx;
+  curQ = 0;
+  document.getElementById("menuView").style.display = "none";
+  document.getElementById("quizView").style.display = "block";
+  loadQuestion();
+}
+
+function loadQuestion() {
+  hasAnswered = false;
+  var topic = quizData[curTopic];
+  var qData = topic.questions[curQ];
+
+  document.getElementById("progTag").textContent = "Ερώτηση " + (curQ + 1) + " / " + topic.questions.length;
+  document.getElementById("qText").textContent = qData.q;
+  document.getElementById("qHint").textContent = qData.hint ? "💡 " + qData.hint : "";
+
+  var fb = document.getElementById("fbMsg");
+  fb.textContent = "";
+  fb.style.display = "none";
+  document.getElementById("nextArea").innerHTML = "";
+
+  var optsBox = document.getElementById("optsList");
+  optsBox.innerHTML = "";
+
+  // SHUFFLE THE OPTIONS DYNAMICALLY! Correct answer will NOT always be first!
+  currentShuffledOpts = shuffleArray(qData.opts);
+
+  currentShuffledOpts.forEach(function(opt) {
+    var btn = document.createElement("button");
+    btn.className = "opt-btn";
+    btn.textContent = opt.t;
+    btn.onclick = function() { checkAnswer(btn, opt); };
+    optsBox.appendChild(btn);
+  });
+}
+
+function checkAnswer(btn, opt) {
+  if (hasAnswered) return;
+  hasAnswered = true;
+
+  var fb = document.getElementById("fbMsg");
+  fb.style.display = "block";
+
+  if (opt.ok) {
+    btn.classList.add("correct");
+    fb.className = "feedback-box good";
+    fb.textContent = "🎉 ΣΩΣΤΟ! " + opt.exp;
+  } else {
+    btn.classList.add("wrong");
+    fb.className = "feedback-box bad";
+    fb.textContent = "✗ ΠΡΟΣΟΧΗ: " + opt.exp;
+    // Highlight correct
+    var buttons = document.querySelectorAll(".opt-btn");
+    currentShuffledOpts.forEach(function(o, idx) {
+      if (o.ok && buttons[idx]) buttons[idx].classList.add("correct");
+    });
+  }
+
+  // Next Button
+  var nextArea = document.getElementById("nextArea");
+  var nb = document.createElement("button");
+  nb.className = "next-btn";
+  var topic = quizData[curTopic];
+
+  if (curQ < topic.questions.length - 1) {
+    nb.textContent = "Επόμενη Ερώτηση (" + (curQ + 2) + "/3) ▶";
+    nb.onclick = function() {
+      curQ++;
+      loadQuestion();
+    };
+  } else if (curTopic < quizData.length - 1) {
+    nb.textContent = "Επόμενη Ενότητα (" + (curTopic + 2) + "/8) ▶";
+    nb.onclick = function() {
+      curTopic++;
+      curQ = 0;
+      loadQuestion();
+    };
+  } else {
+    nb.textContent = "🏆 Συγχαρητήρια! Τέλος Κουίζ! Επιστροφή στο Μενού";
+    nb.onclick = showMenu;
+  }
+  nextArea.appendChild(nb);
+}
+
+initMenu();
+</script>
+</body>
+</html>
