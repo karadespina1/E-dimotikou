@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ψηφιακοί Πράκτορες — Μάθημα 19: Διαγράμματα</title>
+<style>
+:root{--paper:#F3ECD9;--card:#FFFDF7;--ink:#1F3C63;--ink2:#3C5A85;--gold:#C98A2B;--gold2:#E7C583;--good:#3F7A4E;--goodbg:#E1F0E3;--bad:#B8483D;--badbg:#F7E2DF;--line:#D8CBAA}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:#2B2A28;font-family:"Trebuchet MS","Segoe UI",Verdana,sans-serif;padding:18px 14px 50px}
+.wrap{max-width:940px;margin:0 auto}
+header{display:flex;align-items:center;gap:16px;padding:18px 22px;background:var(--ink);color:var(--paper);border-radius:14px}
+.badge{width:54px;height:54px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:bold;color:var(--ink);border:3px solid var(--paper);flex:0 0 auto}
+header h1{margin:0;font-size:clamp(18px,4vw,26px)}header p{margin:4px 0 0;opacity:.85;font-size:13.5px}
+#home{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px;margin-top:20px}
+.mc{background:var(--card);border:2px solid var(--line);border-radius:12px;padding:16px;cursor:pointer;transition:.15s}
+.mc:hover{border-color:var(--gold);transform:translateY(-2px)}
+.mc .n{display:inline-block;width:26px;height:26px;line-height:26px;text-align:center;background:var(--ink);color:var(--paper);border-radius:50%;font-size:13px;font-weight:bold;margin-bottom:8px}
+.mc h3{margin:0 0 4px;font-size:15px;color:var(--ink)}.mc p{margin:0 0 8px;font-size:12.5px;color:var(--ink2)}.st{font-size:15px;color:var(--gold);letter-spacing:1px}
+#view{display:none;background:var(--card);border:2px solid var(--gold);border-radius:12px;padding:20px;margin-top:20px}#view.on{display:block}
+.back{background:none;border:2px solid var(--ink);color:var(--ink);padding:6px 14px;border-radius:8px;font-weight:bold;cursor:pointer;font-family:inherit;margin-bottom:12px}
+h2{margin:0 0 4px;color:var(--ink);font-size:20px}
+.lvs{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.lv{padding:8px 14px;border-radius:8px;border:2px solid var(--line);background:#FBFAF6;cursor:pointer;font-weight:bold;font-size:13px;font-family:inherit;color:var(--ink)}
+.lv.cur{border-color:var(--gold);background:var(--gold2)}.lv:disabled{opacity:.45;cursor:not-allowed}
+.goal{background:#FBF7EC;border-left:4px solid var(--gold);padding:8px 12px;border-radius:6px;font-size:13.5px;color:var(--ink2);margin-bottom:14px}
+button.action{font-family:inherit;background:var(--ink);color:var(--paper);border:none;padding:9px 16px;border-radius:8px;font-size:13.5px;font-weight:bold;cursor:pointer;margin:6px 6px 0 0}
+button.action:hover{background:var(--ink2)}button.action.alt{background:transparent;color:var(--ink);border:2px solid var(--ink)}
+.task{background:var(--ink);color:var(--paper);padding:10px 14px;border-radius:8px;margin-bottom:12px;font-size:14px}
+.fb{min-height:22px;margin:8px 0;font-weight:bold;font-size:14px}.good{color:var(--good)}.bad{color:var(--bad)}
+.qp{font-size:12px;color:var(--ink2);margin-bottom:4px}.qt{font-weight:bold;font-size:15px;margin-bottom:10px}
+.opts{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.opt{padding:9px 14px;border-radius:8px;border:2px solid var(--line);background:#FBFAF6;cursor:pointer;font-size:13.5px}
+.opt:hover{border-color:var(--gold)}.opt.correct{border-color:var(--good);background:var(--goodbg)}.opt.wrong{border-color:var(--bad);background:var(--badbg)}
+.expl{margin-top:10px;font-size:13.5px;color:var(--ink2)}
+.res{margin-top:16px;padding:14px;border-radius:10px;background:var(--goodbg);color:var(--good);font-weight:bold}.big{font-size:24px;color:var(--gold)}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.chip{padding:9px 14px;border-radius:8px;background:#FBFAF6;border:2px solid var(--line);cursor:pointer;font-weight:bold;font-size:13.5px}.chip.sel{border-color:var(--gold);background:var(--gold2)}
+.bks{display:flex;gap:14px;flex-wrap:wrap}.bk{flex:1 1 220px;min-height:90px;border:2px dashed var(--line);border-radius:10px;padding:10px;background:#FBF7EC;cursor:pointer}
+.bk h4{margin:0 0 6px;color:var(--ink);font-size:14px}.bk .p{display:inline-block;background:var(--goodbg);border-radius:6px;padding:4px 10px;margin:3px;font-size:13px}
+.ol{display:flex;flex-direction:column;gap:8px}.oi{padding:10px 14px;border:2px solid var(--line);border-radius:8px;background:#FBFAF6;cursor:pointer;font-size:14px}.oi.fx{border-color:var(--good);background:var(--goodbg);cursor:default}
+.sp{display:flex;gap:18px;flex-wrap:wrap;align-items:flex-start}.sp>div{flex:1 1 280px}
+svg.ch{width:100%;max-width:460px;display:block;margin:6px auto;background:#fff;border:1px solid var(--line);border-radius:8px}
+.ct{font-size:15px;font-weight:bold;fill:#1F3C63}
+svg.ch [data-part]{cursor:pointer}svg.ch [data-part]:hover{opacity:.75}
+.chbox{position:relative;border:2px solid transparent;border-radius:8px}.chbox.edit{border-color:var(--gold);background:#FFF9EA}
+.mg{border-collapse:collapse;font-size:14px;background:#fff}.mg th{background:#eef1f5;border:1px solid #cfd5dd;padding:5px 10px}
+.mg td{border:1px solid #cfd5dd;padding:5px 10px;min-width:130px;height:30px;touch-action:none;user-select:none;cursor:cell}.mg td.num{text-align:right}.mg td.in{background:#d9e6fb}
+.mbar{display:flex;gap:6px;margin-bottom:8px}.mb{border:1px solid #b9c1cc;background:#fff;border-radius:6px;padding:6px 12px;cursor:pointer;font:inherit}
+.ddm{border:1px solid #888;background:#fff;border-radius:6px;width:160px;box-shadow:0 4px 10px rgba(0,0,0,.2);margin-bottom:8px}.ddm div{padding:7px 12px;cursor:pointer;font-size:13.5px}.ddm div:hover{background:var(--gold2)}
+.dl{border:2px solid var(--ink2);border-radius:10px;padding:12px;background:#fff}.dl label{display:block;margin:6px 0;cursor:pointer}.dl input[type=text]{width:100%;padding:8px;border:2px solid var(--line);border-radius:6px;font:inherit;margin:6px 0}
+.menu2{position:absolute;background:#fff;border:1px solid #888;border-radius:6px;box-shadow:0 4px 12px rgba(0,0,0,.25);z-index:9;min-width:210px;font-size:13px}.menu2 div{padding:7px 12px;cursor:pointer}.menu2 div:hover{background:var(--gold2)}
+.sw{display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:middle;margin-right:6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header><div class="badge">19</div><div><h1>Ψηφιακοί Πράκτορες</h1><p>Μάθημα 19ο · Υπολογιστικό φύλλο: Οργάνωση δεδομένων σε διαγράμματα — Ε΄ Δημοτικού</p></div></header>
+<div id="home"></div>
+<div id="view"><button class="back" id="bk">← Πίσω στις αποστολές</button><h2 id="vt"></h2><div class="lvs" id="lvs"></div><div class="goal" id="goal"></div><div id="box"></div></div>
+</div>
+<script>
+const sh=a=>[...a].sort(()=>Math.random()-.5);
+const L=i=>String.fromCharCode(64+i);
+const rgName=g=>{const a=L(g.c1)+g.r1,b=L(g.c2)+g.r2;return a===b?a:a+":"+b};
+const COL=["#2E6FB7","#E08A1E","#4C9A5B","#B8483D","#7A5BA8","#2AA3A0"];
+
+/* ===== CHARTS (SVG) ===== */
+function bar(data,o={}){
+  const W=440,H=270,pl=40,pr=12,pt=o.title?38:14,pb=44,mx=Math.max(...data.map(d=>d[1])),st=mx<=10?2:mx<=30?5:10,top=Math.ceil(mx/st)*st,ph=H-pt-pb,bw=(W-pl-pr)/data.length;
+  let s=`<svg viewBox="0 0 ${W} ${H}" class="ch">`;
+  if(o.title)s+=`<text data-part="title" x="${W/2}" y="24" text-anchor="middle" class="ct">${o.title}</text>`;
+  for(let v=0;v<=top;v+=st){const y=pt+ph-ph*v/top;s+=`<line x1="${pl}" x2="${W-pr}" y1="${y}" y2="${y}" stroke="#d5d9df"/><text data-part="axisy" x="${pl-6}" y="${y+4}" text-anchor="end" font-size="11" fill="#556">${v}</text>`}
+  data.forEach((d,i)=>{const h=ph*d[1]/top,x=pl+bw*i+bw*.18,y=pt+ph-h;
+    s+=`<rect data-part="bar" x="${x}" y="${y}" width="${bw*.64}" height="${h}" fill="${COL[0]}" rx="2"/>`;
+    if(o.labels)s+=`<text data-part="label" x="${x+bw*.32}" y="${y-5}" text-anchor="middle" font-size="12" font-weight="bold" fill="#223">${d[1]}</text>`;
+    s+=`<text data-part="axisx" x="${x+bw*.32}" y="${H-pb+16}" text-anchor="middle" font-size="11" fill="#334">${d[0]}</text>`});
+  return s+"</svg>";
+}
+function pie(data,o={}){
+  const W=440,R=95,cx=o.legend?125:W/2,cy=(o.title?44:16)+R,H=cy+R+16,tot=data.reduce((a,d)=>a+d[1],0);let a0=-Math.PI/2,s=`<svg viewBox="0 0 ${W} ${H}" class="ch">`;
+  if(o.title)s+=`<text data-part="title" x="${W/2}" y="26" text-anchor="middle" class="ct">${o.title}</text>`;
+  data.forEach((d,i)=>{const a1=a0+2*Math.PI*d[1]/tot,x0=cx+R*Math.cos(a0),y0=cy+R*Math.sin(a0),x1=cx+R*Math.cos(a1),y1=cy+R*Math.sin(a1),m=(a0+a1)/2;
+    s+=`<path data-part="slice" data-i="${i}" d="M${cx} ${cy}L${x0} ${y0}A${R} ${R} 0 ${a1-a0>Math.PI?1:0} 1 ${x1} ${y1}Z" fill="${COL[i%6]}" stroke="#fff" stroke-width="2"/>`;
+    if(o.labels)s+=`<text data-part="label" x="${cx+.62*R*Math.cos(m)}" y="${cy+.62*R*Math.sin(m)+5}" text-anchor="middle" font-size="14" font-weight="bold" fill="#fff">${d[1]}</text>`;
+    if(o.legend)s+=`<g data-part="legend"><rect x="265" y="${cy-R+20+i*28}" width="16" height="16" fill="${COL[i%6]}" rx="3"/><text x="288" y="${cy-R+33+i*28}" font-size="13" fill="#223">${d[0]}</text></g>`;a0=a1});
+  return s+"</svg>";
+}
+const FREE=[["Μουσική",10],["Τηλεόραση",6],["Παιχνίδι",16],["Βόλτα",14],["Βιβλίο",4]];
+const TRIP=[["Αρχαιολογικό Μουσείο",12],["Πινακοθήκη",8]];
+const SPORT=[["Ποδόσφαιρο",25],["Μπάσκετ",12],["Βόλεϊ",7],["Κολύμβηση",6]];
+
+/* ===== ENGINES ===== */
+function quiz(el,qs,d){let i=0,sc=0;
+  const go=()=>{const q=qs[i],os=sh(q.o.map((t,k)=>({t,ok:k===q.c})));
+    el.innerHTML=`<div class="qp">Ερώτηση ${i+1}/${qs.length}</div><div class="qt">${q.q}</div>${q.x||""}<div class="opts">${os.map((o,k)=>`<div class="opt" data-k="${k}">${o.t}</div>`).join("")}</div><div class="expl" hidden></div><button class="action nx" hidden></button>`;
+    let ans=false;
+    el.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{if(ans)return;ans=true;const o=os[+b.dataset.k];if(o.ok)sc++;b.classList.add(o.ok?"correct":"wrong");
+      el.querySelectorAll(".opt").forEach(x=>{if(os[+x.dataset.k].ok)x.classList.add("correct")});
+      const e=el.querySelector(".expl");e.hidden=false;e.textContent=(o.ok?"✓ Σωστά! ":"✗ ")+(q.e||"");
+      const n=el.querySelector(".nx");n.hidden=false;n.textContent=i===qs.length-1?"Τέλος ▶":"Επόμενη ▶";n.onclick=()=>{i++;i<qs.length?go():d(sc,qs.length)}})};go()}
+function partTasks(el,svg,tasks,d){let i=0,mis=0;
+  el.innerHTML=`<div class="task"></div>${svg}<div class="fb"></div>`;const tk=el.querySelector(".task"),fb=el.querySelector(".fb");
+  const show=()=>tk.innerHTML=`<b>${i+1}/${tasks.length}</b> ${tasks[i].t}`;show();
+  el.querySelector("svg").addEventListener("click",e=>{const p=e.target.closest("[data-part]");if(!p||i>=tasks.length)return;
+    if(p.dataset.part===tasks[i].p){fb.textContent="✓ Σωστά!";fb.className="fb good";i++;if(i>=tasks.length){tk.textContent="🎉 Τέλος!";d(Math.max(0,tasks.length-mis),tasks.length)}else show()}
+    else{mis++;fb.textContent="✗ Όχι αυτό — δοκίμασε ξανά!";fb.className="fb bad"}})}
+function sort2(el,A,B,items,d){let sel=null,mis=0,left=items.length;
+  el.innerHTML=`<div class="chips"></div><div class="bks"><div class="bk" data-k="A"><h4>${A}</h4></div><div class="bk" data-k="B"><h4>${B}</h4></div></div><div class="fb"></div>`;
+  const ch=el.querySelector(".chips"),fb=el.querySelector(".fb");
+  sh(items).forEach(([t,k])=>{const c=document.createElement("div");c.className="chip";c.textContent=t;c.onclick=()=>{el.querySelectorAll(".chip").forEach(x=>x.classList.remove("sel"));c.classList.add("sel");sel={c,t,k}};ch.appendChild(c)});
+  el.querySelectorAll(".bk").forEach(b=>b.onclick=()=>{if(!sel){fb.textContent="Πρώτα διάλεξε ένα στοιχείο από πάνω.";fb.className="fb";return}
+    if(sel.k===b.dataset.k){const p=document.createElement("span");p.className="p";p.textContent=sel.t;b.appendChild(p);sel.c.remove();sel=null;left--;fb.textContent="✓ Σωστά!";fb.className="fb good";if(!left)d(Math.max(0,items.length-mis),items.length)}
+    else{mis++;fb.textContent="✗ Δεν ανήκει εδώ. Δοκίμασε το άλλο κουτί!";fb.className="fb bad"}})}
+function ordr(el,steps,d){let n=0,mis=0;
+  el.innerHTML='<div class="ol"></div><div class="fb"></div>';const ol=el.querySelector(".ol"),fb=el.querySelector(".fb");
+  sh(steps).forEach(s=>{const x=document.createElement("div");x.className="oi";x.textContent=s;x.onclick=()=>{if(x.classList.contains("fx"))return;
+    if(s===steps[n]){n++;x.classList.add("fx");x.textContent=n+". "+s;fb.textContent="✓ Σωστά!";fb.className="fb good";if(n===steps.length)d(Math.max(0,steps.length-mis),steps.length)}
+    else{mis++;fb.textContent="✗ Αυτό δεν γίνεται τώρα. Σκέψου τι προηγείται!";fb.className="fb bad"}};ol.appendChild(x)})}
+
+/* mini table with drag selection */
+function miniGrid(el,rows,on){
+  let h='<table class="mg"><tr><th></th><th>A</th><th>B</th></tr>';
+  rows.forEach((r,i)=>{h+=`<tr><th>${i+1}</th><td data-c="1" data-r="${i+1}">${r[0]}</td><td data-c="2" data-r="${i+1}" class="${typeof r[1]==="number"?"num":""}">${r[1]}</td></tr>`});
+  el.innerHTML=h+"</table>";let an=null,dr=false;
+  const paint=g=>el.querySelectorAll("td").forEach(td=>{const c=+td.dataset.c,r=+td.dataset.r;td.classList.toggle("in",!!g&&c>=g.c1&&c<=g.c2&&r>=g.r1&&r<=g.r2)});
+  let last=null;
+  el.addEventListener("pointerdown",e=>{const td=e.target.closest("td");if(!td)return;an=[+td.dataset.c,+td.dataset.r];dr=true;last={c1:an[0],c2:an[0],r1:an[1],r2:an[1]};paint(last)});
+  const mv=e=>{if(!el.isConnected){off();return}if(!dr)return;const t=document.elementFromPoint(e.clientX,e.clientY),td=t&&t.closest&&t.closest("td");if(!td||!el.contains(td))return;
+    const c=+td.dataset.c,r=+td.dataset.r;last={c1:Math.min(c,an[0]),c2:Math.max(c,an[0]),r1:Math.min(r,an[1]),r2:Math.max(r,an[1])};paint(last)};
+  const up=()=>{if(!dr)return;dr=false;on(rgName(last))};
+  const off=()=>{document.removeEventListener("pointermove",mv);document.removeEventListener("pointerup",up)};
+  document.addEventListener("pointermove",mv);document.addEventListener("pointerup",up);
+}
+
+/* edit pie: dblclick -> right-click slice -> «Εισαγωγή ετικετών δεδομένων» */
+function labelsFlow(box,data,fb,done){
+  let edit=false,mis=0,lab=false;
+  const draw=()=>{box.style.position="relative";
+    box.innerHTML=`<div class="chbox${edit?" edit":""}">${pie(data,{legend:true,labels:lab,title:"Τι κάνεις στον ελεύθερο χρόνο σου;"})}</div>${lab?"":'<button class="action alt eb">✏️ Επεξεργασία διαγράμματος</button>'}<div class="menu2" hidden></div>`;
+    const cb=box.querySelector(".chbox"),m=box.querySelector(".menu2"),eb=box.querySelector(".eb");
+    const setEdit=()=>{if(lab||edit)return;edit=true;fb.textContent="✓ Το διάγραμμα είναι σε λειτουργία επεξεργασίας. Τώρα κάνε δεξί κλικ (ή πάτα) πάνω στην πίτα.";fb.className="fb good";draw()};
+    cb.ondblclick=setEdit;if(eb)eb.onclick=setEdit;
+    const open=e=>{if(lab)return;const s=e.target.closest('[data-part="slice"]');if(!s)return;e.preventDefault();
+      if(!edit){mis++;fb.textContent="✗ Πρώτα κάνε διπλό κλικ στο διάγραμμα για να το επεξεργαστείς.";fb.className="fb bad";return}
+      const b=box.getBoundingClientRect();m.innerHTML=["Αντιγραφή","Εισαγωγή ετικετών δεδομένων","Μορφοποίηση σειράς δεδομένων"].map((t,i)=>`<div data-i="${i}">${t}</div>`).join("");m.style.left=(e.clientX-b.left)+"px";m.style.top=(e.clientY-b.top)+"px";m.hidden=false};
+    cb.addEventListener("contextmenu",open);cb.addEventListener("click",e=>{if(edit)open(e)});
+    m.onclick=e=>{const it=e.target.closest("[data-i]");if(!it)return;m.hidden=true;
+      if(it.dataset.i==="1"){lab=true;edit=false;draw();fb.textContent="🎉 Τώρα φαίνονται οι αριθμοί πάνω στα κομμάτια της πίτας!";fb.className="fb good";done(mis)}
+      else{mis++;fb.textContent="✗ Όχι αυτή η επιλογή — ψάξε «Εισαγωγή ετικετών δεδομένων».";fb.className="fb bad"}}};
+  draw();
+}
+
+/* chart builder (simulated spreadsheet wizard) */
+function builder(el,sp,d){
+  let st=0,mis=0,tot=sp.labels?7:6;
+  el.innerHTML=`<div class="task"></div><div class="mbar"><button class="mb" data-k="ins">Εισαγωγή ▾</button><button class="mb" data-k="ico" title="Εικονίδιο διαγράμματος">📊</button></div><div class="ddm" hidden><div data-k="chart">Διάγραμμα…</div><div data-k="tbl">Πίνακας…</div><div data-k="img">Εικόνα…</div></div><div class="sp"><div class="g"></div><div class="dlg"></div></div><div class="fb"></div>`;
+  const tk=el.querySelector(".task"),fb=el.querySelector(".fb"),dlg=el.querySelector(".dlg"),dd=el.querySelector(".ddm");
+  const hint=["Επίλεξε με το ποντίκι την περιοχή κελιών <b>"+sp.range+"</b> (κλικ και σύρσιμο).","Επίλεξε από το μενού «Εισαγωγή → Διάγραμμα» ή πάτα το εικονίδιο 📊.","Επίλεξε τον τύπο διαγράμματος <b>"+sp.type+"</b> και πάτα «Επόμενο».","Γράψε έναν τίτλο και πάτα «Τέλος».","Το διάγραμμα δημιουργήθηκε!","Εισήγαγε ετικέτες δεδομένων στην πίτα."];
+  const show=()=>{tk.innerHTML=sp.hints?`<b>Βήμα ${Math.min(st+1,tot)}/${tot}</b> ${hint[Math.min(st,5)]}`:sp.goal};show();
+  const bad=m=>{mis++;fb.textContent="✗ "+m;fb.className="fb bad"};
+  const rows=sp.rows,rr=sp.range.match(/A(\d+):B(\d+)/),data=rows.slice(+rr[1]-1,+rr[2]);
+  miniGrid(el.querySelector(".g"),rows,n=>{if(st>1)return;if(n===sp.range){st=1;fb.textContent="✓ Σωστή περιοχή!";fb.className="fb good";show()}else{st=0;bad("Αυτή δεν είναι η περιοχή που χρειαζόμαστε ("+n+"). Ξαναδοκίμασε.")}});
+  const openDlg=()=>{if(st<1){bad("Πρώτα επίλεξε την περιοχή κελιών με τα δεδομένα.");return}if(st>1)return;st=2;show();
+    dlg.innerHTML=`<div class="dl"><b>Τύπος διαγράμματος</b><label><input type="radio" name="t" value="Στήλη"> 📊 Στήλη</label><label><input type="radio" name="t" value="Πίτα"> 🥧 Πίτα</label><label><input type="radio" name="t" value="Γραμμή"> 📈 Γραμμή</label><button class="action nx">Επόμενο</button></div>`;
+    dlg.querySelector(".nx").onclick=()=>{const c=dlg.querySelector("input:checked");if(!c){bad("Διάλεξε πρώτα έναν τύπο διαγράμματος.");return}
+      if(c.value!==sp.type){bad("Ο τύπος «"+c.value+"» δεν είναι αυτός που ζητείται. Ξαναδιάβασε την εκφώνηση.");return}
+      st=3;show();dlg.innerHTML=`<div class="dl"><b>Τίτλος</b><input type="text" placeholder="Γράψε τίτλο…"><button class="action fn">Τέλος</button></div>`;
+      dlg.querySelector(".fn").onclick=()=>{const t=dlg.querySelector("input").value.trim();if(!t){bad("Δεν έγραψες τίτλο στο πλαίσιο «Τίτλος».");return}
+        st=4;show();const fin=m=>{fb.className="fb good";d(Math.max(0,tot-mis-(m||0)),tot)};
+        if(sp.type==="Στήλη"){dlg.innerHTML=bar(data,{title:t,labels:false});fb.textContent="🎉 Το διάγραμμα εμφανίστηκε σαν εικόνα που μπορείς να μετακινήσεις!";fin()}
+        else if(sp.labels){fb.textContent="Το διάγραμμα δημιουργήθηκε. Τώρα πρόσθεσε τους αριθμούς πάνω στην πίτα (διπλό κλικ → δεξί κλικ στην πίτα).";fb.className="fb good";st=5;show();
+          labelsFlow(dlg,data,fb,m=>{fin(m)})}
+        else{dlg.innerHTML=pie(data,{title:t,legend:true});fb.textContent="🎉 Το διάγραμμα πίτα δημιουργήθηκε!";fin()}}}};
+  el.querySelector(".mbar").onclick=e=>{const b=e.target.closest(".mb");if(!b)return;if(b.dataset.k==="ico")openDlg();else dd.hidden=!dd.hidden};
+  dd.hidden=true;dd.onclick=e=>{const it=e.target.closest("[data-k]");if(!it)return;dd.hidden=true;if(it.dataset.k==="chart")openDlg();else bad("Αυτό δεν δημιουργεί διάγραμμα. Διάλεξε «Διάγραμμα…».")};
+}
+
+/* ===== ACTIVITIES ===== */
+const Q=(q,o,e,x)=>({q,o,c:0,e,x});
+const ACTS=[
+{t:"Γνώρισε τα διαγράμματα",d:"Στήλη, πίτα και τα μέρη τους.",lv:[
+ {n:"Τι διάγραμμα είναι;",g:"Δες τα διαγράμματα και απάντησε.",run:(el,d)=>quiz(el,[
+   Q("Τι είδους διάγραμμα βλέπεις;",["Διάγραμμα στήλη (ραβδόγραμμα)","Διάγραμμα πίτα"],"Εμφανίζει τα δεδομένα σε στήλες (ράβδους).",bar(FREE,{title:"Ελεύθερος χρόνος",labels:true})),
+   Q("Τι είδους διάγραμμα βλέπεις;",["Διάγραμμα πίτα","Διάγραμμα στήλη (ραβδόγραμμα)"],"Η πίτα εμφανίζει τις απαντήσεις σε ένα στρογγυλό σχήμα.",pie(FREE,{legend:true,title:"Ελεύθερος χρόνος"})),
+   Q("Τι κάνουμε με ένα διάγραμμα;",["Παρουσιάζουμε τα δεδομένα με οπτικό τρόπο","Σβήνουμε τα δεδομένα","Αλλάζουμε το όνομα του κελιού","Κλείνουμε το φύλλο"],"Το διάγραμμα οπτικοποιεί τα δεδομένα ενός πίνακα."),
+   Q("Πώς λέγεται αλλιώς το διάγραμμα στήλη;",["Ραβδόγραμμα","Πίτα","Υπόμνημα","Κελί"],"Ραβδόγραμμα ή διάγραμμα στήλη."),
+   Q("Σε τι εμφανίζει τα δεδομένα το διάγραμμα στήλη;",["Σε στήλες (ράβδους)","Σε κομμάτια πίτας","Σε λέξεις","Σε κελιά"],"Κάθε τιμή γίνεται μια ράβδος.")],d)},
+ {n:"Μέρη του διαγράμματος στήλη",g:"Πάτα πάνω στο σωστό μέρος του διαγράμματος.",run:(el,d)=>partTasks(el,bar(FREE,{title:"Τι κάνεις στον ελεύθερο χρόνο σου;",labels:true}),[
+   {t:"Πάτα στον <b>τίτλο</b> του διαγράμματος.",p:"title"},{t:"Πάτα σε μία <b>ράβδο</b>.",p:"bar"},{t:"Πάτα σε έναν <b>αριθμό πάνω από τις ράβδους</b> (ετικέτα δεδομένων).",p:"label"},
+   {t:"Πάτα σε μια <b>ονομασία κάτω από τις ράβδους</b>.",p:"axisx"},{t:"Πάτα στους <b>αριθμούς αριστερά</b> (κλίμακα).",p:"axisy"}],d)},
+ {n:"Μέρη του διαγράμματος πίτα",g:"Βρες τα μέρη της πίτας. Το υπόμνημα εξηγεί τι σημαίνει κάθε χρώμα.",run:(el,d)=>partTasks(el,pie(FREE,{title:"Τι κάνεις στον ελεύθερο χρόνο σου;",legend:true,labels:true}),[
+   {t:"Πάτα στον <b>τίτλο</b>.",p:"title"},{t:"Πάτα σε ένα <b>κομμάτι</b> της πίτας.",p:"slice"},{t:"Πάτα στο <b>υπόμνημα</b> (εξηγεί τα χρώματα).",p:"legend"},
+   {t:"Πάτα σε έναν <b>αριθμό</b> πάνω στην πίτα (ετικέτα δεδομένων).",p:"label"}],d)}]},
+{t:"Διάβασε το διάγραμμα στήλη",d:"Βρες απαντήσεις στις ράβδους.",lv:[
+ {n:"Ελεύθερος χρόνος",g:"Απάντησε κοιτώντας το διάγραμμα.",run:(el,d)=>{const x=bar(FREE,{title:"Τι κάνεις στον ελεύθερο χρόνο σου;",labels:true});quiz(el,[
+   Q("Τι κάνουν περισσότερο τα παιδιά;",["Παιχνίδι","Μουσική","Βόλτα","Βιβλίο"],"Η μεγαλύτερη ράβδος είναι το Παιχνίδι (16).",x),
+   Q("Πόσα παιδιά διαβάζουν βιβλίο;",["4","6","10","14"],"Η ράβδος του Βιβλίου έχει τιμή 4.",x),
+   Q("Ποια δραστηριότητα έχει τις λιγότερες απαντήσεις;",["Βιβλίο","Τηλεόραση","Μουσική","Βόλτα"],"Η μικρότερη ράβδος είναι το Βιβλίο.",x),
+   Q("Πόσα παιδιά κάνουν Βόλτα;",["14","16","10","6"],"Η ράβδος της Βόλτας έχει τιμή 14.",x),
+   Q("Ποιο προτιμούν περισσότερο: Μουσική ή Τηλεόραση;",["Μουσική","Τηλεόραση"],"Μουσική 10, Τηλεόραση 6.",x)],d)}},
+ {n:"Η εκδρομή της Ε΄ τάξης",g:"Οι ερωτήσεις του βιβλίου: ποια επιλογή, πόσα παιδιά, πόσο περισσότερα;",run:(el,d)=>{const x=bar(TRIP,{title:"Επιλογές εκδρομής Ε΄ τάξης",labels:true});quiz(el,[
+   Q("Ποια επιλογή προτιμούν τα παιδιά για την εκδρομή;",["Αρχαιολογικό Μουσείο","Πινακοθήκη"],"Η ψηλότερη ράβδος: Αρχαιολογικό Μουσείο (12).",x),
+   Q("Πόσα παιδιά επέλεξαν την πρώτη επιλογή;",["12","8","20","4"],"Πρώτη επιλογή: 12 παιδιά.",x),
+   Q("Πόσα περισσότερα παιδιά επέλεξαν την πρώτη επιλογή;",["4","12","8","20"],"12 − 8 = 4.",x),
+   Q("Πόσα παιδιά ψήφισαν συνολικά;",["20","4","12","16"],"12 + 8 = 20.",x),
+   Q("Πόσα παιδιά επέλεξαν την Πινακοθήκη;",["8","12","4","20"],"Η ράβδος της Πινακοθήκης έχει τιμή 8.",x)],d)}},
+ {n:"Χωρίς αριθμούς",g:"Δεν υπάρχουν ετικέτες! Διάβασε την τιμή από την κλίμακα αριστερά.",run:(el,d)=>{const x=bar([["Ποδόσφαιρο",15],["Μπάσκετ",25],["Κολύμβηση",10],["Τένις",20]],{title:"Αγαπημένο άθλημα"});quiz(el,[
+   Q("Ποιο άθλημα έχει τη μεγαλύτερη ράβδο;",["Μπάσκετ","Ποδόσφαιρο","Τένις","Κολύμβηση"],"Το Μπάσκετ φτάνει στο 25.",x),
+   Q("Πόσες ψήφους έχει η Κολύμβηση;",["10","5","15","20"],"Η ράβδος φτάνει στη γραμμή του 10.",x),
+   Q("Πόσες ψήφους περισσότερες έχει το Μπάσκετ από το Ποδόσφαιρο;",["10","5","15","25"],"25 − 15 = 10.",x),
+   Q("Πόσα παιδιά ψήφισαν συνολικά;",["70","60","80","50"],"15 + 25 + 10 + 20 = 70.",x),
+   Q("Ποιο άθλημα έχει διπλάσιες ψήφους από την Κολύμβηση;",["Τένις","Ποδόσφαιρο","Μπάσκετ","Κανένα"],"Κολύμβηση 10, Τένις 20 = 2 × 10.",x)],d)}}]},
+{t:"Διάβασε το διάγραμμα πίτα",d:"Χρώματα, υπόμνημα και κομμάτια.",lv:[
+ {n:"Με υπόμνημα",g:"Χρησιμοποίησε το υπόμνημα για να βρεις ποιο χρώμα είναι κάθε επιλογή.",run:(el,d)=>{const x=pie(FREE,{legend:true,title:"Τι κάνεις στον ελεύθερο χρόνο σου;"});quiz(el,[
+   Q("Ποια επιλογή έχει το μεγαλύτερο κομμάτι;",["Παιχνίδι","Βιβλίο","Τηλεόραση","Μουσική"],"Το Παιχνίδι (16) έχει το μεγαλύτερο κομμάτι.",x),
+   Q("Ποια επιλογή έχει το μικρότερο κομμάτι;",["Βιβλίο","Βόλτα","Μουσική","Παιχνίδι"],"Το Βιβλίο (4) είναι το μικρότερο.",x),
+   Q("Τι εξηγεί το υπόμνημα;",["Σε ποια επιλογή αντιστοιχεί κάθε χρώμα","Πόσα κελιά έχει το φύλλο","Πώς αποθηκεύεται το αρχείο","Ποιο ποντίκι χρησιμοποιούμε"],"Το υπόμνημα εξηγεί το κάθε χρώμα της πίτας."),
+   Q("Ποια επιλογή έχει το πορτοκαλί χρώμα στο υπόμνημα;",["Τηλεόραση","Μουσική","Παιχνίδι","Βιβλίο"],"Το πορτοκαλί στο υπόμνημα αντιστοιχεί στην Τηλεόραση.",x)],d)}},
+ {n:"Με ετικέτες",g:"Οι ετικέτες δεδομένων δείχνουν τους αριθμούς πάνω στα κομμάτια.",run:(el,d)=>{const x=pie(FREE,{legend:true,labels:true,title:"Τι κάνεις στον ελεύθερο χρόνο σου;"});quiz(el,[
+   Q("Πόσα παιδιά κάνουν Βόλτα;",["14","16","10","4"],"Η ετικέτα της Βόλτας δείχνει 14.",x),
+   Q("Πόσα περισσότερα παιδιά προτιμούν Παιχνίδι από Μουσική;",["6","10","16","4"],"16 − 10 = 6.",x),
+   Q("Πόσα παιδιά ρωτήθηκαν συνολικά;",["50","40","60","46"],"10 + 6 + 16 + 14 + 4 = 50.",x),
+   Q("Ποιες δύο επιλογές έχουν μαζί 20 παιδιά;",["Τηλεόραση και Βόλτα","Μουσική και Βιβλίο","Βιβλίο και Τηλεόραση","Μουσική και Τηλεόραση"],"Τηλεόραση 6 + Βόλτα 14 = 20.",x)],d)}},
+ {n:"Εκτίμησε το κομμάτι",g:"Χωρίς αριθμούς! Κοίτα το μέγεθος των κομματιών.",run:(el,d)=>{const x=pie(SPORT,{legend:true,title:"Αγαπημένο άθλημα"});quiz(el,[
+   Q("Ποιο άθλημα καταλαμβάνει περίπου το μισό της πίτας;",["Ποδόσφαιρο","Μπάσκετ","Βόλεϊ","Κολύμβηση"],"Το Ποδόσφαιρο (25 στα 50) είναι το μισό.",x),
+   Q("Ποιο άθλημα έχει το μικρότερο κομμάτι;",["Κολύμβηση","Βόλεϊ","Μπάσκετ","Ποδόσφαιρο"],"Η Κολύμβηση (6) είναι το μικρότερο κομμάτι.",x),
+   Q("Ποιο είναι το δεύτερο σε μέγεθος κομμάτι;",["Μπάσκετ","Βόλεϊ","Κολύμβηση","Ποδόσφαιρο"],"Μπάσκετ (12) μετά το Ποδόσφαιρο (25).",x),
+   Q("Το κομμάτι του Μπάσκετ είναι περίπου...",["το ένα τέταρτο της πίτας","το μισό της πίτας","όλη η πίτα","πολύ μικρό, σχεδόν καθόλου"],"12 στα 50 είναι περίπου το ένα τέταρτο.",x)],d)}}]},
+{t:"Βήματα δημιουργίας",d:"Πώς φτιάχνουμε ένα διάγραμμα.",lv:[
+ {n:"Βάλε σε σειρά",g:"Πάτα τα βήματα με τη σωστή σειρά.",run:(el,d)=>ordr(el,["Επιλέγω με το ποντίκι την περιοχή κελιών Α2:Β3","Επιλέγω «Εισαγωγή → Διάγραμμα»","Επιλέγω τον τύπο «Στήλη»","Πατάω «Επόμενο» για να προχωρήσω","Γράφω έναν τίτλο στο πλαίσιο «Τίτλος»","Πατάω «Τέλος» και εμφανίζεται το διάγραμμα"],d)},
+ {n:"Ποιο βήμα;",g:"Θυμάσαι τις οδηγίες;",run:(el,d)=>quiz(el,[
+   Q("Τι κάνεις πρώτο;",["Επιλέγω την περιοχή κελιών με τα δεδομένα","Γράφω τον τίτλο","Πατάω «Τέλος»","Επιλέγω χρώμα"],"Πρώτα επιλέγουμε τα δεδομένα."),
+   Q("Από ποιο μενού δημιουργείς διάγραμμα;",["Εισαγωγή → Διάγραμμα","Αρχείο → Κλείσιμο","Προβολή → Ζουμ","Βοήθεια"],"Μενού «Εισαγωγή → Διάγραμμα» ή το εικονίδιο."),
+   Q("Ποιον τύπο διαλέγεις για να φτιάξεις ραβδόγραμμα;",["Στήλη","Πίτα","Τίτλος","Υπόμνημα"],"Το ραβδόγραμμα λέγεται και διάγραμμα στήλη."),
+   Q("Ποιο κουμπί σε πάει στις επόμενες επιλογές;",["Επόμενο","Τέλος","Ακύρωση","Εισαγωγή"],"Με το «Επόμενο» προχωράς στα επόμενα βήματα."),
+   Q("Τι εμφανίζεται όταν πατήσεις «Τέλος»;",["Το διάγραμμα σαν εικόνα που μπορείς να μετακινήσεις","Ένας νέος πίνακας","Ένα μήνυμα λάθους","Τίποτα"],"Το διάγραμμα εμφανίζεται σαν εικόνα.")],d)},
+ {n:"Βρες το λάθος",g:"Κάποιοι μαθητές έκαναν λάθος. Βοήθησέ τους!",run:(el,d)=>quiz(el,[
+   Q("Ο Νίκος διάλεξε «Εισαγωγή → Διάγραμμα» χωρίς να επιλέξει κελιά. Τι έπρεπε να κάνει πρώτα;",["Να επιλέξει την περιοχή κελιών με τα δεδομένα","Να κλείσει το πρόγραμμα","Να γράψει τον τίτλο","Να πατήσει «Τέλος»"],"Πρώτα επιλέγουμε τα δεδομένα."),
+   Q("Η Μαρία πάτησε «Τέλος» χωρίς να γράψει τίτλο. Ποιο βήμα ξέχασε;",["Να γράψει τίτλο στο πλαίσιο «Τίτλος»","Να επιλέξει τύπο","Να αλλάξει γραμμή","Να σβήσει τα δεδομένα"],"Στο τελευταίο βήμα γράφουμε τίτλο."),
+   Q("Ο Άρης θέλει αριθμούς πάνω στα κομμάτια της πίτας. Τι κάνει;",["Διπλό κλικ στο διάγραμμα και δεξί κλικ στην πίτα → «Εισαγωγή ετικετών δεδομένων»","Σβήνει την πίτα","Αλλάζει τον τύπο σε στήλη","Γράφει τους αριθμούς με το χέρι"],"Οι ετικέτες δεδομένων εμφανίζουν τους αριθμούς."),
+   Q("Το διάγραμμα εμφανίστηκε αλλά βρίσκεται πάνω από τον πίνακα. Τι κάνεις;",["Το μετακινώ, αφού είναι σαν εικόνα","Ξεκινάω από την αρχή","Σβήνω τον πίνακα","Δεν γίνεται τίποτα"],"Το διάγραμμα μπορεί να μετακινηθεί.")],d)}]},
+{t:"Φτιάξε το διάγραμμα",d:"Δημιούργησε διάγραμμα βήμα-βήμα.",lv:[
+ {n:"Διάγραμμα στήλη (με οδηγίες)",g:"Φτιάξε διάγραμμα στήλη για τις επιλογές της εκδρομής.",run:(el,d)=>builder(el,{rows:[["Εκδρομή Ε΄ τάξης",""],["Αρχαιολογικό Μουσείο",12],["Πινακοθήκη",8]],range:"A2:B3",type:"Στήλη",hints:true},d)},
+ {n:"Διάγραμμα πίτα (με οδηγίες)",g:"Φτιάξε διάγραμμα πίτα για τον ελεύθερο χρόνο των παιδιών.",run:(el,d)=>builder(el,{rows:[["Ελεύθερος χρόνος",""],["Μουσική",10],["Τηλεόραση",6],["Παιχνίδι",16],["Βόλτα",14],["Βιβλίο",4]],range:"A2:B6",type:"Πίτα",hints:true},d)},
+ {n:"Πίτα με ετικέτες (χωρίς οδηγίες)",g:"Πρόκληση!",run:(el,d)=>builder(el,{rows:[["Ελεύθερος χρόνος",""],["Μουσική",10],["Τηλεόραση",6],["Παιχνίδι",16],["Βόλτα",14],["Βιβλίο",4]],range:"A2:B6",type:"Πίτα",labels:true,hints:false,goal:"Δημιούργησε διάγραμμα <b>πίτα</b> με τα δεδομένα των κελιών A2:B6 (χωρίς τον τίτλο του πίνακα), δώσε του τίτλο και πρόσθεσε <b>ετικέτες δεδομένων</b>."},d)}]},
+{t:"Στήλη ή πίτα;",d:"Ξεχώρισε τα δύο διαγράμματα.",lv:[
+ {n:"Ταξινόμηση",g:"Διάλεξε ένα χαρακτηριστικό και μετά το κουτί που ταιριάζει.",run:(el,d)=>sort2(el,"📊 Διάγραμμα στήλη","🥧 Διάγραμμα πίτα",[["Εμφανίζει τα δεδομένα σε ράβδους","A"],["Έχει στρογγυλό σχήμα","B"],["Συνήθως έχει υπόμνημα με χρώματα","B"],["Λέγεται και ραβδόγραμμα","A"],["Χωρίζεται σε κομμάτια","B"],["Κάθε επιλογή είναι μια κάθετη ράβδος","A"]],d)},
+ {n:"Αναγνώρισε",g:"Τι είδους διάγραμμα είναι;",run:(el,d)=>quiz(el,[
+   Q("Τι διάγραμμα είναι;",["Στήλη","Πίτα"],"Έχει ράβδους.",bar(TRIP,{title:"Εκδρομή",labels:true})),
+   Q("Τι διάγραμμα είναι;",["Πίτα","Στήλη"],"Έχει κομμάτια και υπόμνημα.",pie(TRIP,{legend:true,labels:true,title:"Εκδρομή"})),
+   Q("Πόσες ράβδους θα έχει ένα διάγραμμα στήλη για 5 επιλογές;",["5","1","10","2"],"Μία ράβδος για κάθε επιλογή."),
+   Q("Πόσα κομμάτια θα έχει μια πίτα για 4 επιλογές;",["4","1","8","2"],"Ένα κομμάτι για κάθε επιλογή."),
+   Q("Σε ποιο διάγραμμα βλέπεις υπόμνημα;",["Στην πίτα","Στο ραβδόγραμμα μόνο","Σε κανένα","Στο κελί"],"Στην πίτα υπάρχει συνήθως υπόμνημα.")],d)},
+ {n:"Σωστό ή Λάθος;",g:"Αποφάσισε αν ισχύει.",run:(el,d)=>quiz(el,[
+   Q("Το ραβδόγραμμα λέγεται και διάγραμμα στήλη.",["Σωστό","Λάθος"],"Σωστό."),
+   Q("Η πίτα δείχνει κάθε απάντηση με διαφορετικό χρώμα.",["Σωστό","Λάθος"],"Σωστό."),
+   Q("Δημιουργούμε το διάγραμμα πριν επιλέξουμε τα δεδομένα.",["Λάθος","Σωστό"],"Λάθος: πρώτα επιλέγουμε την περιοχή κελιών."),
+   Q("Το διάγραμμα εμφανίζεται σαν εικόνα που μπορούμε να μετακινήσουμε.",["Σωστό","Λάθος"],"Σωστό."),
+   Q("Οι ετικέτες δεδομένων δείχνουν το όνομα του χρώματος.",["Λάθος","Σωστό"],"Λάθος: δείχνουν τα δεδομένα (αριθμούς). Το χρώμα το εξηγεί το υπόμνημα."),
+   Q("Στο υπόμνημα βλέπουμε ποιο χρώμα ανήκει σε ποια επιλογή.",["Σωστό","Λάθος"],"Σωστό.")],d)}]},
+{t:"Υπόμνημα & ετικέτες",d:"Πρόσθεσε αριθμούς και χρώματα.",lv:[
+ {n:"Κουίζ",g:"Υπόμνημα και ετικέτες δεδομένων.",run:(el,d)=>quiz(el,[
+   Q("Τι είναι το υπόμνημα;",["Χώρος που εξηγεί σε ποια επιλογή αναφέρεται κάθε χρώμα","Ο τίτλος του διαγράμματος","Ένα κελί του πίνακα","Το κουμπί «Τέλος»"],"Το υπόμνημα εξηγεί το κάθε χρώμα της πίτας.",pie(FREE,{legend:true,title:"Ελεύθερος χρόνος"})),
+   Q("Τι εμφανίζουν οι ετικέτες δεδομένων;",["Τα δεδομένα (αριθμούς) πάνω στα κομμάτια","Το όνομα του προγράμματος","Την ώρα","Τον τίτλο"],"Π.χ. τους αριθμούς 12 και 8 πάνω στα κομμάτια.",pie(TRIP,{legend:true,labels:true,title:"Εκδρομή"})),
+   Q("Πώς μπαίνουν οι ετικέτες δεδομένων;",["Διπλό κλικ στο διάγραμμα και δεξί κλικ στην πίτα → «Εισαγωγή ετικετών δεδομένων»","Πατώντας Enter","Σβήνοντας το υπόμνημα","Αλλάζοντας το όνομα της στήλης"],"Πρώτα επεξεργασία με διπλό κλικ, μετά δεξί κλικ στην πίτα."),
+   Q("Πού βρίσκεται συνήθως το υπόμνημα στην πίτα;",["Σε μια άκρη του διαγράμματος","Μέσα στο κελί A1","Κάτω από το πληκτρολόγιο","Δεν υπάρχει"],"Συνήθως σε μια άκρη.")],d)},
+ {n:"Πρόσθεσε ετικέτες",g:"Εισήγαγε ετικέτες δεδομένων: διπλό κλικ στο διάγραμμα, μετά δεξί κλικ (ή πάτημα) στην πίτα.",run:(el,d)=>{
+   el.innerHTML='<div class="task">Στόχος: να φανούν οι αριθμοί πάνω στην πίτα.</div><div class="bx"></div><div class="fb"></div>';
+   labelsFlow(el.querySelector(".bx"),FREE,el.querySelector(".fb"),m=>d(Math.max(0,3-m),3))}},
+ {n:"Φτιάξε το υπόμνημα",g:"Η πίτα δεν έχει υπόμνημα! Πάτα ένα κομμάτι και μετά την επιλογή που του ταιριάζει (δες τον πίνακα).",run:(el,d)=>{
+   const data=FREE,tot=data.length;let sel=null,mis=0,done=0;const as={};
+   el.innerHTML=`<div class="sp"><div class="pc"></div><div><b>Πίνακας δεδομένων</b><table class="mg" style="margin:8px 0">${data.map(x=>`<tr><td>${x[0]}</td><td class="num">${x[1]}</td></tr>`).join("")}</table><div><b>Το υπόμνημά σου:</b><div class="lg"></div></div><div class="chips"></div></div></div><div class="fb"></div>`;
+   const fb=el.querySelector(".fb"),pc=el.querySelector(".pc"),ch=el.querySelector(".chips"),lg=el.querySelector(".lg");
+   const draw=()=>{pc.innerHTML=pie(data,{labels:true,title:"Τι κάνεις στον ελεύθερο χρόνο σου;"});pc.querySelectorAll("[data-part=slice]").forEach(p=>{p.onclick=()=>{sel=+p.dataset.i;pc.querySelectorAll("[data-part=slice]").forEach(q=>q.setAttribute("stroke",+q.dataset.i===sel?"#111":"#fff"));fb.textContent="Διάλεξε την επιλογή για το επιλεγμένο κομμάτι.";fb.className="fb"}})};draw();
+   const ls=()=>{lg.innerHTML=data.map((x,i)=>as[i]?`<div><span class="sw" style="background:${COL[i]}"></span>${as[i]}</div>`:"").join("")};
+   sh(data.map((x,i)=>x[0])).forEach(n=>{const c=document.createElement("div");c.className="chip";c.textContent=n;c.onclick=()=>{
+     if(sel===null){fb.textContent="Πρώτα πάτα ένα κομμάτι της πίτας.";fb.className="fb";return}
+     if(data[sel][0]===n&&!as[sel]){as[sel]=n;done++;c.remove();ls();sel=null;draw();fb.textContent="✓ Σωστά!";fb.className="fb good";if(done===tot){fb.textContent="🎉 Έφτιαξες το υπόμνημα!";d(Math.max(0,tot-mis),tot)}}
+     else{mis++;fb.textContent="✗ Αυτός ο αριθμός δεν ταιριάζει με αυτή την επιλογή. Κοίτα τον πίνακα!";fb.className="fb bad"}};ch.appendChild(c)})}}]},
+{t:"Τελικό κουίζ",d:"Ό,τι έμαθες για τα διαγράμματα.",lv:[
+ {n:"Εύκολο",g:"Ξεκινάμε απλά!",run:(el,d)=>quiz(el,[
+   Q("Με τι μπορούμε να οπτικοποιήσουμε τα δεδομένα ενός πίνακα;",["Με διάγραμμα","Με το ποντίκι","Με το πληκτρολόγιο","Με την οθόνη"],"Το διάγραμμα οπτικοποιεί τα δεδομένα."),
+   Q("Ποιος τύπος διαγράμματος εμφανίζει ράβδους;",["Στήλη","Πίτα"],"Το διάγραμμα στήλη."),
+   Q("Ποιος τύπος διαγράμματος είναι στρογγυλός;",["Πίτα","Στήλη"],"Η πίτα."),
+   Q("Τι κάνεις πρώτο για να φτιάξεις διάγραμμα;",["Επιλέγω την περιοχή κελιών με τα δεδομένα","Γράφω τον τίτλο","Πατάω «Τέλος»","Κλείνω το φύλλο"],"Επιλέγουμε πρώτα τα δεδομένα."),
+   Q("Τι κουμπί πατάς στο τέλος;",["Τέλος","Επόμενο","Ακύρωση","Κλείσιμο"],"Με το «Τέλος» εμφανίζεται το διάγραμμα.")],d)},
+ {n:"Μέτριο",g:"Διάβασε το διάγραμμα.",run:(el,d)=>{const x=bar(TRIP,{title:"Επιλογές εκδρομής",labels:true}),y=pie(FREE,{legend:true,labels:true,title:"Ελεύθερος χρόνος"});quiz(el,[
+   Q("Πόσα παιδιά επέλεξαν την Πινακοθήκη;",["8","12","20","4"],"Η ράβδος της Πινακοθήκης έχει 8.",x),
+   Q("Πόσα παιδιά ψήφισαν συνολικά για την εκδρομή;",["20","12","8","4"],"12 + 8 = 20.",x),
+   Q("Ποια επιλογή έχει τα περισσότερα παιδιά;",["Παιχνίδι","Μουσική","Βιβλίο","Τηλεόραση"],"Παιχνίδι: 16.",y),
+   Q("Πόσα παιδιά διαβάζουν βιβλίο;",["4","6","10","14"],"Βιβλίο: 4.",y),
+   Q("Τι δείχνουν οι αριθμοί πάνω στα κομμάτια;",["Τις ετικέτες δεδομένων","Το υπόμνημα","Τον τίτλο","Τα κελιά"],"Είναι οι ετικέτες δεδομένων.",y)],d)}},
+ {n:"Δύσκολο",g:"Για πραγματικούς πράκτορες!",run:(el,d)=>{const y=pie(FREE,{legend:true,labels:true,title:"Ελεύθερος χρόνος"});quiz(el,[
+   Q("Πόσα παιδιά ρωτήθηκαν συνολικά;",["50","40","46","60"],"10 + 6 + 16 + 14 + 4 = 50.",y),
+   Q("Πόσα περισσότερα παιδιά επιλέγουν Παιχνίδι από Βιβλίο;",["12","10","16","6"],"16 − 4 = 12.",y),
+   Q("Ποιο χρώμα ανήκει στο Παιχνίδι; Πού το βρίσκεις;",["Στο υπόμνημα","Στο όνομα της στήλης","Στη γραμμή εισαγωγής","Στο ποντίκι"],"Το υπόμνημα εξηγεί τα χρώματα.",y),
+   Q("Ποια οδηγία είναι σωστή για να βάλεις ετικέτες δεδομένων;",["Διπλό κλικ στο διάγραμμα, δεξί κλικ στην πίτα, «Εισαγωγή ετικετών δεδομένων»","Ένα κλικ στο κελί A1","Enter τρεις φορές","Διαγραφή υπομνήματος"],"Έτσι εμφανίζονται οι αριθμοί πάνω στα κομμάτια."),
+   Q("Ποια περιοχή θα επιλέξεις για να φτιάξεις διάγραμμα με τον τίτλο στο A1 και τα δεδομένα στα A2:B6;",["A2:B6","A1","B1:B2","A1:A2"],"Επιλέγουμε τα δεδομένα: τις επιλογές και τις απαντήσεις."),
+   Q("Στο διάγραμμα στήλη, κάθε ράβδος δείχνει...",["Την τιμή μιας επιλογής","Το όνομα του φύλλου","Τον τίτλο","Την ώρα"],"Το ύψος της ράβδου δείχνει την τιμή.")],d)}}]}
+];
+
+/* ===== SHELL ===== */
+let prog={};try{prog=JSON.parse(localStorage.getItem("m19")||"{}")}catch(e){}
+const save=()=>{try{localStorage.setItem("m19",JSON.stringify(prog))}catch(e){}};
+const stars=n=>"★".repeat(n)+"☆".repeat(3-n);
+const home=document.getElementById("home"),view=document.getElementById("view");let cur=0;
+function drawHome(){home.innerHTML="";ACTS.forEach((a,i)=>{const p=prog[i]||[0,0,0],c=document.createElement("div");c.className="mc";
+  c.innerHTML=`<span class="n">${i+1}</span><h3>${a.t}</h3><p>${a.d}</p><div class="st">${p.map(stars).join(" ")}</div>`;c.onclick=()=>openAct(i);home.appendChild(c)})}
+function openAct(i){cur=i;home.style.display="none";view.classList.add("on");document.getElementById("vt").textContent=`Αποστολή ${i+1}: ${ACTS[i].t}`;drawLevels();startLevel(i,0)}
+function drawLevels(l){const p=prog[cur]||[0,0,0],w=document.getElementById("lvs");w.innerHTML="";
+  ACTS[cur].lv.forEach((lv,k)=>{const b=document.createElement("button");b.className="lv"+(k===l?" cur":"");b.disabled=k>0&&!p[k-1];b.textContent=`Επίπεδο ${k+1}: ${lv.n} ${p[k]?stars(p[k]):""}`;b.onclick=()=>startLevel(cur,k);w.appendChild(b)})}
+function startLevel(a,l){cur=a;drawLevels(l);const lv=ACTS[a].lv[l],old=document.getElementById("box");document.getElementById("goal").innerHTML=lv.g;
+  const nb=document.createElement("div");old.replaceWith(nb);nb.id="box";
+  lv.run(nb,(sc,tot)=>{const pc=tot?sc/tot:1,s=pc>=.9?3:pc>=.6?2:1;prog[a]=prog[a]||[0,0,0];prog[a][l]=Math.max(prog[a][l],s);save();drawLevels(l);
+    const r=document.createElement("div");r.className="res";r.innerHTML=`Αποτέλεσμα: <span class="big">${stars(s)}</span> (${sc}/${tot})<br>`;
+    const b1=document.createElement("button");b1.className="action alt";b1.textContent="↺ Ξανά";b1.onclick=()=>startLevel(a,l);r.appendChild(b1);
+    if(l<ACTS[a].lv.length-1){const b2=document.createElement("button");b2.className="action";b2.textContent="Επόμενο επίπεδο ▶";b2.onclick=()=>startLevel(a,l+1);r.appendChild(b2)}
+    else if(a<ACTS.length-1){const b2=document.createElement("button");b2.className="action";b2.textContent="Επόμενη αποστολή ▶";b2.onclick=()=>openAct(a+1);r.appendChild(b2)}
+    nb.appendChild(r);r.scrollIntoView({behavior:"smooth",block:"nearest"})})}
+document.getElementById("bk").onclick=()=>{view.classList.remove("on");home.style.display="";drawHome()};
+drawHome();
+</script>
+</body>
+</html>
