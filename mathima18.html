@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Μάθημα 18 - Προσομοιωτής Υπολογιστικού Φύλλου</title>
+<style>
+:root{--paper:#F3ECD9;--card:#FFFDF7;--ink:#1F3C63;--ink2:#3C5A85;--gold:#C98A2B;--gold2:#E7C583;--good:#3F7A4E;--goodbg:#E1F0E3;--bad:#B8483D;--badbg:#F7E2DF;--line:#D8CBAA}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:#2B2A28;font-family:"Trebuchet MS","Segoe UI",sans-serif;padding:16px 12px 40px}
+.wrap{max-width:960px;margin:0 auto}
+header{display:flex;align-items:center;gap:14px;padding:16px 20px;background:var(--ink);color:var(--paper);border-radius:12px;margin-bottom:20px;box-shadow:0 4px 10px rgba(0,0,0,.1)}
+.badge{width:50px;height:50px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:bold;color:var(--ink);border:3px solid var(--paper);flex-shrink:0}
+header h1{margin:0;font-size:21px}
+header p{margin:4px 0 0;font-size:13px;opacity:.9}
+#menuView{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px}
+.card{background:var(--card);border:2px solid var(--line);border-radius:12px;padding:16px;cursor:pointer;transition:.15s;box-shadow:0 2px 6px rgba(0,0,0,.04)}
+.card:hover{border-color:var(--gold);transform:translateY(-2px);box-shadow:0 6px 14px rgba(0,0,0,.08)}
+.num-tag{display:inline-block;width:26px;height:26px;line-height:26px;text-align:center;background:var(--ink);color:var(--paper);border-radius:50%;font-size:12px;font-weight:bold;margin-bottom:8px}
+.card h3{margin:0 0 6px;font-size:15px;color:var(--ink)}
+.card p{margin:0 0 8px;font-size:12px;color:var(--ink2);line-height:1.3}
+.tag{display:inline-block;padding:3px 8px;background:var(--goodbg);color:var(--good);border-radius:4px;font-size:11px;font-weight:bold}
+#actView{background:var(--card);border:2px solid var(--gold);border-radius:12px;padding:20px;box-shadow:0 6px 16px rgba(0,0,0,.06)}
+.btn-back{background:none;border:2px solid var(--ink);color:var(--ink);padding:7px 16px;border-radius:8px;font-weight:bold;cursor:pointer;margin-bottom:14px;font-family:inherit;font-size:13px}
+.btn-back:hover{background:var(--ink);color:var(--paper)}
+.task-box{background:var(--ink);color:var(--paper);padding:14px 18px;border-radius:8px;font-size:14.5px;line-height:1.45;margin-bottom:16px}
+.feedback{min-height:28px;margin:12px 0;font-weight:bold;font-size:14.5px;padding:8px 12px;border-radius:6px}
+.good{color:var(--good);background:var(--goodbg)}
+.bad{color:var(--bad);background:var(--badbg)}
+.calc-win{background:#f8fafc;border:2px solid #cbd5e1;border-radius:8px;overflow:hidden;margin-bottom:14px;box-shadow:0 3px 8px rgba(0,0,0,.05)}
+.calc-bar{background:#e2e8f0;padding:8px 12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;border-bottom:1px solid #cbd5e1}
+.tool-btn{background:#fff;border:1px solid #94a3b8;border-radius:6px;padding:6px 14px;font-size:13px;font-weight:bold;cursor:pointer;font-family:inherit;color:#1e293b}
+.tool-btn:hover{background:#f1f5f9;border-color:#475569}
+.fx-bar{display:flex;align-items:center;gap:8px;padding:8px 12px;background:#fff;border-bottom:1px solid #cbd5e1}
+.cur-cell{font-weight:bold;min-width:44px;background:#f1f5f9;border:1px solid #cbd5e1;padding:5px 8px;border-radius:4px;text-align:center;font-size:13px;color:#0f172a}
+.fx-lbl{font-weight:bold;font-style:italic;color:#64748b;font-size:14px}
+.fx-txt{flex:1;border:1px solid #cbd5e1;border-radius:4px;padding:6px 10px;font-family:monospace;font-size:14.5px;outline:none}
+.fx-txt:focus{border-color:#2563eb;box-shadow:0 0 0 2px rgba(37,99,235,.15)}
+.fx-enter{background:var(--good);color:#fff;border:none;border-radius:5px;padding:7px 16px;font-weight:bold;cursor:pointer;font-size:13px}
+.fx-enter:hover{background:#2f633d}
+.sheet{border-collapse:collapse;width:100%;background:#fff}
+.sheet th{background:#f1f5f9;border:1px solid #cbd5e1;padding:7px 10px;font-size:12.5px;color:#475569;text-align:center}
+.sheet td{border:1px solid #e2e8f0;padding:7px 10px;height:36px;position:relative;cursor:pointer;font-size:13.5px;user-select:none}
+.sheet td.sel{outline:2px solid #2563eb;background:#eff6ff}
+.sheet td.num{text-align:right}
+.sheet td.brd{border:2px solid #0f172a !important}
+.sheet td.wrap{white-space:normal;line-height:1.2;height:46px}
+.fill-dot{position:absolute;right:-3px;bottom:-3px;width:10px;height:10px;background:#2563eb;border-radius:1px;cursor:pointer;border:1px solid #fff}
+.next-btn{background:var(--ink);color:var(--paper);border:none;padding:11px 20px;border-radius:8px;font-weight:bold;cursor:pointer;font-size:14px;margin-top:12px;font-family:inherit}
+.next-btn:hover{background:var(--ink2)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="badge">18</div>
+    <div>
+      <h1>Ψηφιακοί Πράκτορες — Προσομοιώσεις Υπολογιστικού Φύλλου</h1>
+      <p>Μάθημα 18ο · Αριθμητικές πράξεις, τύποι και μορφοποίηση — Ε΄ Δημοτικού</p>
+    </div>
+  </header>
+
+  <div id="menuView"></div>
+  <div id="actView" style="display:none">
+    <button class="btn-back" onclick="showMenu()">← Πίσω στο μενού</button>
+    <div class="task-box" id="taskDesc"></div>
+    <div class="calc-win">
+      <div class="calc-bar" id="toolBar"></div>
+      <div class="fx-bar">
+        <span class="cur-cell" id="activeCellLabel">A1</span>
+        <span class="fx-lbl">fx</span>
+        <input type="text" class="fx-txt" id="formulaInput" placeholder="Γράψε τύπο με = ή τιμή..." />
+        <button class="fx-enter" onclick="commitInput()">Enter ↵</button>
+      </div>
+      <table class="sheet" id="sheetTable"></table>
+    </div>
+    <div class="feedback" id="fbMsg" style="display:none"></div>
+    <div id="nextArea"></div>
+  </div>
+</div>
+
+<script>
+var curIndex = 0;
+var state = {
+  cols: [], rows: [], data: {}, formulas: {}, active: "A1",
+  wrapped: {}, bordered: {}, showHandle: false
+};
+
+var activities = [
+  {
+    title: "1. Πολλαπλασιασμός με *",
+    desc: "Μάθε να χρησιμοποιείς τον αστερίσκο (*) για πολλαπλασιασμό.",
+    task: "<b>Αποστολή:</b> Κάνε κλικ στο κελί <b>B2</b>, πληκτρολόγησε τον τύπο <b>=8*5</b> στη γραμμή fx και πάτα <b>Enter ↵</b> για να βρεις το γινόμενο!",
+    cols: ["A", "B"], rows: [1, 2],
+    initData: { "A1": "Πράξη", "B1": "Αποτέλεσμα", "A2": "8 επί 5", "B2": "" },
+    startCell: "B2",
+    tools: [],
+    onEnter: function(val) {
+      if (state.active === "B2" && val.replace(/\s+/g, '') === "=8*5") {
+        state.data["B2"] = 40;
+        state.formulas["B2"] = "=8*5";
+        renderSheet();
+        setSuccess("✓ Μπράβο! Ο αστερίσκος (*) εκτέλεσε τον πολλαπλασιασμό: 8 * 5 = 40!");
+      } else {
+        setError("✗ Πρέπει να επιλέξεις το κελί B2, να γράψεις =8*5 και να πατήσεις Enter!");
+      }
+    }
+  },
+  {
+    title: "2. Διαίρεση με /",
+    desc: "Μάθε να χρησιμοποιείς την κάθετο (/) για διαίρεση.",
+    task: "<b>Αποστολή:</b> Μοίρασε 100€ σε 5 παιδιά. Επίλεξε το κελί <b>B2</b>, γράψε <b>=100/5</b> και πάτα <b>Enter ↵</b>.",
+    cols: ["A", "B"], rows: [1, 2],
+    initData: { "A1": "Έξοδα εκδρομής", "B1": "Κόστος ανά παιδί", "A2": "100€ σε 5 παιδιά", "B2": "" },
+    startCell: "B2",
+    tools: [],
+    onEnter: function(val) {
+      if (state.active === "B2" && val.replace(/\s+/g, '') === "=100/5") {
+        state.data["B2"] = 20;
+        state.formulas["B2"] = "=100/5";
+        renderSheet();
+        setSuccess("✓ Εξαιρετικά! Η κάθετος (/) εκτέλεσε τη διαίρεση: 100 / 5 = 20€ ανά παιδί!");
+      } else {
+        setError("✗ Επίλεξε το κελί B2, γράψε =100/5 και πάτα Enter.");
+      }
+    }
+  },
+  {
+    title: "3. Το Κουμπί Σ (Άθροισμα)",
+    desc: "Υπολόγισε το σύνολο μαθητών αυτόματα με τη συνάρτηση SUM.",
+    task: "<b>Αποστολή:</b> 1. Επίλεξε το κελί <b>B4</b> (Σύνολο).<br>2. Πάτα το κουμπί <b>Σ (Άθροισμα)</b> στην εργαλειοθήκη.<br>3. Πάτα <b>Enter ↵</b> για να εφαρμοστεί η συνάρτηση <b>=SUM(B2:B3)</b>!",
+    cols: ["A", "B"], rows: [1, 2, 3, 4],
+    initData: { "A1": "Προορισμός", "B1": "Παιδιά", "A2": "Αρχαιολογικό Μουσείο", "B2": 12, "A3": "Πινακοθήκη", "B3": 10, "A4": "Σύνολο", "B4": "" },
+    startCell: "B2",
+    tools: [
+      {
+        name: "Σ (Άθροισμα)",
+        fn: function() {
+          if (state.active !== "B4") {
+            setError("✗ Πρώτα πρέπει να κάνεις κλικ στο κελί B4 όπου θα μπει το σύνολο!");
+            return;
+          }
+          document.getElementById("formulaInput").value = "=SUM(B2:B3)";
+          setSuccess("✓ Προτάθηκε η συνάρτηση =SUM(B2:B3)! Τώρα πάτα το πράσινο κουμπί Enter ↵.");
+        }
+      }
+    ],
+    onEnter: function(val) {
+      if (state.active === "B4" && val.replace(/\s+/g, '').toUpperCase() === "=SUM(B2:B3)") {
+        state.data["B4"] = 22;
+        state.formulas["B4"] = "=SUM(B2:B3)";
+        renderSheet();
+        setSuccess("🎉 Άψογα! Το άθροισμα υπολογίστηκε αυτόματα: 12 + 10 = 22 παιδιά!");
+      } else {
+        setError("✗ Επίλεξε το B4, πάτα το κουμπί Σ και μετά πάτα Enter.");
+      }
+    }
+  },
+  {
+    title: "4. Το Μυστικό του '='",
+    desc: "Δες γιατί κάθε τύπος πρέπει οπωσδήποτε να ξεκινάει με ίσον.",
+    task: "<b>Αποστολή:</b> Αν γράψουμε 25+15 χωρίς ίσον μένει απλό κείμενο. Επίλεξε το κελί <b>B2</b>, γράψε τον σωστό τύπο <b>=25+15</b> (ξεκινώντας με =) και πάτα <b>Enter ↵</b>.",
+    cols: ["A", "B"], rows: [1, 2],
+    initData: { "A1": "Χωρίς ίσον", "B1": "Με ίσον (=)", "A2": "25+15 (κείμενο)", "B2": "" },
+    startCell: "B2",
+    tools: [],
+    onEnter: function(val) {
+      if (state.active === "B2") {
+        if (val.trim() === "25+15") {
+          setError("✗ Το έγραψες χωρίς ίσον (=) κι έτσι παραμένει απλό κείμενο! Πληκτρολόγησε =25+15.");
+        } else if (val.replace(/\s+/g, '') === "=25+15") {
+          state.data["B2"] = 40;
+          state.formulas["B2"] = "=25+15";
+          renderSheet();
+          setSuccess("✓ Πολύ σωστά! Επειδή έβαλες το σύμβολο '=', ο υπολογιστής έκανε την πράξη: 40!");
+        } else {
+          setError("✗ Γράψε =25+15 στο κελί B2 και πάτα Enter.");
+        }
+      }
+    }
+  },
+  {
+    title: "5. Δυναμική Έκπτωση",
+    desc: "Άλλαξε μια τιμή και δες το αποτέλεσμα να ανανεώνεται αυτόματα.",
+    task: "<b>Αποστολή:</b> Το λεωφορείο κοστίζει 110€ και αντιστοιχεί σε 5€ ανά παιδί (τύπος =E2/22). Κάνε κλικ στο κελί <b>E2</b>, άλλαξε το 110 σε <b>88</b> και πάτα <b>Enter ↵</b> για να δεις τη νέα τιμή στο E3!",
+    cols: ["D", "E"], rows: [1, 2, 3],
+    initData: { "D1": "Κόστος", "E1": "Ποσό", "D2": "Λεωφορείο", "E2": 110, "D3": "Ανά παιδί", "E3": 5 },
+    startCell: "E2",
+    tools: [],
+    onEnter: function(val) {
+      if (state.active === "E2" && (val.trim() === "88" || val.trim() === "=88")) {
+        state.data["E2"] = 88;
+        state.data["E3"] = 4;
+        renderSheet();
+        setSuccess("🎉 Καταπληκτικά! Επειδή στο E3 υπήρχε τύπος, το κόστος ανά παιδί μειώθηκε αυτόματα από 5€ σε 4€!");
+      } else {
+        setError("✗ Επίλεξε το κελί E2, πληκτρολόγησε 88 και πάτα Enter.");
+      }
+    }
+  },
+  {
+    title: "6. Σύνταξη Τύπου με Κλικ",
+    desc: "Φτιάξε τύπο διαιρώντας δύο κελιά του πίνακα.",
+    task: "<b>Αποστολή:</b> Για τη Δ΄ τάξη διαιρούμε το κόστος λεωφορείου (C7) με τα παιδιά (B7). Επίλεξε το κελί <b>D7</b>, γράψε <b>=C7/B7</b> και πάτα <b>Enter ↵</b>.",
+    cols: ["A", "B", "C", "D"], rows: [6, 7],
+    initData: { "A6": "Τάξη", "B6": "Παιδιά", "C6": "Λεωφορείο", "D6": "Κόστος/παιδί", "A7": "Δ΄", "B7": 18, "C7": 90, "D7": "" },
+    startCell: "D7",
+    tools: [],
+    onEnter: function(val) {
+      if (state.active === "D7" && val.replace(/\s+/g, '').toUpperCase() === "=C7/B7") {
+        state.data["D7"] = 5;
+        state.formulas["D7"] = "=C7/B7";
+        renderSheet();
+        setSuccess("✓ Μπράβο! 90€ / 18 παιδιά = 5€ ανά παιδί για τη Δ΄ τάξη!");
+      } else {
+        setError("✗ Επίλεξε το D7, γράψε =C7/B7 και πάτα Enter.");
+      }
+    }
+  },
+  {
+    title: "7. Αυτόματη Αντιγραφή (Λαβή +)",
+    desc: "Αντίγραψε τον τύπο στις άλλες τάξεις με ένα μόνο κλικ.",
+    task: "<b>Αποστολή:</b> Στο κελί D7 υπάρχει ήδη ο τύπος. Κάνε κλικ στο <b>κουμπί της λαβής (+)</b> στην κάτω δεξιά γωνία του κελιού D7 για να αντιγραφεί αυτόματα ο τύπος στις τάξεις Ε΄ και ΣΤ΄!",
+    cols: ["A", "B", "C", "D"], rows: [6, 7, 8, 9],
+    initData: { "A6": "Τάξη", "B6": "Παιδιά", "C6": "Λεωφορείο", "D6": "Κόστος/παιδί", "A7": "Δ΄", "B7": 18, "C7": 90, "D7": 5, "A8": "Ε΄", "B8": 22, "C8": 88, "D8": "", "A9": "ΣΤ΄", "B9": 20, "C9": 100, "D9": "" },
+    startCell: "D7",
+    showHandle: true,
+    tools: [],
+    onHandleClick: function() {
+      state.data["D8"] = 4;
+      state.formulas["D8"] = "=C8/B8";
+      state.data["D9"] = 5;
+      state.formulas["D9"] = "=C9/B9";
+      renderSheet();
+      setSuccess("🎉 Φανταστικά! Ο τύπος αντιγράφηκε αμέσως και προσάρμοσε τις γραμμές: στο D8 έγινε =C8/B8 και στο D9 =C9/B9!");
+    }
+  },
+  {
+    title: "8. Αναδίπλωση & Περιγράμματα",
+    desc: "Μορφοποίησε τον πίνακα για να είναι ευανάγνωστος και έτοιμος για εκτύπωση.",
+    task: "<b>Αποστολή:</b> 1. Επίλεξε το κελί <b>D6</b> και πάτα <b>«Αναδίπλωση Κειμένου»</b> ώστε να χωρέσει σε 2 γραμμές.<br>2. Πάτα <b>«Περιγράμματα»</b> για να εμφανιστούν οι γραμμές εκτύπωσης!",
+    cols: ["A", "B", "C", "D"], rows: [6, 7],
+    initData: { "A6": "Τάξη", "B6": "Παιδιά", "C6": "Λεωφορείο", "D6": "Κόστος ανά παιδί", "A7": "Δ΄", "B7": 18, "C7": 90, "D7": 5 },
+    startCell: "D6",
+    tools: [
+      {
+        name: "Αναδίπλωση Κειμένου",
+        fn: function() {
+          if (state.active !== "D6") {
+            setError("✗ Πρώτα κάνε κλικ στο κελί D6!");
+            return;
+          }
+          state.wrapped["D6"] = true;
+          renderSheet();
+          setSuccess("✓ Έγινε αναδίπλωση στο D6! Τώρα πάτα και το κουμπί 'Περιγράμματα'.");
+        }
+      },
+      {
+        name: "Περιγράμματα",
+        fn: function() {
+          ["A6","B6","C6","D6","A7","B7","C7","D7"].forEach(function(k){ state.bordered[k] = true; });
+          renderSheet();
+          setSuccess("🎉 Τέλεια! Ο πίνακας απέκτησε περιγράμματα και θα εκτυπωθεί πεντακάθαρα!");
+        }
+      }
+    ]
+  }
+];
+
+function initMenu() {
+  var menu = document.getElementById("menuView");
+  menu.innerHTML = "";
+  activities.forEach(function(act, idx) {
+    var c = document.createElement("div");
+    c.className = "card";
+    c.onclick = function() { loadActivity(idx); };
+    c.innerHTML = '<span class="num-tag">' + (idx + 1) + '</span>' +
+                  '<h3>' + act.title + '</h3>' +
+                  '<p>' + act.desc + '</p>' +
+                  '<span class="tag">▶ Έναρξη προσομοίωσης</span>';
+    menu.appendChild(c);
+  });
+}
+
+function showMenu() {
+  document.getElementById("menuView").style.display = "grid";
+  document.getElementById("actView").style.display = "none";
+}
+
+function loadActivity(idx) {
+  curIndex = idx;
+  var act = activities[idx];
+  document.getElementById("menuView").style.display = "none";
+  document.getElementById("actView").style.display = "block";
+
+  document.getElementById("taskDesc").innerHTML = act.task;
+  var fb = document.getElementById("fbMsg");
+  fb.textContent = "";
+  fb.style.display = "none";
+  document.getElementById("nextArea").innerHTML = "";
+
+  state.cols = act.cols.slice();
+  state.rows = act.rows.slice();
+  state.data = Object.assign({}, act.initData);
+  state.formulas = {};
+  state.active = act.startCell || (act.cols[0] + act.rows[0]);
+  state.wrapped = {};
+  state.bordered = {};
+  state.showHandle = !!act.showHandle;
+
+  var tb = document.getElementById("toolBar");
+  tb.innerHTML = "";
+  if (act.tools && act.tools.length > 0) {
+    act.tools.forEach(function(t) {
+      var b = document.createElement("button");
+      b.className = "tool-btn";
+      b.textContent = t.name;
+      b.onclick = t.fn;
+      tb.appendChild(b);
+    });
+  } else {
+    tb.innerHTML = "<span style='font-size:12.5px;color:#64748b'>Εργαλεία: Πληκτρολόγησε τον τύπο στο πεδίο fx και πάτα Enter ↵</span>";
+  }
+
+  renderSheet();
+  updateActiveCellUI();
+}
+
+function renderSheet() {
+  var table = document.getElementById("sheetTable");
+  var html = "<tr><th></th>";
+  state.cols.forEach(function(c) { html += "<th>" + c + "</th>"; });
+  html += "</tr>";
+
+  state.rows.forEach(function(r) {
+    html += "<tr><th>" + r + "</th>";
+    state.cols.forEach(function(c) {
+      var p = c + r;
+      var val = (state.data[p] !== undefined) ? state.data[p] : "";
+      var isSel = (p === state.active);
+      var isNum = typeof val === "number";
+      var isWrap = !!state.wrapped[p];
+      var isBrd = !!state.bordered[p];
+
+      var cls = [];
+      if (isSel) cls.push("sel");
+      if (isNum) cls.push("num");
+      if (isWrap) cls.push("wrap");
+      if (isBrd) cls.push("brd");
+
+      html += '<td data-p="' + p + '" class="' + cls.join(" ") + '">' + val;
+      if (isSel && state.showHandle) {
+        html += '<div class="fill-dot" onclick="handleDotClick(event)"></div>';
+      }
+      html += '</td>';
+    });
+    html += "</tr>";
+  });
+
+  table.innerHTML = html;
+
+  table.querySelectorAll("td").forEach(function(td) {
+    td.onclick = function() {
+      state.active = td.getAttribute("data-p");
+      renderSheet();
+      updateActiveCellUI();
+    };
+  });
+}
+
+function updateActiveCellUI() {
+  document.getElementById("activeCellLabel").textContent = state.active;
+  var input = document.getElementById("formulaInput");
+  if (state.formulas[state.active] !== undefined) {
+    input.value = state.formulas[state.active];
+  } else if (state.data[state.active] !== undefined) {
+    input.value = state.data[state.active];
+  } else {
+    input.value = "";
+  }
+}
+
+function commitInput() {
+  var val = document.getElementById("formulaInput").value;
+  var act = activities[curIndex];
+  if (act.onEnter) {
+    act.onEnter(val);
+  }
+}
+
+document.getElementById("formulaInput").addEventListener("keydown", function(e) {
+  if (e.key === "Enter") {
+    commitInput();
+  }
+});
+
+function handleDotClick(e) {
+  e.stopPropagation();
+  var act = activities[curIndex];
+  if (act.onHandleClick) {
+    act.onHandleClick();
+  }
+}
+
+function setSuccess(msg) {
+  var fb = document.getElementById("fbMsg");
+  fb.textContent = msg;
+  fb.className = "feedback good";
+  fb.style.display = "block";
+
+  var nextArea = document.getElementById("nextArea");
+  if (!nextArea.hasChildNodes()) {
+    var nb = document.createElement("button");
+    nb.className = "next-btn";
+    if (curIndex < activities.length - 1) {
+      nb.textContent = "Επόμενη προσομοίωση ▶";
+      nb.onclick = function() { loadActivity(curIndex + 1); };
+    } else {
+      nb.textContent = "🎉 Ολοκλήρωσες όλες τις προσομοιώσεις! Πίσω στο μενού";
+      nb.onclick = showMenu;
+    }
+    nextArea.appendChild(nb);
+  }
+}
+
+function setError(msg) {
+  var fb = document.getElementById("fbMsg");
+  fb.textContent = msg;
+  fb.className = "feedback bad";
+  fb.style.display = "block";
+}
+
+// Kickstart menu
+initMenu();
+</script>
+</body>
+</html>
