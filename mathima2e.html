@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Μάθημα 2 – Ο αλγόριθμος του Καίσαρα (συνέχεια)</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:'Nunito',sans-serif;
+    background:#0b132b;
+    background-image:radial-gradient(circle at 10% 20%,#1c2541 0%,transparent 45%),radial-gradient(circle at 90% 80%,#3a506b33 0%,transparent 40%);
+    min-height:100vh;padding:16px;color:#1c2541;
+  }
+  .wrap{max-width:960px;margin:0 auto}
+  header{text-align:center;color:#e8f1f2;margin-bottom:20px}
+  header h1{font-size:1.85rem;font-weight:800;margin-bottom:6px}
+  header p{opacity:.85}
+  .progress{height:12px;background:rgba(255,255,255,.12);border-radius:20px;max-width:380px;margin:14px auto 0;overflow:hidden}
+  .progress-bar{height:100%;width:0%;background:linear-gradient(90deg,#5bc0be,#6fffe9);border-radius:20px;transition:width .45s}
+  .nav{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:18px 0 22px}
+  .nav-btn{width:44px;height:44px;border-radius:12px;border:2px solid rgba(232,241,242,.25);background:rgba(232,241,242,.08);color:#e8f1f2;font-family:inherit;font-weight:700;font-size:1.05rem;cursor:pointer;transition:.2s}
+  .nav-btn:hover,.nav-btn.active{background:#5bc0be;border-color:#5bc0be;color:#0b132b}
+  .nav-btn.done{background:#6fffe9;border-color:#6fffe9;color:#0b132b}
+  .panel{display:none;background:#e8f1f2;border-radius:22px;padding:26px;box-shadow:0 12px 36px rgba(0,0,0,.4);animation:up .35s}
+  .panel.show{display:block}
+  @keyframes up{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+  .panel-head{display:flex;align-items:center;gap:14px;margin-bottom:16px}
+  .badge{width:48px;height:48px;background:linear-gradient(135deg,#5bc0be,#3a506b);color:#fff;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.35rem;font-weight:800}
+  .panel-head h2{font-size:1.3rem}
+  .subs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+  .sub-btn{background:#c5d5e0;border:none;border-radius:12px;padding:9px 14px;font-family:inherit;font-size:.92rem;font-weight:600;color:#1c2541;cursor:pointer;transition:.2s}
+  .sub-btn.on{background:#0b132b;color:#e8f1f2}
+  .sub-btn.ok{background:#5bc0be;color:#0b132b}
+  .sub{display:none}.sub.on{display:block;animation:up .3s}
+  .tip{background:#fff;border-left:5px solid #5bc0be;padding:13px 16px;border-radius:12px;margin-bottom:14px;font-size:1.02rem;line-height:1.45}
+  .check-btn{background:linear-gradient(135deg,#0b132b,#3a506b);color:#e8f1f2;border:none;border-radius:50px;padding:11px 24px;font-family:inherit;font-size:1rem;font-weight:700;cursor:pointer;margin-top:12px;transition:transform .2s}
+  .check-btn:hover{transform:scale(1.04)}
+  .msg{margin-top:12px;padding:12px 16px;border-radius:12px;font-weight:700;display:none}
+  .msg.show{display:block;animation:up .3s}
+  .msg.good{background:#d8f3dc;color:#1b4332}
+  .msg.bad{background:#f8d7da;color:#842029}
+
+  .choice{background:#fff;border:3px solid #c5d5e0;border-radius:14px;padding:14px 16px;margin:8px 0;cursor:pointer;font-weight:600;transition:.2s;display:flex;align-items:center;gap:10px}
+  .choice:hover{border-color:#5bc0be;background:#e8f8f7}
+  .choice.picked{border-color:#5bc0be;background:#d4edda}
+  .choice.wrong{border-color:#e76f51;background:#f8d7da;animation:shake .35s}
+  @keyframes shake{0%,100%{transform:translateX(0)}30%{transform:translateX(-6px)}70%{transform:translateX(6px)}}
+
+  .decoder{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:12px 0}
+  .decoder input{width:46px;height:46px;text-align:center;font-size:1.25rem;font-weight:800;border:3px solid #0b132b;border-radius:12px;font-family:inherit;text-transform:uppercase}
+  .decoder input:focus{outline:none;border-color:#5bc0be}
+
+  .algo-box{background:#fff;border-radius:14px;padding:16px;margin:12px 0;font-family:monospace;font-size:.95rem;line-height:1.7;border:2px solid #c5d5e0}
+  .algo-box .hl{background:#fff3cd;padding:1px 4px;border-radius:4px}
+
+  .sort-list{list-style:none;display:flex;flex-direction:column;gap:8px}
+  .sort-item{background:#fff;border:2px solid #c5d5e0;border-radius:12px;padding:12px 16px;cursor:grab;font-weight:600;user-select:none;transition:.2s}
+  .sort-item.dragging{opacity:.5}
+  .sort-item.correct{border-color:#5bc0be;background:#d4edda}
+
+  .tf-row{background:#fff;border-radius:12px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .tf-row span{flex:1;font-weight:600}
+  .tf-btn{border:none;border-radius:10px;padding:8px 14px;font-family:inherit;font-weight:700;cursor:pointer;color:#fff}
+  .tf-btn.yes{background:#5bc0be}.tf-btn.no{background:#e76f51}
+  .tf-btn.ok{box-shadow:0 0 0 3px #6fffe9}.tf-btn.bad{box-shadow:0 0 0 3px #fab1a0}
+
+  .compare{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0}
+  @media(max-width:600px){.compare{grid-template-columns:1fr}}
+  .compare-card{background:#fff;border-radius:14px;padding:14px;border:2px solid #c5d5e0}
+  .compare-card h4{margin-bottom:8px;color:#0b132b}
+
+  .final{display:none;background:#e8f1f2;border-radius:22px;padding:30px;text-align:center;margin-top:26px}
+  .final.show{display:block;animation:up .4s}
+  .score{font-size:2.8rem;font-weight:800;color:#5bc0be}
+  .stars{font-size:1.9rem;letter-spacing:3px;margin:8px 0}
+  .restart{background:linear-gradient(135deg,#5bc0be,#3a506b);color:#fff;border:none;border-radius:50px;padding:12px 28px;font-family:inherit;font-size:1.05rem;font-weight:700;cursor:pointer;margin-top:12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>🔐 Μάθημα 2 – Ο Αλγόριθμος του Καίσαρα (συνέχεια)</h1>
+    <p>8 αποστολές × 3 προκλήσεις – Γενίκευση & διόρθωση αλγορίθμων</p>
+    <div class="progress"><div class="progress-bar" id="prog"></div></div>
+  </header>
+  <div class="nav" id="nav"></div>
+
+  <!-- 1 -->
+  <div class="panel" id="p1">
+    <div class="panel-head"><div class="badge">1</div><h2>Πολλά προβλήματα – πολλοί αλγόριθμοι</h2></div>
+    <div class="subs">
+      <button class="sub-btn on" onclick="go(1,1)">① Τι θυμόμαστε;</button>
+      <button class="sub-btn" onclick="go(1,2)">② Γιατί γενικός;</button>
+      <button class="sub-btn" onclick="go(1,3)">③ Σωστό / Λάθος</button>
+    </div>
+    <div class="sub on" id="s1-1">
+      <div class="tip">Ο προηγούμενος αλγόριθμος (θέση + 3) είχε πρόβλημα με κάποια γράμματα. Ποια;</div>
+      <div class="choice" data-ok="0" onclick="pick(this,1,1)">Μόνο το Α και το Β</div>
+      <div class="choice" data-ok="1" onclick="pick(this,1,1)">Τα Χ, Ψ και Ω (όταν θέση+3 &gt; 24)</div>
+      <div class="choice" data-ok="0" onclick="pick(this,1,1)">Όλα τα φωνήεντα</div>
+      <div class="msg" id="m1-1"></div>
+    </div>
+    <div class="sub" id="s1-2">
+      <div class="tip">Γιατί θέλουμε ο αλγόριθμος να είναι <strong>γενικός</strong>;</div>
+      <div class="choice" data-ok="1" onclick="pick(this,1,2)">Για να δουλεύει με οποιαδήποτε μετατόπιση και πολλά αλφάβητα</div>
+      <div class="choice" data-ok="0" onclick="pick(this,1,2)">Για να είναι πιο αργός και δύσκολος</div>
+      <div class="choice" data-ok="0" onclick="pick(this,1,2)">Για να δουλεύει μόνο με τη λέξη «ΒΟΗΘΕΙΑ»</div>
+      <div class="msg" id="m1-2"></div>
+    </div>
+    <div class="sub" id="s1-3">
+      <div class="tip">Πες Σωστό ή Λάθος:</div>
+      <div class="tf-row" data-ans="yes"><span>Για ένα πρόβλημα μπορεί να υπάρχουν πολλοί αλγόριθμοι.</span>
+        <button class="tf-btn yes" onclick="tf(this,'yes',1,3)">Σωστό</button>
+        <button class="tf-btn no" onclick="tf(this,'no',1,3)">Λάθος</button></div>
+      <div class="tf-row" data-ans="yes"><span>Θέλουμε οι αλγόριθμοι να επιλύουν πολλά παρόμοια προβλήματα.</span>
+        <button class="tf-btn yes" onclick="tf(this,'yes',1,3)">Σωστό</button>
+        <button class="tf-btn no" onclick="tf(this,'no',1,3)">Λάθος</button></div>
+      <div class="tf-row" data-ans="no"><span>Ένας καλός αλγόριθμος δουλεύει μόνο με ένα συγκεκριμένο μήνυμα.</span>
+        <button class="tf-btn yes" onclick="tf(this,'yes',1,3)">Σωστό</button>
+        <button class="tf-btn no" onclick="tf(this,'no',1,3)">Λάθος</button></div>
+      <div class="msg" id="m1-3"></div>
+    </div>
+  </div>
+
+  <!-- 2 -->
+  <div class="panel" id="p2">
+    <div class="panel-head"><div class="badge">2</div><h2>Το πρόβλημα με το Ω</h2></div>
+    <div class="subs">
+      <button class="sub-btn on" onclick="go(2,1)">① Υπολόγισε</button>
+      <button class="sub-btn" onclick="go(2,2)">② Ποια γράμματα;</button>
+      <button class="sub-btn" onclick="go(2,3)">③ Διόρθωσε</button>
+    </div>
+    <div class="sub on" id="s2-1">
+      <div class="tip">Το Ω είναι στη θέση <strong>24</strong>. Αν προσθέσουμε 3, τι αριθμός προκύπτει;</div>
+      <div class="decoder">
+        <input maxlength="2" data-ans="27" id="calc1" style="width:60px">
+      </div>
+      <button class="check-btn" onclick="checkInput('calc1',2,1,'27','Η θέση+3 = 27, που δεν υπάρχει στο αλφάβητο!')">Έλεγχος</button>
+      <div class="msg" id="m2-1"></div>
+    </div>
+    <div class="sub" id="s2-2">
+      <div class="tip">Με μετατόπιση 3, για ποια γράμματα ισχύει θέση + 3 &gt; 24;</div>
+      <div class="choice" data-ok="0" onclick="pick(this,2,2)">Α, Β, Γ</div>
+      <div class="choice" data-ok="1" onclick="pick(this,2,2)">Χ, Ψ, Ω</div>
+      <div class="choice" data-ok="0" onclick="pick(this,2,2)">Μ, Ν, Ξ</div>
+      <div class="msg" id="m2-2"></div>
+    </div>
+    <div class="sub" id="s2-3">
+      <div class="tip">Κρυπτογράφησε σωστά τα Χ Ψ Ω με μετατόπιση 3 (γύρνα στην αρχή):</div>
+      <div class="decoder">
+        <span style="font-weight:700">Χ→</span><input maxlength="1" data-ans="Α" id="w1">
+        <span style="font-weight:700;margin-left:10px">Ψ→</span><input maxlength="1" data-ans="Β" id="w2">
+        <span style="font-weight:700;margin-left:10px">Ω→</span><input maxlength="1" data-ans="Γ" id="w3">
+      </div>
+      <button class="check-btn" onclick="checkWrap(2,3)">Έλεγχος</button>
+      <div class="msg" id="m2-3"></div>
+    </div>
+  </div>
+
+  <!-- 3 -->
+  <div class="panel" id="p3">
+    <div class="panel-head"><div class="badge">3</div><h2>Αλγόριθμος 2 – Ειδικές περιπτώσεις</h2></div>
+    <div class="subs">
+      <button class="sub-btn on" onclick="go(3,1)">① Διάβασε τον αλγόριθμο</button>
+      <button class="sub-btn" onclick="go(3,2)">② Βρες τις λογικές</button>
+      <button class="sub-btn" onclick="go(3,3)">③ Τι αλλάζει αν μετατόπιση=5;</button>
+    </div>
+    <div class="sub on" id="s3-1">
+      <div class="tip">Δες τον Αλγόριθμο 2. Πάτησε «Κατάλαβα» όταν τον διαβάσεις.</div>
+      <div class="algo-box">
+        Επανάλαβε ώσπου να τελειώσουν όλα τα γράμματα<br>
+        &nbsp;&nbsp;Διάβασε το επόμενο γράμμα<br>
+        &nbsp;&nbsp;Βρες τη θέση του γράμματος στο αλφάβητο<br>
+        &nbsp;&nbsp;<span class="hl">Αν το γράμμα είναι το Χ, τότε γράψε Α</span><br>
+        &nbsp;&nbsp;<span class="hl">Αν το γράμμα είναι το Ψ, τότε γράψε Β</span><br>
+        &nbsp;&nbsp;<span class="hl">Αν το γράμμα είναι το Ω, τότε γράψε Γ</span><br>
+        &nbsp;&nbsp;Αν ΔΕΝ είναι Χ ΚΑΙ ΔΕΝ είναι Ψ ΚΑΙ ΔΕΝ είναι Ω, τότε<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;Γράψε το γράμμα στη θέση + 3
+      </div>
+      <button class="check-btn" onclick="markDone(3,1)">Κατάλαβα τον αλγόριθμο!</button>
+      <div class="msg" id="m3-1"></div>
+    </div>
+    <div class="sub" id="s3-2">
+      <div class="tip">Πόσες λογικές εκφράσεις τύπου «Αν … τότε» υπάρχουν στον Αλγόριθμο 2;</div>
+      <div class="choice" data-ok="0" onclick="pick(this,3,2)">1</div>
+      <div class="choice" data-ok="0" onclick="pick(this,3,2)">2</div>
+      <div class="choice" data-ok="1" onclick="pick(this,3,2)">4 (τρεις ειδικές + μία γενική)</div>
+      <div class="msg" id="m3-2"></div>
+    </div>
+    <div class="sub" id="s3-3">
+      <div class="tip">Αν η μετατόπιση γίνει <strong>5</strong>, τι πρέπει να αλλάξουμε στον Αλγόριθμο 2;</div>
+      <div class="choice" data-ok="1" onclick="pick(this,3,3)">Τις ειδικές περιπτώσεις (Χ→Ε, Ψ→Ζ, Ω→Η) και το +3 σε +5</div>
+      <div class="choice" data-ok="0" onclick="pick(this,3,3)">Τίποτα, δουλεύει αυτόματα</div>
+      <div class="choice" data-ok="0" onclick="pick(this,3,3)">Μόνο το όνομα του αλγορίθμου</div>
+      <div class="msg" id="m3-3"></div>
+    </div>
+  </div>
+
+  <!-- 4 -->
+  <div class="panel" id="p4">
+    <div class="panel-head"><div class="badge">4</div><h2>Αλγόριθμος 3 – Πιο γενικός</h2></div>
+    <div class="subs">
+      <button class="sub-btn on" onclick="go(4,1)">① Διάβασε</button>
+      <button class="sub-btn" onclick="go(4,2)">② Σύγκρινε</button>
+      <button class="sub-btn" onclick="go(4,3)">③ Εφάρμοσε</button>
+    </div>
+    <div class="sub on" id="s4-1">
+      <div class="tip">Ο Αλγόριθμος 3 εξετάζει μόνο <strong>δύο</strong> περιπτώσεις:</div>
+      <div class="algo-box">
+        Επανάλαβε ώσπου να τελειώσουν όλα τα γράμματα<br>
+        &nbsp;&nbsp;Διάβασε το επόμενο γράμμα<br>
+        &nbsp;&nbsp;Βρες τη θέση του γράμματος<br>
+        &nbsp;&nbsp;<span class="hl">Αν θέση + 3 &gt; 24 τότε</span><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;Γράψε το γράμμα στη (θέση + 3) − 24<br>
+        &nbsp;&nbsp;<span class="hl">Αλλιώς</span><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;Γράψε το γράμμα στη θέση + 3
+      </div>
+      <button class="check-btn" onclick="markDone(4,1)">Κατάλαβα!</button>
+      <div class="msg" id="m4-1"></div>
+    </div>
+    <div class="sub" id="s4-2">
+      <div class="tip">Ποιος αλγόριθμος είναι πιο γενικός (αλλάζει εύκολα για άλλη μετατόπιση);</div>
+      <div class="compare">
+        <div class="compare-card">
+          <h4>Αλγόριθμος 2</h4>
+          <p>Ξεχωριστές εντολές για Χ, Ψ, Ω</p>
+        </div>
+        <div class="compare-card">
+          <h4>Αλγόριθμος 3</h4>
+          <p>Μία συνθήκη: θέση+μετατόπιση &gt; 24</p>
+        </div>
+      </div>
+      <div class="choice" data-ok="0" onclick="pick(this,4,2)">Ο Αλγόριθμος 2</div>
+      <div class="choice" data-ok="1" onclick="pick(this,4,2)">Ο Αλγόριθμος 3</div>
+      <div class="choice" data-ok="0" onclick="pick(this,4,2)">Και οι δύο ίδιοι</div>
+      <div class="msg" id="m4-2"></div>
+    </div>
+    <div class="sub" id="s4-3">
+      <div class="tip">Με τον Αλγόριθμο 3 και μετατόπιση 3, κρυπτογράφησε το <strong>Ω</strong>:</div>
+      <div class="decoder">
+        <span style="font-weight:700">θέση Ω = 24 → 24+3=27 → 27−24=</span>
+        <input maxlength="1" data-ans="3" id="posCalc" style="width:50px">
+        <span style="font-weight:700">→ γράμμα</span>
+        <input maxlength="1" data-ans="Γ" id="letCalc">
+      </div>
+      <button class="check-btn" onclick="checkTwo()">Έλεγχος</button>
+      <div class="msg" id="m4-3"></div>
+    </div>
+  </div>
+
+  <!-- 5 -->
+  <div class="panel" id="p5">
+    <div class="panel-head"><div class="badge">5</div><h2>Αλλαγή μετατόπισης</h2></div>
+    <div class="subs">
+      <button class="sub-btn on" onclick="go(5,1)">① Τι αλλάζει στον 3;</button>
+      <button class="sub-btn" onclick="go(5,2)">② Κρυπτογράφησε με 5</button>
+      <button class="sub-btn" onclick="go(5,3)">③ Σύγκριση αλλαγών</button>
+    </div>
+    <div class="sub on" id="s5-1">
+      <div class="tip">Στον Αλγόριθμο 3, αν η μετατόπιση γίνει 5, τι αλλάζουμε;</div>
+      <div class="choice" data-ok="1" onclick="pick(this,5,1)">Μόνο το «+3» σε «+5» (και το 24 μένει)</div>
+      <div class="choice" data-ok="0" onclick="pick(this,5,1)">Όλες τις εντολές από την αρχή</div>
+      <div class="choice" data-ok="0" onclick="pick(this,5,1)">Τίποτα</div>
+      <div class="msg" id="m5-1"></div>
+    </div>
+    <div class="sub" id="s5-2">
+      <div class="tip">Κρυπτογράφησε το <strong>Ψ</strong> με μετατόπιση 5 (Αλγόριθμος 3):</div>
+      <p style="margin:8px 0;font-size:.95rem">Ψ = θέση 23 → 23+5=28 → 28−24=4 → γράμμα;</p>
+      <div class="decoder">
+        <input maxlength="1" data-ans="Δ" id="psi5">
+      </div>
+      <button class="check-btn" onclick="checkInput('psi5',5,2,'Δ','Ψ(23)+5=28 → 28-24=4 → Δ')">Έλεγχος</button>
+      <div class="msg" id="m5-2"></div>
+    </div>
+    <div class="sub" id="s5-3">
+      <div class="tip">Ποιος αλγόριθμος χρειάζεται <strong>λιγότερες</strong> αλλαγές όταν αλλάζει η μετατόπιση;</div>
+      <div class="choice" data-ok="0" onclick="pick(this,5,3)">Ο Αλγόριθμος 2 (πολλές ειδικές περιπτώσεις)</div>
+      <div class="choice" data-ok="1" onclick="pick(this,5,3)">Ο Αλγόριθμος 3 (αλλάζουμε μόνο έναν αριθμό)</div>
+      <div class="choice" data-ok="0" onclick="pick(this,5,3)">Κανένας</div>
+      <div class="msg" id="m5-3"></div>
+    </div>
+  </div>
+
+  <!-- 6 -->
+  <div class="panel" id="p6">
+    <div class="panel-head"><div class="badge">6</div><h2>Λατινικό αλφάβητο</h2></div>
+    <div class="subs">
+      <button class="sub-btn on" onclick="go(6,1)">① Πόσα γράμματα;</button>
+      <button class="sub-btn" onclick="go(6,2)">② Τι αλλάζουμε;</button>
+      <button class="sub-btn" onclick="go(6,3)">③ Δοκίμασε</button>
+    </div>
+    <div class="sub on" id="s6-1">
+      <div class="tip">Το λατινικό αλφάβητο (A–Z) έχει πόσα γράμματα;</div>
+      <div class="choice" data-ok="0" onclick="pick(this,6,1)">24</div>
+      <div class="choice" data-ok="1" onclick="pick(this,6,1)">26</div>
+      <div class="choice" data-ok="0" onclick="pick(this,6,1)">30</div>
+      <div class="msg" id="m6-1"></div>
+    </div>
+    <div class="sub" id="s6-2">
+      <div class="tip">Στον Αλγόριθμο 3, για να δουλεύει με λατινικό αλφάβητο, τι αλλάζουμε;</div>
+      <div class="choice" data-ok="1" onclick="pick(this,6,2)">Το 24 γίνεται 26</div>
+      <div class="choice" data-ok="0" onclick="pick(this,6,2)">Σβήνουμε την επανάληψη</div>
+      <div class="choice" data-ok="0" onclick="pick(this,6,2)">Τίποτα</div>
+      <div class="msg" id="m6-2"></div>
+    </div>
+    <div class="sub" id="s6-3">
+      <div class="tip">Με λατινικό αλφάβητο (26 γράμματα) και μετατόπιση 3, το Z (θέση 26) γίνεται;</div>
+      <div class="decoder">
+        <input maxlength="1" data-ans="C" id="latZ" style="text-transform:uppercase">
+      </div>
+      <p style="font-size:.9rem;color:#555">26+3=29 → 29−26=3 → 3ο γράμμα = C</p>
+      <button class="check-btn" onclick="checkInput('latZ',6,3,'C','Z→C (γυρνάμε στην αρχή)')">Έλεγχος</button>
+      <div class="msg" id="m6-3"></div>
+    </div>
+  </div>
+
+  <!-- 7 -->
+  <div class="panel" id="p7">
+    <div class="panel-head"><div class="badge">7</div><h2>Γενίκευση – Η μεγάλη ιδέα</h2></div>
+    <div class="subs">
+      <button class="sub-btn on" onclick="go(7,1)">① Τι σημαίνει γενίκευση;</button>
+      <button class="sub-btn" onclick="go(7,2)">② Βάλε σε σειρά</button>
+      <button class="sub-btn" onclick="go(7,3)">③ Εφάρμοσε</button>
+    </div>
+    <div class="sub on" id="s7-1">
+      <div class="tip">Στην επιστήμη των υπολογιστών, <strong>γενίκευση</strong> σημαίνει:</div>
+      <div class="choice" data-ok="1" onclick="pick(this,7,1)">Να φτιάχνουμε λύσεις που δουλεύουν για πολλά παρόμοια προβλήματα</div>
+      <div class="choice" data-ok="0" onclick="pick(this,7,1)">Να κάνουμε τον κώδικα όσο πιο μεγάλο γίνεται</div>
+      <div class="choice" data-ok="0" onclick="pick(this,7,1)">Να χρησιμοποιούμε μόνο μία μεταβλητή</div>
+      <div class="msg" id="m7-1"></div>
+    </div>
+    <div class="sub" id="s7-2">
+      <div class="tip">Βάλε σε σειρά τα βήματα για να γενικεύσουμε τον αλγόριθμο:</div>
+      <ul class="sort-list" id="sort7">
+        <li class="sort-item" draggable="true" data-ord="2">Αντικατέστησε το σταθερό 3 με μεταβλητή «μετατόπιση»</li>
+        <li class="sort-item" draggable="true" data-ord="1">Εντόπισε τι είναι σταθερό και τι αλλάζει</li>
+        <li class="sort-item" draggable="true" data-ord="3">Δοκίμασε με διαφορετικές τιμές εισόδου</li>
+      </ul>
+      <button class="check-btn" onclick="checkSort(7)">Έλεγχος σειράς</button>
+      <div class="msg" id="m7-2"></div>
+    </div>
+    <div class="sub" id="s7-3">
+      <div class="tip">Ένας γενικός αλγόριθμος μπορεί να κρυπτογραφήσει:</div>
+      <div class="choice" data-ok="0" onclick="pick(this,7,3)">Μόνο ελληνικά γράμματα με μετατόπιση 3</div>
+      <div class="choice" data-ok="1" onclick="pick(this,7,3)">Οποιοδήποτε αλφάβητο με οποιαδήποτε μετατόπιση (με μικρές αλλαγές)</div>
+      <div class="choice" data-ok="0" onclick="pick(this,7,3)">Μόνο τη λέξη «ΦΩΤΙΑ»</div>
+      <div class="msg" id="m7-3"></div>
+    </div>
+  </div>
+
+  <!-- 8 -->
+  <div class="panel" id="p8">
+    <div class="panel-head"><div class="badge">8</div><h2>Παιχνίδι ομάδων – Κρυπτογράφοι!</h2></div>
+    <div class="subs">
+      <button class="sub-btn on" onclick="go(8,1)">① Κρυπτογράφησε</button>
+      <button class="sub-btn" onclick="go(8,2)">② Αποκρυπτογράφησε</button>
+      <button class="sub-btn" onclick="go(8,3)">③ Τελική δοκιμή</button>
+    </div>
+    <div class="sub on" id="s8-1">
+      <div class="tip">Κρυπτογράφησε τη λέξη <strong>ΣΧΟΛΕΙΟ</strong> με μετατόπιση 3 (θυμήσου τον γύρο για τα τελευταία γράμματα):</div>
+      <div class="decoder" id="dec8a">
+        <input maxlength="1" data-ans="Φ">
+        <input maxlength="1" data-ans="Α">
+        <input maxlength="1" data-ans="Σ">
+        <input maxlength="1" data-ans="Ο">
+        <input maxlength="1" data-ans="Θ">
+        <input maxlength="1" data-ans="Μ">
+        <input maxlength="1" data-ans="Σ">
+      </div>
+      <button class="check-btn" onclick="checkDec('dec8a',8,1)">Έλεγχος</button>
+      <div class="msg" id="m8-1"></div>
+    </div>
+    <div class="sub" id="s8-2">
+      <div class="tip">Το μήνυμα <strong>ΦΤΜΧΜ</strong> (μετατόπιση 3) αποκρυπτογραφείται σε:</div>
+      <div class="decoder" id="dec8b">
+        <input maxlength="1" data-ans="Σ">
+        <input maxlength="1" data-ans="Π">
+        <input maxlength="1" data-ans="Ι">
+        <input maxlength="1" data-ans="Τ">
+        <input maxlength="1" data-ans="Ι">
+      </div>
+      <button class="check-btn" onclick="checkDec('dec8b',8,2)">Έλεγχος</button>
+      <div class="msg" id="m8-2"></div>
+    </div>
+    <div class="sub" id="s8-3">
+      <div class="tip">Τελική δοκιμή! Κρυπτογράφησε το <strong>ΩΡΑ</strong> με μετατόπιση 3:</div>
+      <div class="decoder" id="dec8c">
+        <input maxlength="1" data-ans="Γ">
+        <input maxlength="1" data-ans="Υ">
+        <input maxlength="1" data-ans="Δ">
+      </div>
+      <button class="check-btn" onclick="checkDec('dec8c',8,3)">Έλεγχος</button>
+      <div class="msg" id="m8-3"></div>
+    </div>
+  </div>
+
+  <div class="final" id="final">
+    <h2>🏆 Αποστολή ολοκληρώθηκε!</h2>
+    <div class="stars" id="stars">☆☆☆☆☆☆☆☆</div>
+    <div class="score" id="scoreTxt">0 / 24</div>
+    <p id="finalMsg" style="margin-top:8px;font-size:1.1rem"></p>
+    <button class="restart" onclick="location.reload()">🔄 Ξανά από την αρχή</button>
+  </div>
+</div>
+
+<script>
+const GREEK='ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ';
+let done={};
+let tfDone={};
+
+(function(){
+  const nav=document.getElementById('nav');
+  for(let i=1;i<=8;i++){
+    const b=document.createElement('button');
+    b.className='nav-btn'+(i===1?' active':'');
+    b.textContent=i; b.id='n'+i;
+    b.onclick=()=>show(i);
+    nav.appendChild(b);
+  }
+  show(1);
+  // sortable
+  const list=document.getElementById('sort7');
+  if(list){
+    list.querySelectorAll('.sort-item').forEach(item=>{
+      item.addEventListener('dragstart',e=>{item.classList.add('dragging');e.dataTransfer.setData('text','')});
+      item.addEventListener('dragend',()=>item.classList.remove('dragging'));
+    });
+    list.addEventListener('dragover',e=>{
+      e.preventDefault();
+      const after=[...list.querySelectorAll('.sort-item:not(.dragging)')].reduce((c,el)=>{
+        const box=el.getBoundingClientRect();
+        const off=e.clientY-box.top-box.height/2;
+        if(off<0&&off>c.off)return{off,el};return c;
+      },{off:-9999}).el;
+      const drag=list.querySelector('.dragging');
+      if(drag) after?list.insertBefore(drag,after):list.appendChild(drag);
+    });
+  }
+})();
+
+function show(n){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('show'));
+  document.getElementById('p'+n).classList.add('show');
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('n'+n).classList.add('active');
+  go(n,1);
+}
+function go(act,sub){
+  const p=document.getElementById('p'+act);
+  p.querySelectorAll('.sub').forEach(s=>s.classList.remove('on'));
+  p.querySelectorAll('.sub-btn').forEach(b=>b.classList.remove('on'));
+  document.getElementById('s'+act+'-'+sub).classList.add('on');
+  p.querySelectorAll('.sub-btn')[sub-1].classList.add('on');
+}
+function mark(act,sub){
+  const key=act+'-'+sub;
+  if(done[key])return;
+  done[key]=true;
+  document.getElementById('p'+act).querySelectorAll('.sub-btn')[sub-1].classList.add('ok');
+  if(done[act+'-1']&&done[act+'-2']&&done[act+'-3']) document.getElementById('n'+act).classList.add('done');
+  const cnt=Object.keys(done).length;
+  document.getElementById('prog').style.width=(cnt/24*100)+'%';
+  if(cnt===24){
+    document.getElementById('final').classList.add('show');
+    document.getElementById('scoreTxt').textContent='24 / 24';
+    document.getElementById('stars').textContent='⭐⭐⭐⭐⭐⭐⭐⭐';
+    document.getElementById('finalMsg').textContent='Είσαι master γενίκευσης αλγορίθμων! 🚀';
+  }
+}
+function markDone(act,sub){
+  const m=document.getElementById('m'+act+'-'+sub);
+  m.className='msg good show';
+  m.textContent='🎉 Μπράβο!';
+  mark(act,sub);
+}
+
+function pick(el,act,sub){
+  const parent=el.parentElement;
+  if(parent.dataset.locked)return;
+  parent.dataset.locked='1';
+  const m=document.getElementById('m'+act+'-'+sub);
+  if(el.dataset.ok==='1'){
+    el.classList.add('picked');
+    m.className='msg good show';
+    m.textContent='🎉 Σωστά!';
+  } else {
+    el.classList.add('wrong');
+    parent.querySelectorAll('.choice').forEach(c=>{if(c.dataset.ok==='1')c.classList.add('picked')});
+    m.className='msg bad show';
+    m.textContent='Η σωστή απάντηση εμφανίστηκε με πράσινο!';
+  }
+  mark(act,sub);
+}
+
+function tf(btn,choice,act,sub){
+  const row=btn.parentElement;
+  if(row.dataset.done)return;
+  row.dataset.done='1';
+  const correct=row.dataset.ans;
+  if(choice===correct){btn.classList.add('ok')}
+  else{
+    btn.classList.add('bad');
+    row.querySelector('.tf-btn.'+correct).classList.add('ok');
+  }
+  const rows=row.parentElement.querySelectorAll('.tf-row');
+  if([...rows].every(r=>r.dataset.done)){
+    const allOk=[...rows].every(r=>{
+      const c=r.dataset.ans;
+      return r.querySelector('.tf-btn.'+c).classList.contains('ok') && !r.querySelector('.tf-btn.bad');
+    });
+    // simpler: just mark done
+    const m=document.getElementById('m'+act+'-'+sub);
+    m.className='msg good show';
+    m.textContent='🎉 Ολοκληρώθηκε!';
+    mark(act,sub);
+  }
+}
+
+function checkInput(id,act,sub,ans,hint){
+  const inp=document.getElementById(id);
+  const m=document.getElementById('m'+act+'-'+sub);
+  if(inp.value.toUpperCase().trim()===ans){
+    inp.style.borderColor='#5bc0be';inp.style.background='#d4edda';
+    m.className='msg good show';
+    m.textContent='🎉 Σωστά!';
+  } else {
+    inp.value=ans;
+    inp.style.borderColor='#5bc0be';inp.style.background='#d4edda';
+    m.className='msg bad show';
+    m.textContent=hint||('Η σωστή απάντηση είναι: '+ans);
+  }
+  mark(act,sub);
+}
+
+function checkWrap(act,sub){
+  const ids=['w1','w2','w3'];
+  const ans=['Α','Β','Γ'];
+  let ok=true;
+  ids.forEach((id,i)=>{
+    const el=document.getElementById(id);
+    if(el.value.toUpperCase().trim()!==ans[i]) ok=false;
+  });
+  const m=document.getElementById('m'+act+'-'+sub);
+  if(ok){
+    ids.forEach(id=>{const el=document.getElementById(id);el.style.borderColor='#5bc0be';el.style.background='#d4edda'});
+    m.className='msg good show';m.textContent='🎉 Τέλεια! Χ→Α, Ψ→Β, Ω→Γ';
+  } else {
+    ids.forEach((id,i)=>{const el=document.getElementById(id);el.value=ans[i];el.style.borderColor='#5bc0be';el.style.background='#d4edda'});
+    m.className='msg bad show';m.textContent='Οι σωστές: Χ→Α, Ψ→Β, Ω→Γ';
+  }
+  mark(act,sub);
+}
+
+function checkTwo(){
+  const p=document.getElementById('posCalc');
+  const l=document.getElementById('letCalc');
+  const m=document.getElementById('m4-3');
+  if(p.value.trim()==='3' && l.value.toUpperCase().trim()==='Γ'){
+    p.style.borderColor='#5bc0be';p.style.background='#d4edda';
+    l.style.borderColor='#5bc0be';l.style.background='#d4edda';
+    m.className='msg good show';m.textContent='🎉 Σωστά! 27−24=3 → Γ';
+  } else {
+    p.value='3';l.value='Γ';
+    p.style.borderColor='#5bc0be';p.style.background='#d4edda';
+    l.style.borderColor='#5bc0be';l.style.background='#d4edda';
+    m.className='msg bad show';m.textContent='Σωστά: 27−24=3 → γράμμα Γ';
+  }
+  mark(4,3);
+}
+
+function checkSort(act){
+  const items=[...document.getElementById('sort7').children];
+  let ok=true;
+  items.forEach((it,i)=>{if(+it.dataset.ord!==i+1)ok=false});
+  const m=document.getElementById('m'+act+'-2');
+  if(ok){
+    items.forEach(it=>it.classList.add('correct'));
+    m.className='msg good show';m.textContent='🎉 Σωστή σειρά!';
+  } else {
+    // reveal order
+    const sorted=[...items].sort((a,b)=>+a.dataset.ord-+b.dataset.ord);
+    const list=document.getElementById('sort7');
+    list.innerHTML='';
+    sorted.forEach(it=>{it.classList.add('correct');list.appendChild(it)});
+    m.className='msg bad show';m.textContent='Η σωστή σειρά εμφανίστηκε!';
+  }
+  mark(act,2);
+}
+
+function checkDec(boxId,act,sub){
+  const box=document.getElementById(boxId);
+  const inputs=box.querySelectorAll('input');
+  let ok=true;
+  inputs.forEach(inp=>{if(inp.value.toUpperCase().trim()!==inp.dataset.ans)ok=false});
+  const m=document.getElementById('m'+act+'-'+sub);
+  if(ok){
+    inputs.forEach(inp=>{inp.style.borderColor='#5bc0be';inp.style.background='#d4edda'});
+    m.className='msg good show';m.textContent='🎉 Τέλεια!';
+  } else {
+    inputs.forEach(inp=>{
+      inp.value=inp.dataset.ans;
+      inp.style.borderColor='#5bc0be';inp.style.background='#d4edda';
+    });
+    m.className='msg bad show';m.textContent='Οι σωστές απαντήσεις εμφανίστηκαν με πράσινο!';
+  }
+  mark(act,sub);
+}
+
+</script>
+</body>
+</html>
