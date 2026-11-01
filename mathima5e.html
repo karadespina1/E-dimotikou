@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Παιχνίδια Scratch - Ε΄ Δημοτικού (Μάθημα 5)</title>
+<style>
+  :root {
+    --bg-color: #f3f6fb;
+    --card-bg: #ffffff;
+    --text-main: #2d3748;
+    --primary: #4a6fa5;
+    --success: #38b000;
+    --error: #e5383b;
+    --variables: #FF8C1A;
+    --motion: #4C97FF;
+    --looks: #9966FF;
+    --sound: #CF63CF;
+    --control: #FFAB19;
+    --sensing: #5CB1D6;
+  }
+
+  body {
+    font-family: 'Comic Sans MS', 'Chalkboard SE', 'Segoe UI', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    margin: 0;
+    padding: 15px;
+  }
+
+  .header {
+    text-align: center;
+    background: linear-gradient(135deg, #e76f51, #f4a261);
+    color: white;
+    padding: 20px;
+    border-radius: 16px;
+    margin-bottom: 25px;
+    box-shadow: 0 6px 14px rgba(0,0,0,0.12);
+  }
+
+  .header h1 { margin: 0 0 8px 0; font-size: 1.7rem; }
+  .header p { margin: 0; font-size: 1.05rem; opacity: 0.95; }
+
+  /* Tabs πλοήγησης */
+  .nav-tabs {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 25px;
+    max-width: 1100px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .nav-btn {
+    background: white;
+    border: 2px solid #cbd5e1;
+    padding: 10px 16px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 0.92rem;
+    font-weight: bold;
+    color: #475569;
+    transition: all 0.2s;
+  }
+
+  .nav-btn:hover { background: #e2e8f0; }
+  .nav-btn.active {
+    background: #e76f51;
+    color: white;
+    border-color: #d94826;
+    transform: scale(1.05);
+    box-shadow: 0 4px 10px rgba(231, 111, 81, 0.4);
+  }
+
+  .activity-container {
+    max-width: 850px;
+    margin: 0 auto;
+    display: none;
+  }
+  .activity-container.active { display: block; animation: fadeIn 0.3s ease-in; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .main-card {
+    background: var(--card-bg);
+    border-radius: 18px;
+    padding: 24px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+    border-top: 8px solid #e76f51;
+  }
+
+  .act-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .act-header h2 { margin: 0; font-size: 1.35rem; color: #1e293b; }
+
+  .act-story {
+    background: #fff3e6;
+    padding: 12px 16px;
+    border-left: 5px solid #e76f51;
+    border-radius: 8px;
+    font-size: 0.98rem;
+    margin-bottom: 20px;
+    line-height: 1.45;
+  }
+
+  .sub-box {
+    background: #f8fafc;
+    border: 2px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 16px;
+    margin-bottom: 18px;
+  }
+
+  .sub-box h3 {
+    margin: 0 0 10px 0;
+    font-size: 1.05rem;
+    color: #d94826;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .sub-box p {
+    font-size: 0.95rem;
+    margin: 0 0 12px 0;
+    line-height: 1.4;
+  }
+
+  .choice-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .choice-btn {
+    background: white;
+    border: 2px solid #cbd5e1;
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 0.92rem;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .choice-btn:hover { background: #f1f5f9; border-color: #94a3b8; }
+  .choice-btn.correct { background: #dcfce7 !important; border-color: #22c55e !important; color: #14532d; font-weight: bold; }
+  .choice-btn.wrong { background: #fee2e2 !important; border-color: #ef4444 !important; color: #7f1d1d; }
+
+  .feedback-msg {
+    margin-top: 10px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 0.88rem;
+    font-weight: bold;
+    display: none;
+  }
+  .feedback-msg.show { display: block; }
+  .feedback-msg.win { background: #dcfce7; color: #166534; border: 1px solid #86efac; }
+  .feedback-msg.lose { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+
+  /* Scratch Μπλοκ Styling */
+  .sb {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 6px;
+    color: white;
+    font-weight: bold;
+    font-size: 0.85rem;
+    vertical-align: middle;
+  }
+  .sb-var { background-color: var(--variables); }
+  .sb-motion { background-color: var(--motion); }
+  .sb-looks { background-color: var(--looks); }
+  .sb-sound { background-color: var(--sound); }
+  .sb-control { background-color: var(--control); }
+  .sb-sensing { background-color: var(--sensing); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>⭐ Παιχνίδια Scratch: Πόντοι & Ζωές</h1>
+  <p><strong>Μάθημα 5: Αυξάνοντας τους πόντους και χάνοντας ζωές – Οι μεταβλητές (Ε΄ Δημοτικού)</strong><br>
+  Επίλεξε καρτέλα παρακάτω — Κάθε αποστολή έχει 3 απλά βήματα με 2 επιλογές!</p>
+</div>
+
+<!-- TABS ΠΛΟΗΓΗΣΗΣ -->
+<div class="nav-tabs">
+  <button class="nav-btn active" onclick="switchTab(0)">📦 1. Το Μαγικό Κουτί</button>
+  <button class="nav-btn" onclick="switchTab(1)">🏁 2. Η Εκκίνηση (Reset)</button>
+  <button class="nav-btn" onclick="switchTab(2)">💎 3. Συλλογή Διαμαντιών</button>
+  <button class="nav-btn" onclick="switchTab(3)">👻 4. Το Φαντασματάκι</button>
+  <button class="nav-btn" onclick="switchTab(4)">🐢 5. Η Ταχύτητα Καταδίωξης</button>
+  <button class="nav-btn" onclick="switchTab(5)">💔 6. Χάνοντας Ζωές</button>
+  <button class="nav-btn" onclick="switchTab(6)">🎵 7. Ήχοι στη Σκηνή</button>
+  <button class="nav-btn" onclick="switchTab(7)">👀 8. Εμφάνιση στη Σκηνή</button>
+</div>
+
+<!-- 1. ΤΟ ΜΑΓΙΚΟ ΚΟΥΤΙ -->
+<div class="activity-container active" id="act-0">
+  <div class="main-card">
+    <div class="act-header">
+      <h2>📦 Αποστολή 1: Το Μαγικό Κουτί των Μεταβλητών</h2>
+    </div>
+    <div class="act-story">
+      <strong>Ιστορία:</strong> Φαντάσου μια μεταβλητή σαν ένα κουτί φαγητού που γράφει απ' έξω ένα όνομα, αλλά το περιεχόμενό του αλλάζει κάθε μέρα!
+    </div>
+
+    <div class="sub-box">
+      <h3>Βήμα 1.1: Τι είναι η μεταβλητή;</h3>
+      <p>Τι ακριβώς κάνει μια μεταβλητή στον προγραμματισμό;</p>
+      <div class="choice-grid">
+        <button class="choice-btn" onclick="answer(this, true, 'Μπράβο! Είναι σαν ένα κουτάκι στη μνήμη που κρατάει έναν αριθμό (π.χ. πόντους ή ζωές) που αλλάζει!')">Αποθηκεύει μια πληροφορία (π.χ. αριθμό) που μπορεί να αλλάζει</button>
+        <button class="choice-btn" onclick="answer(this, false, 'Όχι, η μεταβλητή κρατάει τιμές και αριθμούς, δεν είναι εικόνα!')">Είναι μια εικόνα που ζωγραφίζουμε για φόντο</button>
+      </div>
+      <div class="feedback-msg"></div>
+    </div>
+
+    <div class="sub-box">
+      <h3>Βήμα 1.2: Πού φτιάχνουμε μεταβλητές;</h3>
+      <p>Σε ποια κατηγορία στο Scratch πατάμε το κουμπί <strong>«Δημιουργία μεταβλητής»</strong>;</p>
+      <div class="choice-grid">
+        <button class="choice-btn" onclick="answer(this, true, 'Σωστά! Στην πορτοκαλί/καφέ κατηγορία Μεταβλητές!')">Στην κατηγορία <span class="sb sb-var">Μεταβλητές</span></button>
+        <button class="choice-btn" onclick="answer(this, false, 'Στην Κίνηση βρίσκονται εντολές όπως «κινήσου 10 βήματα».')">Στην κατηγορία <span class="sb sb-motion">Κίνηση</span></button>
+      </div>
+      <div class="feedback-msg"></div>
+    </div>
+
+    <div class="sub-box">
+      <h3>Βήμα 1.3: Το όνομα της μεταβλητής</h3>
+      <p>Ποιο είναι το πιο κατάλληλο όνομα για τη μεταβλητή που μετράει το σκορ μας;</p>
+      <div class="choice-grid">
+        <button class="choice-btn" onclick="answer(this, true, 'Έξοχα! Δίνουμε πάντα ονόματα που φανερώνουν καθαρά τι αποθηκεύουμε!')">«πόντοι» ή «σκορ»</button>
+        <button class="choice-btn" onclick="answer(this, false, 'Αυτό το όνομα δεν μας βοηθάει καθόλου να καταλάβουμε τι μετράμε!')">«πράγμα123»</button>
+      </div>
+      <div class="feedback-msg"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 2. Η ΕΚΚΙΝΗΣΗ (RESET) -->
+<div class="activity-container" id="act-1">
+  <div class="main-card">
+    <div class="act-header">
+      <h2>🏁 Αποστολή 2: Η Εκκίνηση του Παιχνιδιού (Αρχικοποίηση)</h2>
+    </div>
+    <div class="act-story">
+      <strong>Ιστορία:</strong> Κάθε φορά που πατάμε την πράσινη σημαία για νέο παιχνίδι, το σκορ πρέπει να μηδενίζεται και οι ζωές να ξαναγεμίζουν!
+    </div>
+
+    <div class="sub-box">
+      <h3>Βήμα 2.1: Πόσους πόντους έχουμε στην αρχή;</h3>
+      <p>Ποια εντολή βάζουμε κάτω από την πράσινη σημαία για να ξεκινάει το παιχνίδι με μηδέν πόντους;</p>
+      <div class="choice-grid">
+        <button class="choice-btn" onclick="answer(this, true, 'Σωστά! Η εντολή «όρισε σε» δίνει την πρώτη αρχική τιμή (αρχικοποίηση)!')"><span class="sb sb-var">όρισε πόντοι σε 0</span></button>
+        <button class="choice-btn" onclick="answer(this, false, 'Το «άλλαξε κατά» προσθέτει πόντους, δεν τους μηδενίζει!')"><span class="sb sb-var">άλλαξε πόντοι κατά 1</span></button>
+      </div>
+      <div class="feedback-msg"></div>
+    </div>
+
+    <div class="sub-box">
+      <h3>Βήμα 2.2: Με πόσες ζωές ξεκινάμε;</h3>
+      <p>Αν ο ήρωάς μας δικαιούται 3 ευκαιρίες (ζωές), ποια εντολή βάζουμε στην αρχή;</p>
+      <div class="choice-grid">
+        <button class="choice-btn" onclick="answer(this, true, 'Μπράβο! Έτσι ξεκινάμε γεμάτοι με 3 ζωές!')"><span class="sb sb-var">όρισε ζωές σε 3</span></button>
+        <button class="choice-btn" onclick="answer(this, false, 'Αν βάλουμε 0, το παιχνίδι θα τελείωνε πριν καν αρχίσει!')"><span class="sb sb-var">όρισε ζωές σε 0</span></button>
+      </div>
+      <div class="feedback-msg"></div>
+    </div>
+
+    <div class="sub-box">
+      <h3>Βήμα 2.3: Πού τοποθετούμε το «όρισε σε»;</h3>
+      <p>Σε ποιο σημείο του κώδικα πρέπει να μπει το μηδένισμα των πόντων;</p>
+      <div class="choice-grid">
+        <button class="choice-btn" onclick="answer(this, true, 'Σωστά! Στην αρχή-αρχή, μία φορά μόλις πατηθεί η σημαία!')">Ψηλά στην αρχή, ακριβώς κάτω από την πράσινη σημαία</button>
+        <button class="choice-btn" onclick="answer(this, false, 'Αν μπει μέσα στο για πάντα, οι πόντοι θα γίνονται συνέχεια 0 και δεν θα κερδίζεις ποτέ!')">Μέσα στην επανάληψη «για πάντα»</button>
+      </div>
+      <div class="feedback-msg"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 3. ΣΥΛΛΟΓΗ ΔΙΑΜΑΝΤΙΩΝ -->
+<div class="activity-container" id="act-2">
+  <div class="main-card">
+    <div class="act-header">
+      <h2>💎 Αποστολή 3: Συλλογή Διαμαντιών (Κερδίζω Πόντους)</h2>
+    </div>
+    <div class="act-story">
+      <strong>Ιστορία:</strong> Ένας γενναίος ιππότης μαζεύει λαμπερά διαμάντια στο κάστρο. Κάθε φορά που αγγίζει ένα διαμάντι, κερδίζει πόντους!
+    </div>
+
+    <div class="sub-box">
+      <h3>Βήμα 3.1: Πώς ανεβαίνει το σκορ;</h3>
+      <p>Κάθε φορά που ο ιππότης πιάνει το διαμάντι, ποια εντολή προσθέτει έναν πόντο;</p>
+      <div class="choice-grid">
+        <button class="choice-btn" onclick="answer(this, true, 'Ακριβώς! Η εντολή «άλλαξε κατά 1» αυξάνει το περιεχόμενο του κουτιού κατά ένα!')"><span class="sb sb-var">άλλαξε πόντοι κατά 1</span></button>
+        <button class="choice-btn" onclick="answer(this, false, 'Αυτό θα κρατούσε τους πόντους μόνιμα κολλημένους στο 1!')"><span class="sb sb-var">όρισε πόντοι σε 1</span></button>
+      </div>
+      <div class="feedback-msg"></div>
+    </div>
+
+    <div class="sub-box">
+      <h3>Βήμα 3.2: Πού φωλιάζει η εντολή των πόντων;</h3>
+      <p>Μέσα σε ποια συνθήκη πρέπει να μπει το <span class="sb sb-var">άλλαξε πόντοι κατά 1</span>;</p>
+      <div class="choice-grid">
+        <button class="choice-btn" onclick="answer(this, true, 'Μπράβο! Έτσι κερδίζουμε πόντο μόνο όταν όντως ακουμπάμε το διαμάντι!')">Μέσα στο <span class="sb sb-control">εάν</span> <span class="sb sb-sensing">αγγίζει Ιππότης;</span> <span class="sb sb-control">τότε</span></button>
+        <button class="choice-btn" onclick="answer(this, false, 'Έξω από τη συνθήκη θα έπαιρνε πόντους στον αέρα χωρίς να κάνει τίποτα!')">Έξω από κάθε συνθήκη</button>
+      </div>
+      <div class="feedback-msg"></div>
+    </div>
+
+    <div class="sub-box">
+      <h3>Βήμα 3.3: Σούπερ Διαμάντι (+5 πόντοι)</h3>
+      <p>Αν βρούμε ένα σπάνιο χρυσό διαμάντι και θέλουμε να δίνει 5 πόντους μαζί, τι γράφουμε;</p>
+      <div class="choice-grid">
+        <button class="choice-btn" onclick="answer(this, true, 'Σωστά! Γράφουμε τον αριθμό 5 μέσα στο κυκλάκι της εντολής!')"><span class="sb sb-var">άλλαξε πόντοι κατά 5</span></button>
+        <button class="choice-btn" onclick="answer(this, false, 'Το «όρισε σε 5» θα έκανε το σκορ 5 όσους πόντους κι αν είχαμε πριν!')"><span class="sb sb-var">όρισε πόντοι σε 5</span></button>
+      </div>
+      <div class="feedback-msg"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 4. ΤΟ ΦΑΝΤΑΣΜΑΤΑΚΙ -->
+<div class="activity-container" id="act-3">
+  <div class="main-card">
+    <div class="act-header">
+      <h2>👻 Αποστολή 4: Το Φαντασματάκι που μας κυνηγάει</h2>
+    </div>
+    <div class="act-story">
+      <strong>Ιστορία:</strong> Στο παιχνίδι εμφανίζεται ένας αντίπαλος (ένα φαντασματάκι) που γλιστράει απαλά και μας καταδιώκει συνεχώς!
+    </div>
+
+    <div class="sub-box">
+      <h3>Βήμα 4.1: Η εντολή της καταδίωξης</h3>
+      <p>Ποια εντολή κάνει το φαντασματάκι να γλιστράει (ολισθαίνει) προς τον παίκτη;</p>
+      <div class="choice-grid">
+        <button class="choice-btn" onclick="answer(this, true, 'Σωστά! Η εντολή «ολίσθησε» κάνει ομαλή κίνηση προς έναν χαρακτήρα!')"><span class="sb sb-motion">ολίσθησε για 1 δευτ. στη θέση Ήρωας</span></button>
+        <button class="choice-btn" onclick="answer(this, false, 'Η τυχαία θέση το στέλνει όπου να 'ναι, όχι προς τον παίκτη!')"><span class="sb sb-motion">πήγαινε σε τυχαία θέση</span></button>
+      </div>
+      <div class="feedback-msg"></div>
+    </div>
+
+    <div class="sub-box">
+      <h3>Βήμα 4.2: Για πάντα στο κατόπι μας</h3>
+      <p>Για να μη σταματάει το κυνηγητό μετά από 1 φορά, πού τοποθετούμε την ολίσθηση;</p>
+      <div class="choice-grid">
+        <button class="choice-btn" onclick="answer(this, true, 'Μπράβο! Μέσα στο «για πάντα» το κυνηγητό συνεχίζεται ασταμάτητα!')">Μέσα σε ένα μπλοκ <span class="sb sb-control">για πάντα</span></button>
+        <button class="choice-btn" onclick="answer(this, false, 'Χωρίς επανάληψη θα γλιστρούσε μία φορά και θα πάγωνε!')">Μόνο του χωρίς επανάληψη</button>
+      </div>
+      <div class="feedback-msg"></div>
+    </div>
+
+    <div class="sub-box">
+      <h3>Βήμα 4.3: Δύο προγράμματα ταυτόχρονα</h3>
+      <p>Το σενάριο του παίκτη και το σενάριο του αντιπάλου ξεκινούν και τα δύο με πράσινη σημαία. Πώς τρέχουν;</p>
+      <div class="choice-grid">
+        <button class="choice-btn" onclick="answer(this, true, 'Ακριβώς! Τρέχουν ταυτόχρονα (παράλληλα), γι' αυτό κινούμαστε ενώ μας κυνηγάει!')">Ταυτόχρονα και τα δύο μαζί</button>
+        <button class="choice-btn" onclick="answer(this, false, 'Όχι, δεν περιμένει το ένα να τελειώσει το άλλο!')">Πρώτα το ένα και μετά από ώρες το άλλο</button>
+      </div>
+      <div class="feedback-msg"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 5. ΤΑΧΥΤΗΤΑ ΚΑΤΑΔΙΩΞΗΣ -->
+<div class="activity-container" id="act-4">
+  <div class="main-card">
+    <div class="act-header">
+      <h2>🐢 Αποστολή 5: Ρύθμιση Ταχύτητας Αντιπάλου</h2>
+    </div>
+    <div class="act-story">
+      <strong>Ιστορία:</strong> Θέλουμε να ρυθμίσουμε πόσο γρήγορα ή αργά κινείται ο αντίπαλος αλλάζοντας τα δευτερόλεπτα στην εντολή «ολίσθησε».
+    </div>
+
+    <div class="sub-box">
+      <h3>Βήμα 5.1: Αργός αντίπαλος (Σαν χελώνα)</h3>
+      <p>Αν αλλάξουμε το <span class="sb sb-motion">ολίσθησε για 1 δευτ.</span> σε <span class="sb sb-motion">ολίσθησε για 3 δευτ.</span>, τι θα γίνει;</p>
+      <div class="choice-grid">
+        <button class="choice-btn" onclick="answer(this, true, 'Σωστά! Χρειάζεται περισσότερο χρόνο (3 δευτερόλεπτα) για να φτάσει, άρα πάει πιο αργά!')">Ο αντίπαλος θα κινείται πιο αργά</button>
+        <button class="choice-btn" onclick="answer(this, false, 'Όχι! Περισσότερα δευτερόλεπτα σημαίνει ότι αργεί περισσότερο!')">Ο αντίπαλος θα κινείται πιο γρήγορα</button>
+      </div>
+      <div class="feedback-msg"></div>
+    </div>
+
+    <div class="sub-box">
+      <h3>Βήμα 5.2: Γρήγορος αντίπαλος (Σαν αστραπή)</h3>
+      <p>Αν βάλουμε <span class="sb sb-motion">ολίσθησε για 0.5 δευτ.</span>, πώς θα κινείται;</p>
+      <div class="choice-grid">
+        <button class="choice-btn" onclick="answer(this, true, 'Μπράβο! Μισό δευτερόλεπτο σημαίνει ότι πετάγεται πάνω μας αστραπιαία!')">Πολύ γρήγορα και επικίνδυνα!</button>
+        <button class="choice-btn" onclick="answer(this, false, 'Το 0.5 είναι λιγότερος χρόνος, άρα δεν είναι καθόλου αργό!')">Πιο αργά από πριν</button>
+      </div>
+      <div class="feedback-msg"></div>
+    </div>
+
+    <div class="sub-box">
+      <h3>Βήμα 5.3: Ο κανόνας του χρόνου</h3>
+      <p>Συμπλήρωσε τον κανόνα: «Όσο πιο μεγάλος είναι ο αριθμός των δευτερολέπτων...»</p>
+      <div class="choice-grid">
+        <button class="choice-btn" onclick="answer(this, true, 'Σωστά! Περισσότερα δευτερόλεπτα = πιο αργή και άνετη κίνηση!')">...τόσο πιο αργά γλιστράει ο χαρακτήρας</button>
+        <button class="choice-btn" onclick="answer(this, false, 'Αντίθετα, ο μικρός αριθμός δευτερολέπτων κάνει τη γρήγορη κίνηση!')">...τόσο πιο γρήγορα τρέχει</button>
+      </div>
+      <div class="feedback-msg"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 6. ΧΑΝΟΝΤΑΣ ΖΩΕΣ -->
+<div class="activity-container" id="act-5">
+  <div class="main-card">
+    <div class="act-header">
+      <h2>💔 Αποστολή 6: Άουτς! Χάνω Ζωή (Αφαίρεση)</h2>
+    </div>
+    <div class="act-story">
+      <strong>Ιστορία:</strong> Κάθε φορά που ο αντίπαλος μας αγγίζει, χάνουμε 1 ζωή! Πώς κάνουμε τη μεταβλητή να μειώνεται;
+    </div>
+
+    <div class="sub-box">
+      <h3>Βήμα 6.1: Το μαγικό πλην (-)</h3>
+      <p>Ποια εντολή αφαιρεί μία ζωή από το σύνολο των ζωών μας;</p>
+      <div class="choice-grid">
+        <button class="choice-btn" onclick="answer(this, true, 'Μπράβο! Το σύμβολο πλην (-1) αφαιρεί έναν πόντο/ζωή!')"><span class="sb sb-var">άλλαξε ζωές κατά -1</span></button>
+        <button class="choice-btn" onclick="answer(this, false, 'Το σκέτο 1 θα του πρόσθετε ζωή σαν δώρο!')"><span class="sb sb-var">άλλαξε ζωές κατά 1</span></button>
+      </div>
+      <div class="feedback-msg"></div>
+    </div>
+
+    <div class="sub-box">
+      <h3>Βήμα 6.2: Πότε αφαιρείται η ζωή;</h3>
+      <p>Σε ποια συνθήκη ελέγχουμε αν ο αντίπαλος άγγιξε τον ήρωα;</p>
+      <div class="choice-grid">
+        <button class="choice-btn" onclick="answer(this, true, 'Σωστά! Μόλις υπάρξει επαφή, η μεταβλητή ζωές μειώνεται κατά 1!')"><span class="sb sb-control">εάν</span> <span class="sb sb-sensing">αγγίζει Ήρωας;</span> <span class="sb sb-control">τότε</span> [ άλλαξε ζωές κατά -1 ]</button>
+        <button class="choice-btn" onclick="answer(this, false, 'Αυτό θα μείωνε τις ζωές μόνο όταν ακουμπάμε το ποντίκι!')"><span class="sb sb-control">εάν</span> <span class="sb sb-sensing">αγγίζει δείκτη ποντικιού;</span> <span class="sb sb-control">τότε</span></button>
+      </div>
+      <div class="feedback-msg"></div>
+    </div>
+
+    <div class="sub-box">
+      <h3>Βήμα 6.3: Πόσες ζωές έμειναν;</h3>
+      <p>Αν είχες 3 ζωές και ο αντίπαλος σε άγγιξε 2 φορές, πόση είναι τώρα η τιμή της μεταβλητής;</p>
+      <div class="choice-grid">
+        <button class="choice-btn" onclick="answer(this, true, 'Σωστά μαθηματικά! 3 - 1 - 1 = 1 ζωή έμεινε!')">1 ζωή</button>
+        <button class="choice-btn" onclick="answer(this, false, 'Υπολόγισε: ξεκίνησες με 3 και έχασες 2 φορές από μία ζωή!')">0 ζωές</button>
+      </div>
+      <div class="feedback-msg"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 7. ΗΧΟΙ ΣΤΗ ΣΚΗΝΗ -->
+<div class="activity-container" id="act-6">
+  <div class="main-card">
+    <div class="act-header">
+      <h2>🎵 Αποστολή 7: Βιβλιοθήκη Ήχων</h2>
+    </div>
+    <div class="act-story">
+      <strong>Ιστορία:</strong> Τα παιχνίδια γίνονται συναρπαστικά όταν έχουν ήχους! Ένας ήχος όταν κερδίζουμε πόντο κι ένας ήχος όταν χτυπάμε!
+    </div>
+
+    <div class="sub-box">
+      <h3>Βήμα 7.1: Πού βρίσκουμε νέους ήχους;</h3>
+      <p>Αν δεν μας αρέσει ο αρχικός ήχος ενός αντικειμένου, πού πάμε για να βρούμε άλλον;</p>
+      <div class="choice-grid">
+        <button class="choice-btn" onclick="answer(this, true, 'Μπράβο! Στην καρτέλα «Ήχοι» στο πάνω μέρος της οθόνης!')">Στην καρτέλα «Ήχοι» και στην αναζήτηση ήχων</button>
+        <button class="choice-btn" onclick="answer(this, false, 'Στις Ενδυμασίες αλλάζουμε μόνο την εμφάνιση και τα ρούχα!')">Στην καρτέλα «Ενδυμασίες»</button>
+      </div>
+      <div class="feedback-msg"></div>
+    </div>
+
+    <div class="sub-box">
+      <h3>Βήμα 7.2: Ακρόαση πριν την επιλογή</h3>
+      <p>Πώς ακούμε έναν ήχο στη βιβλιοθήκη για να δούμε αν μας αρέσει πριν τον βάλουμε;</p>
+      <div class="choice-grid">
+        <button class="choice-btn" onclick="answer(this, true, 'Σωστά! Πατάμε το μοβ κυκλάκι με το τρίγωνο play!')">Πατάμε το κουμπί αναπαραγωγής (Play ▶️)</button>
+        <button class="choice-btn" onclick="answer(this, false, 'Όχι, δεν χρειάζεται να κλείσουμε το Scratch!')">Κλείνουμε τα ηχεία του υπολογιστή</button>
+      </div>
+      <div class="feedback-msg"></div>
+    </div>
+
+    <div class="sub-box">
+      <h3>Βήμα 7.3: Παίξε τον ήχο</h3>
+      <p>Ποιο χρώμα έχουν οι εντολές αναπαραγωγής ήχου στο Scratch;</p>
+      <div class="choice-grid">
+        <button class="choice-btn" onclick="answer(this, true, 'Σωστά! Έχουν ροζ / φούξια χρώμα!')">Ροζ / Φούξια (<span class="sb sb-sound">Ήχος</span>)</button>
+        <button class="choice-btn" onclick="answer(this, false, 'Το μπλε χρώμα είναι για την κίνηση!')">Μπλε (<span class="sb sb-motion">Κίνηση</span>)</button>
+      </div>
+      <div class="feedback-msg"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 8. ΕΜΦΑΝΙΣΗ ΣΤΗ ΣΚΗΝΗ -->
+<div class="activity-container" id="act-7">
+  <div class="main-card">
+    <div class="act-header">
+      <h2>👀 Αποστολή 8: Βλέπω το Σκορ στην Οθόνη</h2>
+    </div>
+    <div class="act-story">
+      <strong>Ιστορία:</strong> Για να ξέρει ο παίκτης πόσους πόντους και πόσες ζωές έχει, οι μεταβλητές πρέπει να φαίνονται καθαρά πάνω στη σκηνή!
+    </div>
+
+    <div class="sub-box">
+      <h3>Βήμα 8.1: Το μπλε τετραγωνάκι</h3>
+      <p>Δίπλα στο όνομα της μεταβλητής υπάρχει ένα μικρό κουτάκι. Τι πρέπει να είναι για να φαίνεται η μεταβλητή στη σκηνή;</p>
+      <div class="choice-grid">
+        <button class="choice-btn" onclick="answer(this, true, 'Μπράβο! Το μπλε σημαδάκι (τικ) την κάνει ορατή πάνω στο παιχνίδι!')">Πρέπει να είναι επιλεγμένο (μπλε με τικ ☑️)</button>
+        <button class="choice-btn" onclick="answer(this, false, 'Αν είναι άσπρο/άδειο, η μεταβλητή κρύβεται και δεν φαίνεται!')">Πρέπει να είναι άδειο (άσπρο ⬜)</button>
+      </div>
+      <div class="feedback-msg"></div>
+    </div>
+
+    <div class="sub-box">
+      <h3>Βήμα 8.2: Πού στέκονται οι μετρητές;</h3>
+      <p>Μπορούμε να σύρουμε με το ποντίκι το κουτάκι του σκορ σε όποια γωνία της οθόνης θέλουμε;</p>
+      <div class="choice-grid">
+        <button class="choice-btn" onclick="answer(this, true, 'Σωστά! Μπορούμε να το τοποθετήσουμε όπου μας βολεύει πάνω στη σκηνή!')">Ναι, μπορούμε να το σύρουμε όπου θέλουμε</button>
+        <button class="choice-btn" onclick="answer(this, false, 'Μπορεί να μετακινηθεί ελεύθερα με το ποντίκι!')">Όχι, μένει για πάντα κλειδωμένο στο κέντρο</button>
+      </div>
+      <div class="feedback-msg"></div>
+    </div>
+
+    <div class="sub-box">
+      <h3>Βήμα 8.3: Ενημέρωση μεταβλητής</h3>
+      <p>Όταν στο παιχνίδι αυξάνονται οι πόντοι ή μειώνονται οι ζωές, πώς λέμε ότι αλλάζει η μεταβλητή;</p>
+      <div class="choice-grid">
+        <button class="choice-btn" onclick="answer(this, true, 'Ακριβώς! Λέμε ότι η μεταβλητή ενημερώνεται με τη νέα της τιμή!')">Λέμε ότι η μεταβλητή <em>ενημερώνεται</em></button>
+        <button class="choice-btn" onclick="answer(this, false, 'Όχι, η μεταβλητή δεν διαγράφεται, απλώς αλλάζει αριθμό!')">Λέμε ότι η μεταβλητή <em>σβήστηκε</em></button>
+      </div>
+      <div class="feedback-msg"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+function switchTab(index) {
+  const tabs = document.querySelectorAll('.nav-btn');
+  const acts = document.querySelectorAll('.activity-container');
+  
+  tabs.forEach((t, i) => {
+    if (i === index) t.classList.add('active');
+    else t.classList.remove('active');
+  });
+
+  acts.forEach((a, i) => {
+    if (i === index) a.classList.add('active');
+    else a.classList.remove('active');
+  });
+}
+
+function answer(btn, isCorrect, explanation) {
+  const parent = btn.closest('.sub-box');
+  const buttons = parent.querySelectorAll('.choice-btn');
+  const fb = parent.querySelector('.feedback-msg');
+
+  buttons.forEach(b => {
+    b.disabled = true;
+    b.classList.remove('correct', 'wrong');
+  });
+
+  fb.classList.add('show');
+  if (isCorrect) {
+    btn.classList.add('correct');
+    fb.className = 'feedback-msg show win';
+    fb.innerHTML = '🌟 ' + explanation;
+  } else {
+    btn.classList.add('wrong');
+    fb.className = 'feedback-msg show lose';
+    fb.innerHTML = '💡 ' + explanation;
+  }
+}
+</script>
+
+</body>
+</html>
