@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Μάθημα 6: Η Συνθήκη Τέλους - Παιχνίδια Scratch</title>
+<style>
+  * { box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
+  body {
+    background: #f1f5f9;
+    color: #1e293b;
+    margin: 0;
+    padding: 16px;
+  }
+  .app-header {
+    text-align: center;
+    background: #1e293b;
+    color: #ffffff;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+  }
+  .app-header h1 { margin: 0 0 6px 0; font-size: 1.5rem; }
+  .app-header p { margin: 0; font-size: 0.95rem; color: #94a3b8; }
+
+  /* Navigation Bar */
+  .act-menu {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+  .act-btn {
+    background: #ffffff;
+    border: 2px solid #cbd5e1;
+    color: #334155;
+    padding: 8px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.88rem;
+  }
+  .act-btn:hover { background: #e2e8f0; }
+  .act-btn.active {
+    background: #334155;
+    color: #ffffff;
+    border-color: #334155;
+  }
+
+  .stage-panel {
+    display: none;
+    max-width: 800px;
+    margin: 0 auto;
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 24px;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  }
+  .stage-panel.active { display: block; }
+
+  .stage-title {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: #0f172a;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 10px;
+    margin-bottom: 16px;
+  }
+
+  .part-box {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  .part-box h3 { margin: 0 0 8px 0; font-size: 1rem; color: #334155; }
+  .part-box p { margin: 0 0 12px 0; font-size: 0.92rem; color: #475569; }
+
+  /* Scratch Blocks (Αυθεντικά Χρώματα Scratch) */
+  .sb-code {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-weight: bold;
+    font-size: 0.88rem;
+    color: #ffffff;
+    vertical-align: middle;
+  }
+  .sb-control { background: #FFAB19; }
+  .sb-op { background: #59C059; }
+  .sb-var { background: #FF8C1A; }
+  .sb-motion { background: #4C97FF; }
+
+  /* Drag & Drop Tokens */
+  .token-pool {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 10px 0;
+  }
+  .drag-token {
+    background: #ffffff;
+    border: 2px solid #94a3b8;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.88rem;
+    cursor: grab;
+    user-select: none;
+  }
+  .drop-target {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 90px;
+    height: 36px;
+    border: 2px dashed #94a3b8;
+    background: #ffffff;
+    border-radius: 6px;
+    padding: 0 10px;
+    font-weight: bold;
+    color: #334155;
+    vertical-align: middle;
+  }
+  .drop-target.filled { border-style: solid; border-color: #334155; }
+
+  /* Toggle Buttons */
+  .toggle-grid {
+    display: flex;
+    gap: 10px;
+  }
+  .t-btn {
+    flex: 1;
+    background: #ffffff;
+    border: 2px solid #cbd5e1;
+    padding: 10px;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 0.92rem;
+    cursor: pointer;
+    text-align: center;
+  }
+  .t-btn:hover { background: #f1f5f9; }
+  .t-btn.correct { background: #dcfce7 !important; border-color: #22c55e !important; color: #15803d !important; }
+  .t-btn.wrong { background: #fee2e2 !important; border-color: #ef4444 !important; color: #b91c1c !important; }
+
+  /* Traffic Light Widget */
+  .traffic-light {
+    display: inline-flex;
+    gap: 8px;
+    background: #1e293b;
+    padding: 6px 12px;
+    border-radius: 20px;
+    vertical-align: middle;
+  }
+  .bulb {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #475569;
+    transition: all 0.2s;
+  }
+  .bulb.red.on { background: #ef4444; box-shadow: 0 0 10px #ef4444; }
+  .bulb.green.on { background: #22c55e; box-shadow: 0 0 10px #22c55e; }
+
+  .msg-area {
+    margin-top: 10px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 0.88rem;
+    font-weight: bold;
+    display: none;
+  }
+  .msg-area.show { display: block; }
+  .msg-area.ok { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
+  .msg-area.err { background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; }
+
+  /* Canvas Stage for Runner Game */
+  #mini-game-canvas {
+    background: #1e293b;
+    border-radius: 8px;
+    display: block;
+    margin: 10px auto;
+  }
+</style>
+</head>
+<body>
+
+<div class="app-header">
+  <h1>🎮 Εργαστήριο Scratch: Η Συνθήκη Τέλους</h1>
+  <p>Μάθημα 6: Διαδραστικά παιχνίδια και δραστηριότητες (Ε΄ Δημοτικού)</p>
+</div>
+
+<!-- Tabs -->
+<div class="act-menu">
+  <button class="act-btn active" onclick="showAct(0)">1. Χτίσε το Μπλοκ</button>
+  <button class="act-btn" onclick="showAct(1)">2. Φανάρι Κυκλοφορίας</button>
+  <button class="act-btn" onclick="showAct(2)">3. Ο Μεγεθυντικός Φακός</button>
+  <button class="act-btn" onclick="showAct(3)">4. Οι 3 Ήρωες</button>
+  <button class="act-btn" onclick="showAct(4)">5. Πραγματικό Παιχνίδι</button>
+  <button class="act-btn" onclick="showAct(5)">6. Σωστό ή Λάθος</button>
+  <button class="act-btn" onclick="showAct(6)">7. Πειραματικό Εργαστήριο</button>
+  <button class="act-btn" onclick="showAct(7)">8. Αποστολή Στόχου</button>
+</div>
+
+<!-- ================= 1. ΧΤΙΣΕ ΤΟ ΜΠΛΟΚ (INTERACTIVE BUILDER) ================= -->
+<div class="stage-panel active" id="act-0">
+  <div class="stage-title">🛠️ Δραστηριότητα 1: Συναρμολόγηση του Μπλοκ Τερματισμού</div>
+  <p style="color:#64748b; font-size:0.9rem;">Κάνε κλικ στα κομμάτια για να χτίσεις βήμα-βήμα το μεγάλο μπλοκ του Scratch!</p>
+
+  <!-- 1.1 -->
+  <div class="part-box">
+    <h3>1.1 Το Αριστερό Μέρος (Νίκη)</h3>
+    <p>Βάλε στη θέση του το μπλοκ που ελέγχει αν κερδίσαμε με 10 πόντους:</p>
+    <div>Υποδοχή: <span class="drop-target" id="drop-1-1">...</span></div>
+    <div class="token-pool">
+      <div class="drag-token" onclick="insertToken('drop-1-1', 'πόντοι = 10', true, 'msg-1-1', 'Μπράβο! Αυτό ελέγχει τους πόντους νίκης!')">πόντοι = 10</div>
+      <div class="drag-token" onclick="insertToken('drop-1-1', 'κινήσου 10', false, 'msg-1-1', 'Όχι, αυτό είναι κίνηση, όχι έλεγχος!')">κινήσου 10</div>
+    </div>
+    <div class="msg-area" id="msg-1-1"></div>
+  </div>
+
+  <!-- 1.2 -->
+  <div class="part-box">
+    <h3>1.2 Ο Συνδετήρας</h3>
+    <p>Ποια λέξη ενώνει το κέρδισα (10 πόντοι) με το έχασα (0 ζωές);</p>
+    <div>Έκφραση: <code>&lt;πόντοι = 10&gt;</code> <span class="drop-target" id="drop-1-2">...</span> <code>&lt;ζωές = 0&gt;</code></div>
+    <div class="token-pool">
+      <div class="drag-token" onclick="insertToken('drop-1-2', 'ή', true, 'msg-1-2', 'Σωστά! Τελειώνει είτε γίνει το ένα ΕΙΤΕ το άλλο!')">ή</div>
+      <div class="drag-token" onclick="insertToken('drop-1-2', 'και', false, 'msg-1-2', 'Το «και» σημαίνει να συμβούν και τα δύο μαζί!')">και</div>
+    </div>
+    <div class="msg-area" id="msg-1-2"></div>
+  </div>
+
+  <!-- 1.3 -->
+  <div class="part-box">
+    <h3>1.3 Το Εξωτερικό Κουτί</h3>
+    <p>Σε ποια εντολή μπαίνει όλη αυτή η πράσινη συνθήκη για να σταματάει;</p>
+    <div>Μπλοκ: <span class="drop-target" id="drop-1-3">...</span> <code>&lt;&lt;πόντοι = 10&gt; ή &lt;ζωές = 0&gt;&gt;</code></div>
+    <div class="token-pool">
+      <div class="drag-token" onclick="insertToken('drop-1-3', 'επανάλαβε ώσπου', true, 'msg-1-3', 'Τέλεια! Το «επανάλαβε ώσπου» σταματάει μόλις η συνθήκη γίνει αληθινή!')">επανάλαβε ώσπου</div>
+      <div class="drag-token" onclick="insertToken('drop-1-3', 'για πάντα', false, 'msg-1-3', 'Το «για πάντα» δεν σταματάει ποτέ μόνο του!')">για πάντα</div>
+    </div>
+    <div class="msg-area" id="msg-1-3"></div>
+  </div>
+</div>
+
+<!-- ================= 2. ΦΑΝΑΡΙ ΚΥΚΛΟΦΟΡΙΑΣ ================= -->
+<div class="stage-panel" id="act-1">
+  <div class="stage-title">🚦 Δραστηριότητα 2: Το Φανάρι (ΠΡΑΣΙΝΟ = Παίζει | ΚΟΚΚΙΝΟ = Σταματά)</div>
+  <p style="color:#64748b; font-size:0.9rem;">Κοίταξε τις τιμές στον πίνακα και πάτησε τι χρώμα ανάβει το φανάρι του παιχνιδιού!</p>
+
+  <!-- 2.1 -->
+  <div class="part-box">
+    <h3>2.1 Κατάσταση: 10 Πόντοι & 3 Ζωές</h3>
+    <p>Ο παίκτης μάζεψε 10 πόντους! Τι πρέπει να ανάψει;</p>
+    <div class="toggle-grid">
+      <button class="t-btn" onclick="testSignal(this, false, 'msg-2-1', 'Όχι, αφού έφτασε τους 10 πόντους δεν πρέπει να συνεχίσει!')">🟢 ΠΡΑΣΙΝΟ (Συνεχίζει)</button>
+      <button class="t-btn" onclick="testSignal(this, true, 'msg-2-1', 'Σωστά! ΚΟΚΚΙΝΟ! Ο παίκτης νίκησε και το παιχνίδι σταματάει!')">🔴 ΚΟΚΚΙΝΟ (Σταματάει)</button>
+    </div>
+    <div class="msg-area" id="msg-2-1"></div>
+  </div>
+
+  <!-- 2.2 -->
+  <div class="part-box">
+    <h3>2.2 Κατάσταση: 6 Πόντοι & 2 Ζωές</h3>
+    <p>Ο παίκτης έχει 6 πόντους και του μένουν 2 ζωές. Τι ανάβει;</p>
+    <div class="toggle-grid">
+      <button class="t-btn" onclick="testSignal(this, true, 'msg-2-2', 'Μπράβο! ΠΡΑΣΙΝΟ! Δεν έφτασε ούτε στο 10 ούτε στο 0, άρα παίζει ακόμα!')">🟢 ΠΡΑΣΙΝΟ (Συνεχίζει)</button>
+      <button class="t-btn" onclick="testSignal(this, false, 'msg-2-2', 'Όχι, το παιχνίδι συνεχίζεται κανονικά!')">🔴 ΚΟΚΚΙΝΟ (Σταματάει)</button>
+    </div>
+    <div class="msg-area" id="msg-2-2"></div>
+  </div>
+
+  <!-- 2.3 -->
+  <div class="part-box">
+    <h3>2.3 Κατάσταση: 4 Πόντοι & 0 Ζωές</h3>
+    <p>Ο παίκτης χτυπήθηκε και οι ζωές του έγιναν 0. Τι ανάβει;</p>
+    <div class="toggle-grid">
+      <button class="t-btn" onclick="testSignal(this, false, 'msg-2-3', 'Χωρίς ζωές δεν μπορεί να συνεχίσει να παίζει!')">🟢 ΠΡΑΣΙΝΟ (Συνεχίζει)</button>
+      <button class="t-btn" onclick="testSignal(this, true, 'msg-2-3', 'Σωστά! ΚΟΚΚΙΝΟ! Μηδενίστηκαν οι ζωές, άρα έχασε και παγώνει!')">🔴 ΚΟΚΚΙΝΟ (Σταματάει)</button>
+    </div>
+    <div class="msg-area" id="msg-2-3"></div>
+  </div>
+</div>
+
+<!-- ================= 3. Ο ΜΕΓΕΘΥΝΤΙΚΟΣ ΦΑΚΟΣ ================= -->
+<div class="stage-panel" id="act-2">
+  <div class="stage-title">🔍 Δραστηριότητα 3: Ο Μεγεθυντικός Φακός (Εντόπισε το Σφάλμα)</div>
+  <p style="color:#64748b; font-size:0.9rem;">Κάποιος μαθητής έκανε ένα λάθος στο Scratch. Βρες τι πήγε στραβά!</p>
+
+  <div class="part-box">
+    <h3>3.1 Σφάλμα 1: Το λάθος συνδετικό</h3>
+    <p>Έγραψε: <code>επανάλαβε ώσπου &lt;πόντοι = 10 ΚΑΙ ζωές = 0&gt;</code>. Γιατί δεν τελειώνει ποτέ;</p>
+    <div class="toggle-grid">
+      <button class="t-btn" onclick="testSignal(this, true, 'msg-3-1', 'Ακριβώς! Δεν γίνεται να έχει ταυτόχρονα και 10 πόντους ΚΑΙ 0 ζωές!')">Γιατί το «ΚΑΙ» ζητάει να συμβούν και τα δύο ταυτόχρονα</button>
+      <button class="t-btn" onclick="testSignal(this, false, 'msg-3-1', 'Όχι, το 10 είναι σωστός αριθμός για τους πόντους!')">Γιατί το 10 είναι λάθος νούμερο</button>
+    </div>
+    <div class="msg-area" id="msg-3-1"></div>
+  </div>
+
+  <div class="part-box">
+    <h3>3.2 Σφάλμα 2: Το διπλό κουτί</h3>
+    <p>Έβαλε το <span class="sb-code sb-control">επανάλαβε ώσπου</span> μέσα σε ένα <span class="sb-code sb-control">για πάντα</span>. Τι θα συμβεί;</p>
+    <div class="toggle-grid">
+      <button class="t-btn" onclick="testSignal(this, true, 'msg-3-2', 'Μπράβο! Μόλις τελειώνει ο έλεγχος, το «για πάντα» τον ξαναξεκινάει αμέσως!')">Μόλις τελειώσει ο γύρος, θα ξαναρχίζει αμέσως από την αρχή</button>
+      <button class="t-btn" onclick="testSignal(this, false, 'msg-3-2', 'Όχι, το ποντίκι δεν χαλάει από τέτοιο λάθος!')">Θα χαλάσει το ποντίκι του υπολογιστή</button>
+    </div>
+    <div class="msg-area" id="msg-3-2"></div>
+  </div>
+
+  <div class="part-box">
+    <h3>3.3 Σφάλμα 3: Εντολή έξω από το κουτί</h3>
+    <p>Έβαλε το <span class="sb-code sb-motion">κινήσου 10 βήματα</span> κάτω από το <span class="sb-code sb-control">επανάλαβε ώσπου</span>. Πότε θα κινηθεί;</p>
+    <div class="toggle-grid">
+      <button class="t-btn" onclick="testSignal(this, true, 'msg-3-3', 'Σωστά! Ό,τι είναι έξω από το μπλοκ εκτελείται ΜΟΝΟ αφού τελειώσει το παιχνίδι!')">Μόνο μία φορά, αφού τελειώσει όλο το παιχνίδι</button>
+      <button class="t-btn" onclick="testSignal(this, false, 'msg-3-3', 'Αν είναι έξω από την επανάληψη, δεν κινείται συνεχώς!')">Θα κινείται κανονικά σε όλο το παιχνίδι</button>
+    </div>
+    <div class="msg-area" id="msg-3-3"></div>
+  </div>
+</div>
+
+<!-- ================= 4. ΟΙ 3 ΗΡΩΕΣ ================= -->
+<div class="stage-panel" id="act-3">
+  <div class="stage-title">👥 Δραστηριότητα 4: Οι 3 Ήρωες του Παιχνιδιού</div>
+  <p style="color:#64748b; font-size:0.9rem;">Στο παιχνίδι έχουμε: 1. Τον Δύτη (Παίκτης), 2. Τον Αστερία (Στόχος), 3. Το Ψάρι (Εχθρός).</p>
+
+  <div class="part-box">
+    <h3>4.1 Ποιοι πρέπει να σταματούν;</h3>
+    <p>Όταν τελειώνει το παιχνίδι, ποιος πρέπει να παγώνει;</p>
+    <div class="toggle-grid">
+      <button class="t-btn" onclick="testSignal(this, true, 'msg-4-1', 'Σωστά! Πρέπει να σταματούν όλοι μαζί για να παγώσει η οθόνη!')">Και οι τρεις ήρωες ταυτόχρονα</button>
+      <button class="t-btn" onclick="testSignal(this, false, 'msg-4-1', 'Αν σταματήσει μόνο ο ένας, οι άλλοι δύο θα συνεχίσουν να τρέχουν!')">Μόνο ο Δύτης</button>
+    </div>
+    <div class="msg-area" id="msg-4-1"></div>
+  </div>
+
+  <div class="part-box">
+    <h3>4.2 Τι θα κάνει ο εχθρός αν τον ξεχάσουμε;</h3>
+    <p>Αν ο Δύτης σταματήσει αλλά το Ψάρι συνεχίζει να τρέχει, τι θα γίνει;</p>
+    <div class="toggle-grid">
+      <button class="t-btn" onclick="testSignal(this, true, 'msg-4-2', 'Μπράβο! Θα πέφτει πάνω στον ακίνητο Δύτη και θα του κλέβει ζωές!')">Θα συνεχίσει να χτυπάει τον ακίνητο Δύτη</button>
+      <button class="t-btn" onclick="testSignal(this, false, 'msg-4-2', 'Όχι, στο Scratch κανένας χαρακτήρας δεν σταματάει αν δεν του δώσουμε εντολή!')">Θα εξαφανιστεί αυτόματα</button>
+    </div>
+    <div class="msg-area" id="msg-4-2"></div>
+  </div>
+
+  <div class="part-box">
+    <h3>4.3 Πώς το φτιάχνουμε;</h3>
+    <p>Πώς κάνουμε και τους τρεις να σταματούν μαζί;</p>
+    <div class="toggle-grid">
+      <button class="t-btn" onclick="testSignal(this, true, 'msg-4-3', 'Ακριβώς! Βάζουμε το ίδιο μπλοκ «επανάλαβε ώσπου» στον κώδικα και των τριών!')">Βάζουμε την ίδια συνθήκη τέλους και στους 3 ήρωες</button>
+      <button class="t-btn" onclick="testSignal(this, false, 'msg-4-3', 'Χρειαζόμαστε την ίδια συνθήκη για να είναι συγχρονισμένοι!')">Βάζουμε διαφορετικό κανόνα στον καθένα</button>
+    </div>
+    <div class="msg-area" id="msg-4-3"></div>
+  </div>
+</div>
+
+<!-- ================= 5. ΠΡΑΓΜΑΤΙΚΟ ΠΑΙΧΝΙΔΙ (RUNNER DEMO) ================= -->
+<div class="stage-panel" id="act-4">
+  <div class="stage-title">🎮 Δραστηριότητα 5: Παίξε και Δες τη Συνθήκη σε Δράση!</div>
+  <p style="color:#64748b; font-size:0.9rem;">Κούνα το ποντίκι μέσα στο γκρι πλαίσιο για να μαζέψεις 10 αστέρια πριν χάσεις 3 ζωές!</p>
+
+  <div style="background:#0f172a; border-radius:10px; padding:12px; text-align:center;">
+    <div style="display:flex; justify-content:space-around; color:#fff; font-weight:bold; margin-bottom:8px; font-size:0.95rem;">
+      <span>⭐ Πόντοι: <span id="g-pts">0</span> / 10</span>
+      <span>❤️ Ζωές: <span id="g-lvs">3</span> / 3</span>
+      <span>Κανόνας: <code>&lt;πόντοι = 10 ή ζωές = 0&gt;</code></span>
+    </div>
+    <canvas id="mini-game-canvas" width="600" height="220"></canvas>
+    <div id="g-over-banner" style="display:none; color:#f8fafc; font-weight:bold; font-size:1.1rem; padding:6px; margin-top:6px;"></div>
+    <button class="t-btn" style="width:160px; margin:8px auto; padding:6px;" onclick="initMiniGame()">Επανεκκίνηση</button>
+  </div>
+
+  <div class="part-box" style="margin-top:14px;">
+    <h3>5.1 Τι παρατήρησες όταν έφτασες 10 πόντους;</h3>
+    <div class="toggle-grid">
+      <button class="t-btn" onclick="testSignal(this, true, 'msg-5-1', 'Σωστά! Η συνθήκη έγινε ΑΛΗΘΕΙΑ και το παιχνίδι πάγωσε αμέσως!')">Ο παίκτης πάγωσε και το παιχνίδι τερμάτισε</button>
+      <button class="t-btn" onclick="testSignal(this, false, 'msg-5-1', 'Όχι, είδες ότι το παιχνίδι σταμάτησε!')">Συνέχισες να μαζεύεις πόντους</button>
+    </div>
+    <div class="msg-area" id="msg-5-1"></div>
+  </div>
+
+  <div class="part-box">
+    <h3>5.2 Τι συνέβη όταν οι ζωές έγιναν 0;</h3>
+    <div class="toggle-grid">
+      <button class="t-btn" onclick="testSignal(this, true, 'msg-5-2', 'Μπράβο! Το παιχνίδι σταμάτησε ακριβώς στο 0 χωρίς να πάει σε αρνητικούς αριθμούς!')">Το παιχνίδι σταμάτησε στο 0 ζωές</button>
+      <button class="t-btn" onclick="testSignal(this, false, 'msg-5-2', 'Όχι, τώρα δεν πέφτουν κάτω από το 0!')">Οι ζωές πήγαν στο -1</button>
+    </div>
+    <div class="msg-area" id="msg-5-2"></div>
+  </div>
+
+  <div class="part-box">
+    <h3>5.3 Γιατί σταμάτησε και στις δύο περιπτώσεις;</h3>
+    <div class="toggle-grid">
+      <button class="t-btn" onclick="testSignal(this, true, 'msg-5-3', 'Ακριβώς! Ο τελεστής «ή» ενεργοποιεί το τέλος είτε κερδίσουμε είτε χάσουμε!')">Γιατί ο τελεστής «ή» σταματάει αν συμβεί είτε το ένα είτε το άλλο</button>
+      <button class="t-btn" onclick="testSignal(this, false, 'msg-5-3', 'Όχι, το παιχνίδι λειτούργησε άψογα!')">Επειδή κόλλησε ο υπολογιστής</button>
+    </div>
+    <div class="msg-area" id="msg-5-3"></div>
+  </div>
+</div>
+
+<!-- ================= 6. ΣΩΣΤΟ Η ΛΑΘΟΣ ================= -->
+<div class="stage-panel" id="act-5">
+  <div class="stage-title">⚖️ Δραστηριότητα 6: Σωστό ή Λάθος;</div>
+  <p style="color:#64748b; font-size:0.9rem;">Διάβασε την πρόταση και διάλεξε αν είναι Σωστή ή Λάθος.</p>
+
+  <div class="part-box">
+    <h3>6.1 Πρόταση 1</h3>
+    <p>«Η εντολή <em>για πάντα</em> έχει ειδική υποδοχή για να βάλουμε συνθήκη τέλους.»</p>
+    <div class="toggle-grid">
+      <button class="t-btn" onclick="testSignal(this, false, 'msg-6-1', 'Λάθος! Το «για πάντα» δεν έχει καμία υποδοχή για συνθήκη!')">ΣΩΣΤΟ</button>
+      <button class="t-btn" onclick="testSignal(this, true, 'msg-6-1', 'Σωστά είναι ΛΑΘΟΣ! Μόνο το «επανάλαβε ώσπου» έχει υποδοχή για συνθήκη!')">ΛΑΘΟΣ</button>
+    </div>
+    <div class="msg-area" id="msg-6-1"></div>
+  </div>
+
+  <div class="part-box">
+    <h3>6.2 Πρόταση 2</h3>
+    <p>«Ο τελεστής <em>ή</em> δίνει ΑΛΗΘΕΙΑ αν τουλάχιστον ένα από τα δύο μέρη του είναι αληθινό.»</p>
+    <div class="toggle-grid">
+      <button class="t-btn" onclick="testSignal(this, true, 'msg-6-2', 'Μπράβο! ΣΩΣΤΟ! Αρκεί να γίνει ένα από τα δύο!')">ΣΩΣΤΟ</button>
+      <button class="t-btn" onclick="testSignal(this, false, 'msg-6-2', 'Είναι ΣΩΣΤΟ! Αυτή ακριβώς είναι η λειτουργία του «ή»!')">ΛΑΘΟΣ</button>
+    </div>
+    <div class="msg-area" id="msg-6-2"></div>
+  </div>
+
+  <div class="part-box">
+    <h3>6.3 Πρόταση 3</h3>
+    <p>«Όταν σταματήσει το <em>επανάλαβε ώσπου</em>, εκτελούνται οι εντολές που βρίσκονται από κάτω του.»</p>
+    <div class="toggle-grid">
+      <button class="t-btn" onclick="testSignal(this, true, 'msg-6-3', 'Σωστά! ΣΩΣΤΟ! Το πρόγραμμα συνεχίζει στις επόμενες εντολές!')">ΣΩΣΤΟ</button>
+      <button class="t-btn" onclick="testSignal(this, false, 'msg-6-3', 'Είναι ΣΩΣΤΟ! Έτσι μπορούμε να δείξουμε την οθόνη τέλους!')">ΛΑΘΟΣ</button>
+    </div>
+    <div class="msg-area" id="msg-6-3"></div>
+  </div>
+</div>
+
+<!-- ================= 7. ΠΕΙΡΑΜΑΤΙΚΟ ΕΡΓΑΣΤΗΡΙΟ ================= -->
+<div class="stage-panel" id="act-6">
+  <div class="stage-title">🧪 Δραστηριότητα 7: Πειράματα με τους Κανόνες</div>
+  <p style="color:#64748b; font-size:0.9rem;">Πώς μπορούμε να αλλάξουμε τους κανόνες για διαφορετικά παιχνίδια;</p>
+
+  <div class="part-box">
+    <h3>7.1 Πιο Μεγάλο Παιχνίδι</h3>
+    <p>Αν θέλουμε ο παίκτης να μαζεύει 15 πόντους αντί για 10, ποιον αριθμό αλλάζουμε;</p>
+    <div class="toggle-grid">
+      <button class="t-btn" onclick="testSignal(this, true, 'msg-7-1', 'Σωστά! Αλλάζουμε το 10 σε 15!')">Αλλάζουμε το 10 σε 15</button>
+      <button class="t-btn" onclick="testSignal(this, false, 'msg-7-1', 'Όχι, οι ζωές παραμένουν 0 για την ήττα!')">Αλλάζουμε το 0 των ζωών σε 15</button>
+    </div>
+    <div class="msg-area" id="msg-7-1"></div>
+  </div>
+
+  <div class="part-box">
+    <h3>7.2 Παιχνίδι με Χρόνο</h3>
+    <p>Αν το παιχνίδι σταματάει όταν μηδενιστεί το χρονόμετρο, ποια συνθήκη ταιριάζει;</p>
+    <div class="toggle-grid">
+      <button class="t-btn" onclick="testSignal(this, true, 'msg-7-2', 'Μπράβο! Συνδυάζουμε πόντους με χρόνο = 0!')">&lt;&lt;πόντοι = 10&gt; ή &lt;χρόνος = 0&gt;&gt;</button>
+      <button class="t-btn" onclick="testSignal(this, false, 'msg-7-2', 'Αυτό δεν έχει καθόλου χρονόμετρο!')">&lt;&lt;πόντοι = 10&gt; ή &lt;ζωές = 0&gt;&gt;</button>
+    </div>
+    <div class="msg-area" id="msg-7-2"></div>
+  </div>
+
+  <div class="part-box">
+    <h3>7.3 Μία μόνο ζωή!</h3>
+    <p>Αν ο παίκτης έχει μόνο 1 ευκαιρία και στο πρώτο χτύπημα χάνει, πότε τελειώνει;</p>
+    <div class="toggle-grid">
+      <button class="t-btn" onclick="testSignal(this, true, 'msg-7-3', 'Σωστά! Ξεκινάει με 1 ζωή και μόλις πάει στο 0 σταματάει!')">Μόλις οι ζωές γίνουν 0</button>
+      <button class="t-btn" onclick="testSignal(this, false, 'msg-7-3', 'Αν σταματούσε στο 1, θα έχανε αμέσως στην εκκίνηση!')">Μόλις οι ζωές γίνουν 1</button>
+    </div>
+    <div class="msg-area" id="msg-7-3"></div>
+  </div>
+</div>
+
+<!-- ================= 8. ΑΠΟΣΤΟΛΗ ΣΤΟΧΟΥ ================= -->
+<div class="stage-panel" id="act-7">
+  <div class="stage-title">🎯 Δραστηριότητα 8: Τι Μάθαμε Σήμερα;</div>
+  <p style="color:#64748b; font-size:0.9rem;">Κάνε την τελική ανασκόπηση των στόχων του μαθήματος!</p>
+
+  <div class="part-box">
+    <h3>8.1 Ο βασικός στόχος</h3>
+    <p>Τι καταφέραμε να κάνουμε στο παιχνίδι μας σε αυτό το μάθημα;</p>
+    <div class="toggle-grid">
+      <button class="t-btn" onclick="testSignal(this, true, 'msg-8-1', 'Συγχαρητήρια! Τώρα το παιχνίδι μας ξέρει ακριβώς πότε να παγώνει!')">Να τερματίζουμε το παιχνίδι όταν νικάμε ή χάνουμε</button>
+      <button class="t-btn" onclick="testSignal(this, false, 'msg-8-1', 'Αυτό ήταν σε προηγούμενο μάθημα!')">Μόνο να αλλάζουμε τα χρώματα</button>
+    </div>
+    <div class="msg-area" id="msg-8-1"></div>
+  </div>
+
+  <div class="part-box">
+    <h3>8.2 Ο τελεστής της ημέρας</h3>
+    <p>Ποιος ήταν ο μεγάλος πρωταγωνιστής των λογικών εκφράσεων σήμερα;</p>
+    <div class="toggle-grid">
+      <button class="t-btn" onclick="testSignal(this, true, 'msg-8-2', 'Μπράβο! Ο τελεστής «Ή» που ένωσε τις δύο περιπτώσεις!')">Ο πράσινος τελεστής «Ή»</button>
+      <button class="t-btn" onclick="testSignal(this, false, 'msg-8-2', 'Όχι, ο πρωταγωνιστής σήμερα ήταν το «Ή»!')">Ο τελεστής της πρόσθεσης (+)</button>
+    </div>
+    <div class="msg-area" id="msg-8-2"></div>
+  </div>
+
+  <div class="part-box">
+    <h3>8.3 Το επόμενο βήμα</h3>
+    <p>Τι θα μάθουμε στο επόμενο μάθημα (Μάθημα 7);</p>
+    <div class="toggle-grid">
+      <button class="t-btn" onclick="testSignal(this, true, 'msg-8-3', 'Τέλεια! Στο Μάθημα 7 θα βάλουμε οθόνη Νίκης ή Ήττας!')">Να δείχνουμε οθόνη «Κέρδισες!» ή «Έχασες!»</button>
+      <button class="t-btn" onclick="testSignal(this, false, 'msg-8-3', 'Όχι, το παιχνίδι συνεχίζει με οθόνες τέλους!')">Να σβήσουμε όλο το παιχνίδι</button>
+    </div>
+    <div class="msg-area" id="msg-8-3"></div>
+  </div>
+</div>
+
+<script>
+function showAct(idx) {
+  const btns = document.querySelectorAll('.act-btn');
+  const panels = document.querySelectorAll('.stage-panel');
+  btns.forEach((b, i) => {
+    if (i === idx) b.classList.add('active');
+    else b.classList.remove('active');
+  });
+  panels.forEach((p, i) => {
+    if (i === idx) p.classList.add('active');
+    else p.classList.remove('active');
+  });
+  if (idx === 4) {
+    initMiniGame();
+  }
+}
+
+function insertToken(dropId, text, isCorrect, msgId, feedback) {
+  const target = document.getElementById(dropId);
+  const msg = document.getElementById(msgId);
+  target.textContent = text;
+  target.classList.add('filled');
+  msg.classList.add('show');
+  if (isCorrect) {
+    target.style.borderColor = '#22c55e';
+    target.style.color = '#15803d';
+    msg.className = 'msg-area show ok';
+    msg.innerHTML = '🌟 ' + feedback;
+  } else {
+    target.style.borderColor = '#ef4444';
+    target.style.color = '#b91c1c';
+    msg.className = 'msg-area show err';
+    msg.innerHTML = '💡 ' + feedback;
+  }
+}
+
+function testSignal(btn, isCorrect, msgId, feedback) {
+  const parent = btn.closest('.part-box');
+  const allBtns = parent.querySelectorAll('.t-btn');
+  const msg = document.getElementById(msgId);
+
+  allBtns.forEach(b => b.disabled = true);
+  msg.classList.add('show');
+
+  if (isCorrect) {
+    btn.classList.add('correct');
+    msg.className = 'msg-area show ok';
+    msg.innerHTML = '🌟 ' + feedback;
+  } else {
+    btn.classList.add('wrong');
+    msg.className = 'msg-area show err';
+    msg.innerHTML = '💡 ' + feedback;
+  }
+}
+
+// Mini Game Canvas Logic
+let canvas = document.getElementById('mini-game-canvas');
+let ctx = canvas.getContext('2d');
+let gPoints = 0;
+let gLives = 3;
+let gActive = true;
+let pX = 50, pY = 110;
+let star = { x: 300, y: 100, r: 12 };
+let rock = { x: 550, y: 110, r: 14, spd: 3 };
+
+canvas.addEventListener('mousemove', (e) => {
+  if (!gActive) return;
+  const rect = canvas.getBoundingClientRect();
+  pX = e.clientX - rect.left;
+  pY = e.clientY - rect.top;
+});
+
+function initMiniGame() {
+  gPoints = 0;
+  gLives = 3;
+  gActive = true;
+  document.getElementById('g-pts').textContent = gPoints;
+  document.getElementById('g-lvs').textContent = gLives;
+  document.getElementById('g-over-banner').style.display = 'none';
+  star.x = 200 + Math.random() * 350;
+  star.y = 30 + Math.random() * 160;
+  rock.x = 580;
+  rock.y = 30 + Math.random() * 160;
+}
+
+function gameLoop() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  if (gActive) {
+    // Κίνηση εχθρού
+    rock.x -= rock.spd;
+    if (rock.x < -20) {
+      rock.x = 600;
+      rock.y = 30 + Math.random() * 160;
+    }
+
+    // Έλεγχος επαφής με αστέρι (+1 πόντος)
+    let dStar = Math.hypot(pX - star.x, pY - star.y);
+    if (dStar < 24) {
+      gPoints++;
+      document.getElementById('g-pts').textContent = gPoints;
+      star.x = 50 + Math.random() * 500;
+      star.y = 30 + Math.random() * 160;
+    }
+
+    // Έλεγχος επαφής με εχθρό (-1 ζωή)
+    let dRock = Math.hypot(pX - rock.x, pY - rock.y);
+    if (dRock < 26) {
+      gLives--;
+      document.getElementById('g-lvs').textContent = gLives;
+      rock.x = 600;
+      rock.y = 30 + Math.random() * 160;
+    }
+
+    // ΣΥΝΘΗΚΗ ΤΕΛΟΥΣ: <πόντοι = 10 ή ζωές = 0>
+    if (gPoints >= 10 || gLives <= 0) {
+      gActive = false;
+      const banner = document.getElementById('g-over-banner');
+      banner.style.display = 'block';
+      if (gPoints >= 10) {
+        banner.style.background = '#15803d';
+        banner.textContent = '🎉 ΝΙΚΗ! Έφτασες τους 10 πόντους! (Η συνθήκη έγινε ΑΛΗΘΕΙΑ - Πάγωμα)';
+      } else {
+        banner.style.background = '#b91c1c';
+        banner.textContent = '💔 ΗΤΤΑ! 0 Ζωές! (Η συνθήκη έγινε ΑΛΗΘΕΙΑ - Πάγωμα)';
+      }
+    }
+  }
+
+  // Σχεδίαση Παίκτη (Δύτης/Κύκλος)
+  ctx.fillStyle = '#38bdf8';
+  ctx.beginPath();
+  ctx.arc(pX, pY, 14, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Σχεδίαση Στόχου (Αστέρι)
+  ctx.fillStyle = '#facc15';
+  ctx.beginPath();
+  ctx.arc(star.x, star.y, star.r, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Σχεδίαση Εχθρού (Επικίνδυνο ψάρι/βράχος)
+  ctx.fillStyle = '#ef4444';
+  ctx.beginPath();
+  ctx.arc(rock.x, rock.y, rock.r, 0, Math.PI * 2);
+  ctx.fill();
+
+  requestAnimationFrame(gameLoop);
+}
+
+// Εκκίνηση loop
+requestAnimationFrame(gameLoop);
+</script>
+
+</body>
+</html>
