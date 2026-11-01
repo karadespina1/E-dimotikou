@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Παιχνίδια Scratch - Ε΄ Δημοτικού (Μάθημα 4)</title>
+<style>
+  :root {
+    --bg-color: #f3f6fb;
+    --card-bg: #ffffff;
+    --text-main: #2d3748;
+    --primary: #4a6fa5;
+    --success: #38b000;
+    --error: #e5383b;
+    --motion: #4C97FF;
+    --looks: #9966FF;
+    --sensing: #5CB1D6;
+    --control: #FFAB19;
+    --operators: #59C059;
+  }
+
+  body {
+    font-family: 'Comic Sans MS', 'Chalkboard SE', 'Segoe UI', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    margin: 0;
+    padding: 15px;
+  }
+
+  .header {
+    text-align: center;
+    background: linear-gradient(135deg, #4361ee, #3a0ca3);
+    color: white;
+    padding: 20px;
+    border-radius: 16px;
+    margin-bottom: 25px;
+    box-shadow: 0 6px 14px rgba(0,0,0,0.12);
+  }
+
+  .header h1 { margin: 0 0 8px 0; font-size: 1.7rem; }
+  .header p { margin: 0; font-size: 1.05rem; opacity: 0.95; }
+
+  /* Tabs πλοήγησης για να μην είναι όλα μαζεμένα */
+  .nav-tabs {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 25px;
+    max-width: 1100px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .nav-btn {
+    background: white;
+    border: 2px solid #cbd5e1;
+    padding: 10px 16px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: bold;
+    color: #475569;
+    transition: all 0.2s;
+  }
+
+  .nav-btn:hover { background: #e2e8f0; }
+  .nav-btn.active {
+    background: #ff9f1c;
+    color: white;
+    border-color: #f77f00;
+    transform: scale(1.05);
+    box-shadow: 0 4px 10px rgba(255, 159, 28, 0.4);
+  }
+
+  .activity-container {
+    max-width: 850px;
+    margin: 0 auto;
+    display: none;
+  }
+  .activity-container.active { display: block; animation: fadeIn 0.3s ease-in; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .main-card {
+    background: var(--card-bg);
+    border-radius: 18px;
+    padding: 24px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+    border-top: 8px solid #ff9f1c;
+  }
+
+  .act-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .act-header h2 { margin: 0; font-size: 1.35rem; color: #1e293b; }
+
+  .act-story {
+    background: #eef2ff;
+    padding: 12px 16px;
+    border-left: 5px solid #4361ee;
+    border-radius: 8px;
+    font-size: 0.98rem;
+    margin-bottom: 20px;
+    line-height: 1.45;
+  }
+
+  /* Υποδραστηριότητες (Βήματα 1, 2, 3) */
+  .sub-box {
+    background: #f8fafc;
+    border: 2px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 16px;
+    margin-bottom: 18px;
+  }
+
+  .sub-box h3 {
+    margin: 0 0 10px 0;
+    font-size: 1.05rem;
+    color: #2b6cb0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .sub-box p {
+    font-size: 0.95rem;
+    margin: 0 0 12px 0;
+    line-height: 1.4;
+  }
+
+  /* Κουμπιά επιλογών */
+  .choice-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .choice-btn {
+    background: white;
+    border: 2px solid #cbd5e1;
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 0.92rem;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .choice-btn:hover { background: #f1f5f9; border-color: #94a3b8; }
+  .choice-btn.correct { background: #dcfce7 !important; border-color: #22c55e !important; color: #14532d; font-weight: bold; }
+  .choice-btn.wrong { background: #fee2e2 !important; border-color: #ef4444 !important; color: #7f1d1d; }
+
+  .feedback-msg {
+    margin-top: 10px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 0.88rem;
+    font-weight: bold;
+    display: none;
+  }
+  .feedback-msg.show { display: block; }
+  .feedback-msg.win { background: #dcfce7; color: #166534; border: 1px solid #86efac; }
+  .feedback-msg.lose { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+
+  /* Scratch Μπλοκ Styling */
+  .sb {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 6px;
+    color: white;
+    font-weight: bold;
+    font-size: 0.85rem;
+    vertical-align: middle;
+  }
+  .sb-motion { background-color: var(--motion); }
+  .sb-looks { background-color: var(--looks); }
+  .sb-control { background-color: var(--control); }
+  .sb-sensing { background-color: var(--sensing); }
+  .sb-operators { background-color: var(--operators); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🎮 Διαδραστικά Παιχνίδια Scratch</h1>
+  <p><strong>Μάθημα 4: Φτιάχνω το πρώτο μου παιχνίδι (Ε΄ Δημοτικού)</strong><br>
+  Διάλεξε καρτέλα παρακάτω — Κάθε αποστολή έχει 3 απλά βήματα!</p>
+</div>
+
+<!-- TABS ΠΛΟΗΓΗΣΗΣ -->
+<div class="nav-tabs">
+  <button class="nav-btn active" onclick="switchTab(0)">🚀 1. Το Διαστημόπλοιο</button>
+  <button class="nav-btn" onclick="switchTab(1)">🐝 2. Η Μελισσούλα</button>
+  <button class="nav-btn" onclick="switchTab(2)">⚽ 3. Ο Τερματοφύλακας</button>
+  <button class="nav-btn" onclick="switchTab(3)">🧀 4. Το Ποντικάκι</button>
+  <button class="nav-btn" onclick="switchTab(4)">🎨 5. Τα Χρώματα Εντολών</button>
+  <button class="nav-btn" onclick="switchTab(5)">🕵️ 6. Ντετέκτιβ Λαθών</button>
+  <button class="nav-btn" onclick="switchTab(6)">🔄 7. Ο Μαγικός Καθρέφτης</button>
+  <button class="nav-btn" onclick="switchTab(7)">🎯 8. Ο Σχεδιαστής</button>
+</div>
+
+<!-- 1. ΔΙΑΣΤΗΜΟΠΛΟΙΟ -->
+<div class="activity-container active" id="act-0">
+  <div class="main-card">
+    <div class="act-header">
+      <h2>🚀 Αποστολή 1: Το Διαστημόπλοιο & Ο Μετωρίτης</h2>
+    </div>
+    <div class="act-story">
+      <strong>Ιστορία:</strong> Οδηγούμε έναν διαστημικό εξερευνητή με το ποντίκι μας, ενώ ένας λαμπερός μετεωρίτης ξεπροβάλλει ξαφνικά στο σκοτεινό διάστημα!
+    </div>
+
+    <div class="sub-box">
+      <h3>Βήμα 1.1: Πώς ακολουθεί το ποντίκι;</h3>
+      <p>Θέλουμε το σκάφος μας να κοιτάζει και να προχωράει προς το ποντίκι. Ποιο ζευγάρι εντολών βάζουμε στο <span class="sb sb-control">για πάντα</span>;</p>
+      <div class="choice-grid">
+        <button class="choice-btn" onclick="answer(this, false, 'Σχεδόν! Το «δείξε προς» αλλάζει μόνο κατεύθυνση. Χρειαζόμαστε και κίνηση!')">Μόνο <span class="sb sb-motion">δείξε προς δείκτη ποντικιού</span></button>
+        <button class="choice-btn" onclick="answer(this, true, 'Μπράβο! Πρώτα στρίβει προς το ποντίκι και μετά κάνει βήματα προς αυτό!')">Το <span class="sb sb-motion">δείξε προς δείκτη ποντικιού</span> ΚΑΙ <span class="sb sb-motion">κινήσου 10 βήματα</span></button>
+      </div>
+      <div class="feedback-msg"></div>
+    </div>
+
+    <div class="sub-box">
+      <h3>Βήμα 1.2: Σταμάτα να τρέμεις!</h3>
+      <p>Όταν το σκάφος φτάνει πάνω στο ποντίκι, τρεμοπαίζει νευρικά! Πώς του λέμε: <em>«Προχώρα ΜΟΝΟ όταν ΔΕΝ ακουμπάς το ποντίκι»</em>;</p>
+      <div class="choice-grid">
+        <button class="choice-btn" onclick="answer(this, true, 'Τέλεια! Ο πράσινος τελεστής «όχι» σταματάει το τρέμουλο όταν φτάνουμε στον στόχο!')">Με την εντολή: <span class="sb sb-control">εάν</span> <span class="sb sb-operators">όχι</span> <span class="sb sb-sensing">αγγίζει δείκτη ποντικιού;</span> <span class="sb sb-control">τότε</span></button>
+        <button class="choice-btn" onclick="answer(this, false, 'Όχι, αν βάλουμε αυτό, το σκάφος θα προχωράει ΜΟΝΟ όταν το αγγίζουμε!')">Με την εντολή: <span class="sb sb-control">εάν</span> <span class="sb sb-sensing">αγγίζει δείκτη ποντικιού;</span> <span class="sb sb-control">τότε</span></button>
+      </div>
+      <div class="feedback-msg"></div>
+    </div>
+
+    <div class="sub-box">
+      <h3>Βήμα 1.3: Ο Μετεωρίτης κρύβεται και φανερώνεται</h3>
+      <p>Ο μετεωρίτης πρέπει να αλλάζει κρυφά θέση και μετά να εμφανίζεται. Ποια είναι η σωστή σειρά;</p>
+      <div class="choice-grid">
+        <button class="choice-btn" onclick="answer(this, true, 'Σωστά! Πρώτα κρύβεται, αλλάζει θέση και μετά εμφανίζεται σαν έκπληξη!')">1. <span class="sb sb-looks">εξαφανίσου</span> ➔ 2. <span class="sb sb-motion">πήγαινε σε τυχαία θέση</span> ➔ 3. <span class="sb sb-looks">εμφανίσου</span></button>
+        <button class="choice-btn" onclick="answer(this, false, 'Αν εμφανιστεί πριν αλλάξει θέση, θα τον βλέπουμε να τηλεμεταφέρεται απότομα!')">1. <span class="sb sb-looks">εμφανίσου</span> ➔ 2. <span class="sb sb-looks">εξαφανίσου</span> ➔ 3. <span class="sb sb-motion">πήγαινε σε τυχαία θέση</span></button>
+      </div>
+      <div class="feedback-msg"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 2. ΜΕΛΙΣΣΟΥΛΑ -->
+<div class="activity-container" id="act-1">
+  <div class="main-card">
+    <div class="act-header">
+      <h2>🐝 Αποστολή 2: Η Μελισσούλα στο Λιβάδι</h2>
+    </div>
+    <div class="act-story">
+      <strong>Ιστορία:</strong> Μια μέλισσα πετάει προς τα λουλούδια για γύρη, αλλά προσέχει να μην αγγίζει τα αγκάθια!
+    </div>
+
+    <div class="sub-box">
+      <h3>Βήμα 2.1: Γρήγορη ή Αργή πτήση;</h3>
+      <p>Αν αλλάξουμε το <span class="sb sb-motion">κινήσου 10 βήματα</span> σε <span class="sb sb-motion">κινήσου 3 βήματα</span>, πώς θα πετάει η μέλισσα;</p>
+      <div class="choice-grid">
+        <button class="choice-btn" onclick="answer(this, true, 'Μπράβο! Μικρότερα βήματα σημαίνει πιο αργή και ήρεμη κίνηση!')">Πιο αργά και απαλά</button>
+        <button class="choice-btn" onclick="answer(this, false, 'Όχι, όσο μικρότερος είναι ο αριθμός των βημάτων, τόσο πιο αργά κινείται!')">Πιο γρήγορα σαν πύραυλος</button>
+      </div>
+      <div class="feedback-msg"></div>
+    </div>
+
+    <div class="sub-box">
+      <h3>Βήμα 2.2: Προσοχή στα αγκάθια!</h3>
+      <p>Πώς γράφουμε στον κώδικα: <em>«Προχώρα μόνο αν ΔΕΝ αγγίζεις αγκάθι»</em>;</p>
+      <div class="choice-grid">
+        <button class="choice-btn" onclick="answer(this, true, 'Εξαιρετικά! Το «όχι αγγίζει αγκάθι» την προστατεύει!')"><span class="sb sb-control">εάν</span> <span class="sb sb-operators">όχι</span> <span class="sb sb-sensing">αγγίζει αγκάθι;</span> <span class="sb sb-control">τότε</span></button>
+        <button class="choice-btn" onclick="answer(this, false, 'Αυτό θα σήμαινε πως κινείται μόνο όταν πέφτει πάνω στο αγκάθι!')"><span class="sb sb-control">εάν</span> <span class="sb sb-sensing">αγγίζει αγκάθι;</span> <span class="sb sb-control">τότε</span></button>
+      </div>
+      <div class="feedback-msg"></div>
+    </div>
+
+    <div class="sub-box">
+      <h3>Βήμα 2.3: Το λουλούδι ανοίγει</h3>
+      <p>Το λουλούδι μένει κρυφό για 2 δευτερόλεπτα πριν ανοίξει. Ποια εντολή περιμένει χρόνο;</p>
+      <div class="choice-grid">
+        <button class="choice-btn" onclick="answer(this, true, 'Σωστά! Η εντολή «περίμενε» δίνει χρόνο στο παιχνίδι!')"><span class="sb sb-control">περίμενε 2 δευτερόλεπτα</span></button>
+        <button class="choice-btn" onclick="answer(this, false, 'Το «κινήσου» κάνει βήματα στο χώρο, δεν μετράει δευτερόλεπτα!')"><span class="sb sb-motion">κινήσου 2 βήματα</span></button>
+      </div>
+      <div class="feedback-msg"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 3. ΤΕΡΜΑΤΟΦΥΛΑΚΑΣ -->
+<div class="activity-container" id="act-2">
+  <div class="main-card">
+    <div class="act-header">
+      <h2>⚽ Αποστολή 3: Ο Τερματοφύλακας Ρομπότ</h2>
+    </div>
+    <div class="act-story">
+      <strong>Ιστορία:</strong> Ο τερματοφύλακας ακολουθεί τα γάντια μας (ποντίκι) στην εστία για να αποκρούσει την μπάλα που σουτάρεται ξαφνικά!
+    </div>
+
+    <div class="sub-box">
+      <h3>Βήμα 3.1: Μετακίνηση στα δοκάρια</h3>
+      <p>Ποιο μπλοκ βοηθά τον τερματοφύλακα να κοιτάζει συνεχώς προς τη θέση του ποντικιού;</p>
+      <div class="choice-grid">
+        <button class="choice-btn" onclick="answer(this, true, 'Σωστά! Έτσι ο τερματοφύλακας στρέφεται αμέσως εκεί που δείχνουμε!')"><span class="sb sb-motion">δείξε προς δείκτη ποντικιού</span></button>
+        <button class="choice-btn" onclick="answer(this, false, 'Το «στρίψε 15 μοίρες» απλώς θα τον κάνει να γυρίζει κυκλικά!')"><span class="sb sb-motion">στρίψε 15 μοίρες</span></button>
+      </div>
+      <div class="feedback-msg"></div>
+    </div>
+
+    <div class="sub-box">
+      <h3>Βήμα 3.2: Ήχος απόκρουσης</h3>
+      <p>Θέλουμε να ακούγεται ο ήχος «Boing» ΜΟΝΟ όταν ο τερματοφύλακας πιάνει την μπάλα. Πού μπαίνει ο ήχος;</p>
+      <div class="choice-grid">
+        <button class="choice-btn" onclick="answer(this, true, 'Μπράβο! Μπαίνει μέσα στη συνθήκη ώστε να ακούγεται ΜΟΝΟ όταν υπάρχει επαφή!')">Μέσα στο <span class="sb sb-control">εάν</span> <span class="sb sb-sensing">αγγίζει Μπάλα;</span> <span class="sb sb-control">τότε</span></button>
+        <button class="choice-btn" onclick="answer(this, false, 'Αν μπει σκέτο στο «για πάντα», ο ήχος θα βαράει ασταμάτητα!')">Έξω, χύμα μέσα στο «για πάντα»</button>
+      </div>
+      <div class="feedback-msg"></div>
+    </div>
+
+    <div class="sub-box">
+      <h3>Βήμα 3.3: Σουτ από απρόβλεπτο σημείο</h3>
+      <p>Ποια εντολή κάνει την μπάλα να εμφανίζεται σε διαφορετικό, απρόβλεπτο σημείο του γηπέδου;</p>
+      <div class="choice-grid">
+        <button class="choice-btn" onclick="answer(this, true, 'Σωστά! Η τυχαία θέση κάνει το παιχνίδι συναρπαστικό!')"><span class="sb sb-motion">πήγαινε σε τυχαία θέση</span></button>
+        <button class="choice-btn" onclick="answer(this, false, 'Αυτό θα την έστελνε πάντα στο κέντρο!')">πήγαινε σε x: 0, y: 0</button>
+      </div>
+      <div class="feedback-msg"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 4. ΠΟΝΤΙΚΑΚΙ -->
+<div class="activity-container" id="act-3">
+  <div class="main-card">
+    <div class="act-header">
+      <h2>🧀 Αποστολή 4: Το Ποντικάκι και το Τυρί</h2>
+    </div>
+    <div class="act-story">
+      <strong>Ιστορία:</strong> Οδηγούμε ένα πεινασμένο ποντικάκι προς ένα κομμάτι τυρί που εμφανίζεται και χάνεται σε διάφορες γωνιές του δωματίου!
+    </div>
+
+    <div class="sub-box">
+      <h3>Βήμα 4.1: Το μέγεθος του τυριού</h3>
+      <p>Το τυρί στην αρχή ήταν τεράστιο (Μέγεθος 100). Το αλλάξαμε σε <strong>50</strong>. Πώς είναι τώρα;</p>
+      <div class="choice-grid">
+        <button class="choice-btn" onclick="answer(this, true, 'Ακριβώς! Το 50 είναι το μισό του 100!')">Έγινε μισό σε μέγεθος (πιο μικρό)</button>
+        <button class="choice-btn" onclick="answer(this, false, 'Όχι, όταν ο αριθμός μικραίνει, μικραίνει και το σχέδιο!')">Έγινε διπλάσιο σε μέγεθος</button>
+      </div>
+      <div class="feedback-msg"></div>
+    </div>
+
+    <div class="sub-box">
+      <h3>Βήμα 4.2: Πόσες φορές εμφανίζεται;</h3>
+      <p>Αν βάλουμε <span class="sb sb-control">επανάλαβε 10</span> στον κώδικα του τυριού, πόσες φορές θα εμφανιστεί συνολικά;</p>
+      <div class="choice-grid">
+        <button class="choice-btn" onclick="answer(this, true, 'Σωστά! Ο αριθμός μέσα στην επανάληψη λέει πόσες φορές ακριβώς θα τρέξει!')">Ακριβώς 10 φορές</button>
+        <button class="choice-btn" onclick="answer(this, false, 'Για να τρέχει για πάντα χρειαζόμαστε την εντολή «για πάντα»!')">Για πάντα χωρίς τέλος</button>
+      </div>
+      <div class="feedback-msg"></div>
+    </div>
+
+    <div class="sub-box">
+      <h3>Βήμα 4.3: Τέλος παιχνιδιού</h3>
+      <p>Όταν τελειώσουν και οι 10 επαναλήψεις, τι βάζουμε στο τέλος για να εξαφανιστεί το τυρί;</p>
+      <div class="choice-grid">
+        <button class="choice-btn" onclick="answer(this, true, 'Μπράβο! Έτσι η οθόνη καθαρίζει στο τέλος του γύρου!')">Την εντολή <span class="sb sb-looks">εξαφανίσου</span></button>
+        <button class="choice-btn" onclick="answer(this, false, 'Αν βάλουμε εμφανίσου, θα μείνει ορατό στην οθόνη!')">Την εντολή <span class="sb sb-looks">εμφανίσου</span></button>
+      </div>
+      <div class="feedback-msg"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 5. ΧΡΩΜΑΤΑ ΕΝΤΟΛΩΝ -->
+<div class="activity-container" id="act-4">
+  <div class="main-card">
+    <div class="act-header">
+      <h2>🎨 Αποστολή 5: Τα Χρώματα του Scratch</h2>
+    </div>
+    <div class="act-story">
+      <strong>Ιστορία:</strong> Στο Scratch κάθε είδος εντολής έχει το δικό του χρώμα. Ας γνωρίσουμε τις οικογένειες των μπλοκ!
+    </div>
+
+    <div class="sub-box">
+      <h3>Βήμα 5.1: Πού κρύβεται η Εμφάνιση;</h3>
+      <p>Σε ποια χρωματιστή κατηγορία ανήκουν τα μπλοκ <span class="sb sb-looks">εμφανίσου</span> και <span class="sb sb-looks">εξαφανίσου</span>;</p>
+      <div class="choice-grid">
+        <button class="choice-btn" onclick="answer(this, true, 'Μπράβο! Είναι στην κατηγορία «Όψεις» που έχει μωβ χρώμα!')">Μωβ (Όψεις)</button>
+        <button class="choice-btn" onclick="answer(this, false, 'Το μπλε χρώμα είναι για τις εντολές Κίνησης!')">Μπλε (Κίνηση)</button>
+      </div>
+      <div class="feedback-msg"></div>
+    </div>
+
+    <div class="sub-box">
+      <h3>Βήμα 5.2: Οι Πράσινοι Τελεστές</h3>
+      <p>Ο τελεστής <span class="sb sb-operators">όχι</span> ανήκει στους πράσινους Τελεστές. Τι σχήμα έχει;</p>
+      <div class="choice-grid">
+        <button class="choice-btn" onclick="answer(this, true, 'Σωστά! Έχει μυτερές άκρες (εξάγωνο) γιατί χωράει μέσα σε συνθήκες ΑΛΗΘΕΙΑ/ΨΕΜΑ!')">Έχει μυτερές άκρες &lt; εξάγωνο &gt;</button>
+        <button class="choice-btn" onclick="answer(this, false, 'Τα στρογγυλά είναι για αριθμούς ή λέξεις.')">Είναι στρογγυλό σαν αυγό</button>
+      </div>
+      <div class="feedback-msg"></div>
+    </div>
+
+    <div class="sub-box">
+      <h3>Βήμα 5.3: Οι Αισθητήρες</h3>
+      <p>Ποιο χρώμα έχουν οι Αισθητήρες, όπως το μπλοκ <span class="sb sb-sensing">αγγίζει δείκτη ποντικιού;</span>;</p>
+      <div class="choice-grid">
+        <button class="choice-btn" onclick="answer(this, true, 'Ακριβώς! Γαλάζιο / Cyan χρώμα!')">Γαλάζιο (Αισθητήρες)</button>
+        <button class="choice-btn" onclick="answer(this, false, 'Το κίτρινο είναι τα Συμβάντα (π.χ. πράσινη σημαία)!')">Κίτρινο (Συμβάντα)</button>
+      </div>
+      <div class="feedback-msg"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 6. ΝΤΕΤΕΚΤΙΒ ΛΑΘΩΝ -->
+<div class="activity-container" id="act-5">
+  <div class="main-card">
+    <div class="act-header">
+      <h2>🕵️ Αποστολή 6: Ντετέκτιβ Λαθών</h2>
+    </div>
+    <div class="act-story">
+      <strong>Ιστορία:</strong> Ένας συμμαθητής μας έγραψε κώδικα αλλά κάτι πήγε στραβά! Βρες το λάθος για να τον βοηθήσεις!
+    </div>
+
+    <div class="sub-box">
+      <h3>Βήμα 6.1: Ο αόρατος ήρωας</h3>
+      <p>Έγραψε: <code>επανάλαβε 10 [ εξαφανίσου, περίμενε 1, πήγαινε σε τυχαία θέση ]</code>. Γιατί ο ήρωας δεν φαίνεται πουθενά;</p>
+      <div class="choice-grid">
+        <button class="choice-btn" onclick="answer(this, true, 'Μπράβο ντετέκτιβ! Ξέχασε να βάλει την εντολή «εμφανίσου»!')">Ξέχασε να βάλει το <span class="sb sb-looks">εμφανίσου</span>!</button>
+        <button class="choice-btn" onclick="answer(this, false, 'Όχι, η πράσινη σημαία δουλεύει, απλώς ο ήρωας μένει πάντα κρυμμένος!')">Χάλασε ο υπολογιστής του</button>
+      </div>
+      <div class="feedback-msg"></div>
+    </div>
+
+    <div class="sub-box">
+      <h3>Βήμα 6.2: Γυρίζει σαν σβούρα αλλά μένει εκεί</h3>
+      <p>Ο χαρακτήρας στρίβει προς το ποντίκι, αλλά δεν πάει προς τα εκεί. Τι λείπει;</p>
+      <div class="choice-grid">
+        <button class="choice-btn" onclick="answer(this, true, 'Σωστά! Το «δείξε προς» αλλάζει μόνο τη ματιά του. Χρειάζεται και το «κινήσου»!')">Λείπει η εντολή <span class="sb sb-motion">κινήσου 10 βήματα</span></button>
+        <button class="choice-btn" onclick="answer(this, false, 'Το υπόβαθρο αλλάζει μόνο το σκηνικό, δεν επηρεάζει την κίνηση!')">Λείπει ένα νέο υπόβαθρο</button>
+      </div>
+      <div class="feedback-msg"></div>
+    </div>
+
+    <div class="sub-box">
+      <h3>Βήμα 6.3: Γιατί τρέμει;</h3>
+      <p>Όταν ο ήρωας αγγίζει το ποντίκι, κουνιέται μπρος-πίσω σαν να τρέμει. Ποιο μαγικό μπλοκ λύνει το πρόβλημα;</p>
+      <div class="choice-grid">
+        <button class="choice-btn" onclick="answer(this, true, 'Τέλεια! Ο τελεστής «όχι» λέει στον ήρωα να ηρεμήσει όταν φτάσει!')">Ο πράσινος τελεστής <span class="sb sb-operators">όχι</span></button>
+        <button class="choice-btn" onclick="answer(this, false, 'Το στρίψε θα τον έκανε να γυρίζει עוד πιο γρήγορα!')">Η εντολή «στρίψε 15 μοίρες»</button>
+      </div>
+      <div class="feedback-msg"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 7. Ο ΜΑΓΙΚΟΣ ΚΑΘΡΕΦΤΗΣ -->
+<div class="activity-container" id="act-6">
+  <div class="main-card">
+    <div class="act-header">
+      <h2>🔄 Αποστολή 7: Ο Μαγικός Καθρέφτης («ΟΧΙ»)</h2>
+    </div>
+    <div class="act-story">
+      <strong>Ιστορία:</strong> Ο τελεστής «ΟΧΙ» είναι σαν ένας μαγικός καθρέφτης: ό,τι είναι Αλήθεια το κάνει Ψέμα, και ό,τι είναι Ψέμα το κάνει Αλήθεια!
+    </div>
+
+    <div class="sub-box">
+      <h3>Βήμα 7.1: Αντιστροφή στο Ψέμα</h3>
+      <p>Αν η πρόταση <em>«Βρέχει»</em> είναι <strong>ΨΕΜΑ</strong>, τότε η πρόταση <strong>«ΟΧΙ βρέχει»</strong> τι είναι;</p>
+      <div class="choice-grid">
+        <button class="choice-btn" onclick="answer(this, true, 'Μπράβο! Το όχι γυρίζει το Ψέμα σε Αλήθεια!')">ΑΛΗΘΕΙΑ</button>
+        <button class="choice-btn" onclick="answer(this, false, 'Θυμήσου τον καθρέφτη: αντιστρέφει πάντα την απάντηση!')">ΨΕΜΑ</button>
+      </div>
+      <div class="feedback-msg"></div>
+    </div>
+
+    <div class="sub-box">
+      <h3>Βήμα 7.2: Αντιστροφή στην Αλήθεια</h3>
+      <p>Αν ο ήρωας <strong>αγγίζει</strong> τον τοίχο (ΑΛΗΘΕΙΑ), τι θα πει το μπλοκ <span class="sb sb-operators">όχι</span> <span class="sb sb-sensing">αγγίζει τοίχο;</span>;</p>
+      <div class="choice-grid">
+        <button class="choice-btn" onclick="answer(this, true, 'Σωστά! Η Αλήθεια έγινε ΨΕΜΑ!')">ΨΕΜΑ</button>
+        <button class="choice-btn" onclick="answer(this, false, 'Το «όχι» δεν αφήνει ποτέ την ίδια τιμή!')">ΑΛΗΘΕΙΑ</button>
+      </div>
+      <div class="feedback-msg"></div>
+    </div>
+
+    <div class="sub-box">
+      <h3>Βήμα 7.3: Σκέψου έξυπνα</h3>
+      <p>Αν πούμε: <em>«Εάν ΟΧΙ νύχτωσε, τότε πήγαινε για παιχνίδι»</em>. Πότε θα πάμε τελικά για παιχνίδι;</p>
+      <div class="choice-grid">
+        <button class="choice-btn" onclick="answer(this, true, 'Ακριβώς! «Όχι νύχτωσε» σημαίνει είναι μέρα!')">Όταν είναι ακόμα μέρα</button>
+        <button class="choice-btn" onclick="answer(this, false, 'Αν είχε νυχτώσει, η συνθήκη «όχι νύχτωσε» θα ήταν ψέμα!')">Μόλις νυχτώσει για τα καλά</button>
+      </div>
+      <div class="feedback-msg"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 8. Ο ΣΧΕΔΙΑΣΤΗΣ ΠΑΙΧΝΙΔΙΩΝ -->
+<div class="activity-container" id="act-7">
+  <div class="main-card">
+    <div class="act-header">
+      <h2>🎯 Αποστολή 8: Ο Σχεδιαστής Παιχνιδιών</h2>
+    </div>
+    <div class="act-story">
+      <strong>Ιστορία:</strong> Ώρα να γίνεις εσύ ο προγραμματιστής! Πώς θα κάνεις το παιχνίδι σου πιο εύκολο ή πιο δύσκολο για τους φίλους σου;
+    </div>
+
+    <div class="sub-box">
+      <h3>Βήμα 8.1: Παιχνίδι για πρωταθλητές (Δύσκολο)</h3>
+      <p>Θέλεις ο στόχος να μένει στην οθόνη για πολύ λίγο χρόνο ώστε να προλαβαίνουν μόνο οι γρήγοροι. Τι αλλάζεις;</p>
+      <div class="choice-grid">
+        <button class="choice-btn" onclick="answer(this, true, 'Μπράβο! Λιγότερα δευτερόλεπτα σημαίνει ότι ο στόχος εξαφανίζεται αστραπιαία!')">Βάζεις <span class="sb sb-control">περίμενε 0.5 δευτερόλεπτα</span></button>
+        <button class="choice-btn" onclick="answer(this, false, 'Τα 5 δευτερόλεπτα είναι πάρα πολλά, θα είναι υπερβολικά εύκολο!')">Βάζεις <span class="sb sb-control">περίμενε 5 δευτερόλεπτα</span></button>
+      </div>
+      <div class="feedback-msg"></div>
+    </div>
+
+    <div class="sub-box">
+      <h3>Βήμα 8.2: Πιο εύκολος στόχος</h3>
+      <p>Ένας φίλος σου δυσκολεύεται να πατήσει τον στόχο γιατί είναι πολύ μικρός. Τι πρέπει να κάνεις στο μέγεθος;</p>
+      <div class="choice-grid">
+        <button class="choice-btn" onclick="answer(this, true, 'Σωστά! Μεγαλώνουμε τον αριθμό μεγέθους για να πιάνεται πιο εύκολα!')">Να αυξήσεις το μέγεθος από 50 σε 80</button>
+        <button class="choice-btn" onclick="answer(this, false, 'Αν το πας στο 20 θα γίνει σχεδόν αόρατο!')">Να μειώσεις το μέγεθος σε 20</button>
+      </div>
+      <div class="feedback-msg"></div>
+    </div>
+
+    <div class="sub-box">
+      <h3>Βήμα 8.3: Πράσινη σημαία & Κόκκινο κουμπί</h3>
+      <p>Ποιο κουμπί πατάει πάντα ο παίκτης για να ξεκινήσει το παιχνίδι από την αρχή;</p>
+      <div class="choice-grid">
+        <button class="choice-btn" onclick="answer(this, true, 'Μπράβο! Η Πράσινη Σημαία ξεκινάει όλα τα προγράμματα στο Scratch!')">Την Πράσινη Σημαία</button>
+        <button class="choice-btn" onclick="answer(this, false, 'Το κόκκινο κουμπί σταματάει τα πάντα!')">Το Κόκκινο Στοπ</button>
+      </div>
+      <div class="feedback-msg"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+function switchTab(index) {
+  const tabs = document.querySelectorAll('.nav-btn');
+  const acts = document.querySelectorAll('.activity-container');
+  
+  tabs.forEach((t, i) => {
+    if (i === index) t.classList.add('active');
+    else t.classList.remove('active');
+  });
+
+  acts.forEach((a, i) => {
+    if (i === index) a.classList.add('active');
+    else a.classList.remove('active');
+  });
+}
+
+function answer(btn, isCorrect, explanation) {
+  const parent = btn.closest('.sub-box');
+  const buttons = parent.querySelectorAll('.choice-btn');
+  const fb = parent.querySelector('.feedback-msg');
+
+  buttons.forEach(b => {
+    b.disabled = true;
+    b.classList.remove('correct', 'wrong');
+  });
+
+  fb.classList.add('show');
+  if (isCorrect) {
+    btn.classList.add('correct');
+    fb.className = 'feedback-msg show win';
+    fb.innerHTML = '🌟 ' + explanation;
+  } else {
+    btn.classList.add('wrong');
+    fb.className = 'feedback-msg show lose';
+    fb.innerHTML = '💡 ' + explanation;
+  }
+}
+</script>
+
+</body>
+</html>
