@@ -3,15 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Μάθημα 9 – Δομή Επιλογής & Αισθητήρες | Ε΄ Δημοτικού</title>
+<title>Μάθημα 9 – Παράλληλες Ακολουθίες Εντολών | Ε΄ Δημοτικού</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
     font-family: 'Nunito', sans-serif;
-    background: linear-gradient(160deg, #0f766e 0%, #0d9488 45%, #5eead4 100%);
+    background: linear-gradient(160deg, #1e1b4b 0%, #312e81 40%, #4338ca 75%, #6366f1 100%);
     min-height: 100vh;
-    color: #134e4a;
+    color: #1e1b4b;
     padding-bottom: 50px;
   }
   .header {
@@ -22,7 +22,7 @@
   .header h1 {
     font-size: 1.8rem;
     font-weight: 800;
-    text-shadow: 0 3px 12px rgba(0,0,0,0.25);
+    text-shadow: 0 3px 12px rgba(0,0,0,0.3);
   }
   .header p {
     margin-top: 5px;
@@ -37,7 +37,7 @@
     margin: 10px 0 18px;
   }
   .container {
-    max-width: 820px;
+    max-width: 840px;
     margin: 0 auto;
     padding: 0 16px;
   }
@@ -45,11 +45,11 @@
     background: white;
     border-radius: 20px;
     margin-bottom: 18px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.14);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.18);
     overflow: hidden;
   }
   .act-head {
-    background: linear-gradient(90deg, #f0fdfa, #ccfbf1);
+    background: linear-gradient(90deg, #eef2ff, #e0e7ff);
     padding: 16px 20px;
     display: flex;
     align-items: center;
@@ -60,7 +60,7 @@
   .act-num {
     width: 44px;
     height: 44px;
-    background: linear-gradient(135deg, #0d9488, #0f766e);
+    background: linear-gradient(135deg, #4f46e5, #3730a3);
     color: white;
     border-radius: 12px;
     display: flex;
@@ -72,13 +72,13 @@
   }
   .act-title {
     flex: 1;
-    font-size: 1.15rem;
+    font-size: 1.12rem;
     font-weight: 800;
-    color: #0f766e;
+    color: #312e81;
   }
   .arrow {
     font-size: 1.2rem;
-    color: #0d9488;
+    color: #4f46e5;
     transition: transform 0.3s;
   }
   .activity.open .arrow { transform: rotate(180deg); }
@@ -96,7 +96,7 @@
   }
   .phase-title {
     font-weight: 800;
-    color: #0f766e;
+    color: #3730a3;
     margin-bottom: 10px;
     font-size: 1.02rem;
     display: flex;
@@ -104,7 +104,7 @@
     gap: 8px;
   }
   .phase-title span {
-    background: #0d9488;
+    background: #4f46e5;
     color: white;
     width: 26px;
     height: 26px;
@@ -117,17 +117,17 @@
   .choices { display: flex; flex-direction: column; gap: 9px; }
   .choice {
     background: white;
-    border: 2px solid #99f6e4;
+    border: 2px solid #c7d2fe;
     border-radius: 11px;
     padding: 11px 13px;
     font-weight: 700;
     cursor: pointer;
     transition: 0.2s;
-    font-size: 0.98rem;
+    font-size: 0.96rem;
   }
-  .choice:hover { border-color: #0d9488; background: #f0fdfa; }
-  .choice.ok { border-color: #10b981; background: #d1fae5; }
-  .choice.bad { border-color: #ef4444; background: #fee2e2; }
+  .choice:hover { border-color: #4f46e5; background: #eef2ff; }
+  .choice.ok { border-color: #10b981; background: #d1fae5; color: #065f46; }
+  .choice.bad { border-color: #ef4444; background: #fee2e2; color: #991b1b; }
   .feedback {
     margin-top: 10px;
     padding: 10px 13px;
@@ -139,7 +139,7 @@
   .feedback.ok { background: #d1fae5; color: #065f46; }
   .feedback.bad { background: #fee2e2; color: #991b1b; }
   .stage {
-    background: linear-gradient(135deg, #134e4a, #042f2e);
+    background: linear-gradient(135deg, #1e1b4b, #312e81);
     border-radius: 14px;
     height: 140px;
     display: flex;
@@ -149,16 +149,42 @@
     position: relative;
     overflow: hidden;
   }
-  .char { font-size: 3.2rem; transition: transform 0.3s; }
-  .item-target { font-size: 2.8rem; }
+  .dancer {
+    font-size: 3rem;
+    transition: transform 0.25s, filter 0.25s;
+    display: inline-block;
+  }
+  .dancer.dance { animation: danceAnim 0.5s infinite alternate ease-in-out; }
+  .dancer.spin-right { animation: spinR 1.2s infinite linear; }
+  .dancer.spin-left { animation: spinL 1.2s infinite linear; }
+  @keyframes danceAnim {
+    0% { transform: translateY(0px) rotate(-8deg) scale(1); }
+    100% { transform: translateY(-12px) rotate(8deg) scale(1.08); }
+  }
+  @keyframes spinR {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+  @keyframes spinL {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(-360deg); }
+  }
+  .music-note {
+    font-size: 1.8rem;
+    animation: pulse 1s infinite alternate;
+  }
+  @keyframes pulse {
+    from { transform: scale(0.9); opacity: 0.6; }
+    to { transform: scale(1.2); opacity: 1; }
+  }
   .btn {
-    background: linear-gradient(135deg, #0d9488, #0f766e);
+    background: linear-gradient(135deg, #4f46e5, #4338ca);
     color: white;
     border: none;
     padding: 10px 18px;
     border-radius: 50px;
     font-weight: 800;
-    font-size: 0.95rem;
+    font-size: 0.92rem;
     cursor: pointer;
     font-family: inherit;
     margin: 4px 4px 0 0;
@@ -166,63 +192,43 @@
   }
   .btn:hover { transform: scale(1.04); }
   .btn-orange { background: linear-gradient(135deg, #f59e0b, #d97706); }
+  .btn-green { background: linear-gradient(135deg, #10b981, #059669); }
+  .btn-pink { background: linear-gradient(135deg, #ec4899, #db2777); }
   .btn-gray { background: #64748b; }
-  .btn-red { background: linear-gradient(135deg, #ef4444, #dc2626); }
-  .slider-box {
-    background: white;
-    border-radius: 11px;
-    padding: 12px;
-    margin-top: 8px;
-  }
-  input[type="range"] {
-    width: 100%;
-    height: 8px;
-    appearance: none;
-    background: #99f6e4;
-    border-radius: 8px;
-  }
-  input[type="range"]::-webkit-slider-thumb {
-    appearance: none;
-    width: 22px;
-    height: 22px;
-    background: #0d9488;
-    border-radius: 50%;
-    cursor: pointer;
-    border: 3px solid white;
-  }
-  .val-display {
-    text-align: center;
-    font-weight: 800;
-    color: #0f766e;
-    margin-top: 5px;
-  }
   .block {
     display: inline-block;
-    background: #0d9488;
-    color: white;
-    padding: 6px 11px;
+    padding: 5px 10px;
     border-radius: 7px;
     font-weight: 700;
     font-size: 0.88rem;
     margin: 2px;
+    color: white;
   }
+  .block-event { background: #eab308; color: #1e1b4b; }
   .block-control { background: #f59e0b; }
-  .block-sensor { background: #0284c7; }
-  .block-ops { background: #16a34a; }
-  .sim-status {
-    color: #5eead4;
-    font-weight: 800;
-    font-size: 1.05rem;
+  .block-looks { background: #9333ea; }
+  .block-sound { background: #db2777; }
+  .block-custom { background: #e11d48; }
+  .live-box {
+    background: #0f172a;
+    border-radius: 12px;
+    padding: 12px;
+    color: white;
     text-align: center;
-    padding: 4px;
+    margin: 10px 0;
+  }
+  .live-val {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: #818cf8;
   }
 </style>
 </head>
 <body>
 
 <div class="header">
-  <h1>🚦 Δομή Επιλογής & Αισθητήρες</h1>
-  <p>Μάθημα 9ο – 8 Δραστηριότητες (2 φάσεις η καθεμία)</p>
+  <h1>👯 Μάθημα 9ο: Παράλληλες ακολουθίες εντολών</h1>
+  <p>Πληροφορική Ε΄ Δημοτικού – 8 Δραστηριότητες (3 φάσεις η καθεμία: Α, Β, Γ)</p>
 </div>
 
 <div class="score">⭐ Πόντοι: <span id="score">0</span></div>
@@ -233,29 +239,39 @@
   <div class="activity open">
     <div class="act-head" onclick="toggle(this)">
       <div class="act-num">1</div>
-      <div class="act-title">Τι είναι η συνθήκη;</div>
+      <div class="act-title">Τι είναι οι παράλληλες ακολουθίες εντολών;</div>
       <div class="arrow">▼</div>
     </div>
     <div class="act-body">
       <div class="phase">
-        <div class="phase-title"><span>Α</span> Κατανόηση</div>
-        <p style="margin-bottom:10px;font-weight:600">Τι σημαίνει συνθήκη στον προγραμματισμό;</p>
+        <div class="phase-title"><span>Α</span> Η βασική έννοια</div>
+        <p style="margin-bottom:10px;font-weight:600">Τι σημαίνει στον προγραμματισμό «παράλληλες ακολουθίες εντολών»;</p>
         <div class="choices">
-          <div class="choice" onclick="check(this,true,'f1a',5)">Μία ερώτηση/έλεγχος που μπορεί να είναι μόνο Αληθής ή Ψευδής (Ναι ή Όχι)</div>
-          <div class="choice" onclick="check(this,false,'f1a',5)">Ένας ήχος που παίζει στην αρχή του παιχνιδιού</div>
-          <div class="choice" onclick="check(this,false,'f1a',5)">Ένα σχέδιο για το υπόβαθρο</div>
+          <div class="choice" onclick="check(this,true,'f1a',5)">Δύο ή περισσότερες ομάδες εντολών που εκτελούνται ταυτόχρονα (μαζί)</div>
+          <div class="choice" onclick="check(this,false,'f1a',5)">Εντολές που εκτελούνται μόνο μία φορά και σταματούν για πάντα</div>
+          <div class="choice" onclick="check(this,false,'f1a',5)">Εντολές που περιμένουν να κλείσει ο υπολογιστής</div>
         </div>
         <div class="feedback" id="f1a"></div>
       </div>
       <div class="phase">
-        <div class="phase-title"><span>Β</span> Παράδειγμα ζωής</div>
-        <p style="margin-bottom:10px;font-weight:600">Ποιο από τα παρακάτω εκφράζει συνθήκη επιλογής;</p>
+        <div class="phase-title"><span>Β</span> Πώς ξεκινούν ταυτόχρονα;</div>
+        <p style="margin-bottom:10px;font-weight:600">Τι χρειαζόμαστε ώστε διαφορετικές ομάδες εντολών να ξεκινήσουν ταυτόχρονα;</p>
         <div class="choices">
-          <div class="choice" onclick="check(this,true,'f1b',5)">Αν βρέχει, πάρε ομπρέλα, αλλιώς φόρα γυαλιά ηλίου</div>
-          <div class="choice" onclick="check(this,false,'f1b',5)">Περπάτα 10 βήματα ευθεία</div>
-          <div class="choice" onclick="check(this,false,'f1b',5)">Άλλαξε χρώμα στη μπλούζα σου</div>
+          <div class="choice" onclick="check(this,true,'f1b',5)">Ένα κοινό συμβάν εκκίνησης (π.χ. το πάτημα της πράσινης σημαίας)</div>
+          <div class="choice" onclick="check(this,false,'f1b',5)">Μία ειδική μεταβλητή για το μέγεθος της οθόνης</div>
+          <div class="choice" onclick="check(this,false,'f1b',5)">Πρέπει να τις γράψουμε σε χαρτί πρώτα</div>
         </div>
         <div class="feedback" id="f1b"></div>
+      </div>
+      <div class="phase">
+        <div class="phase-title"><span>Γ</span> Παράδειγμα από τη ζωή του παιχνιδιού</div>
+        <p style="margin-bottom:10px;font-weight:600">Ποιο από τα παρακάτω είναι παράδειγμα παράλληλης εκτέλεσης;</p>
+        <div class="choices">
+          <div class="choice" onclick="check(this,true,'f1c',5)">Ο ήρωας να χορεύει στην πίστα ενώ ταυτόχρονα παίζει συνεχώς η μουσική</div>
+          <div class="choice" onclick="check(this,false,'f1c',5)">Να παίζει όλο το τραγούδι και μόνο αφού τελειώσει να αρχίσει να κινείται ο ήρωας</div>
+          <div class="choice" onclick="check(this,false,'f1c',5)">Να σβήσουμε τον χαρακτήρα από το έργο</div>
+        </div>
+        <div class="feedback" id="f1c"></div>
       </div>
     </div>
   </div>
@@ -264,32 +280,42 @@
   <div class="activity">
     <div class="act-head" onclick="toggle(this)">
       <div class="act-num">2</div>
-      <div class="act-title">Η εντολή «Εάν... τότε» (Απλή Επιλογή)</div>
+      <div class="act-title">Το πρόβλημα της σειριακής εκτέλεσης ήχου</div>
       <div class="arrow">▼</div>
     </div>
     <div class="act-body">
       <div class="phase">
-        <div class="phase-title"><span>Α</span> Πώς λειτουργεί;</div>
+        <div class="phase-title"><span>Α</span> Η παγίδα της εντολής «μέχρι τέλους»</div>
         <div style="text-align:center;margin:10px 0">
-          <div class="block block-control">εάν &lt;συνθήκη&gt; τότε</div><br>
-          <div class="block" style="background:#2563eb">πες «Μπράβο!» για 2 δευτερόλεπτα</div>
+          <div class="block block-sound">παίξε ήχο [dance celebrate] μέχρι τέλους</div>
         </div>
+        <p style="margin-bottom:10px;font-weight:600">Τι κάνει η εντολή «μέχρι τέλους» στην επόμενη εντολή του ίδιου σεναρίου;</p>
         <div class="choices">
-          <div class="choice" onclick="check(this,true,'f2a',5)">Οι εντολές μέσα εκτελούνται ΜΟΝΟ αν η συνθήκη ισχύει (είναι αληθής)</div>
-          <div class="choice" onclick="check(this,false,'f2a',5)">Οι εντολές εκτελούνται πάντα ανεξάρτητα από τη συνθήκη</div>
-          <div class="choice" onclick="check(this,false,'f2a',5)">Το πρόγραμμα σταματάει αυτόματα</div>
+          <div class="choice" onclick="check(this,true,'f2a',5)">Περιμένει πρώτα να ολοκληρωθεί όλος ο ήχος και μετά εκτελεί την επόμενη εντολή</div>
+          <div class="choice" onclick="check(this,false,'f2a',5)">Εκτελεί αμέσως την επόμενη εντολή χωρίς καμία καθυστέρηση</div>
+          <div class="choice" onclick="check(this,false,'f2a',5)">Σβήνει τον ήχο από τη βιβλιοθήκη</div>
         </div>
         <div class="feedback" id="f2a"></div>
       </div>
       <div class="phase">
-        <div class="phase-title"><span>Β</span> Τι θα συμβεί αν είναι ψευδής;</div>
-        <p style="margin-bottom:10px;font-weight:600">Αν η συνθήκη ΔΕΝ ισχύει (είναι ψευδής):</p>
+        <div class="phase-title"><span>Β</span> Γιατί «κόλλησε» ο χορός;</div>
+        <p style="margin-bottom:10px;font-weight:600">Αν βάλουμε την «παίξε ήχο μέχρι τέλους» μέσα στην ίδια επανάληψη με την εντολή «Χορός»:</p>
         <div class="choices">
-          <div class="choice" onclick="check(this,true,'f2b',5)">Ο υπολογιστής προσπερνά τις εντολές μέσα και συνεχίζει παρακάτω</div>
-          <div class="choice" onclick="check(this,false,'f2b',5)">Ο υπολογιστής κλείνει την εφαρμογή</div>
-          <div class="choice" onclick="check(this,false,'f2b',5)">Επαναλαμβάνει τις εντολές για πάντα</div>
+          <div class="choice" onclick="check(this,true,'f2b',5)">Ο χορός θα παγώνει και θα περιμένει να τελειώσει το τραγούδι σε κάθε επανάληψη</div>
+          <div class="choice" onclick="check(this,false,'f2b',5)">Ο χορός θα γίνει 10 φορές πιο γρήγορος</div>
+          <div class="choice" onclick="check(this,false,'f2b',5)">Δεν αλλάζει απολύτως τίποτα</div>
         </div>
         <div class="feedback" id="f2b"></div>
+      </div>
+      <div class="phase">
+        <div class="phase-title"><span>Γ</span> Η λύση του σχολικού βιβλίου</div>
+        <p style="margin-bottom:10px;font-weight:600">Πώς λύνει το βιβλίο αυτό το πρόβλημα ώστε μουσική και χορός να τρέχουν ασταμάτητα;</p>
+        <div class="choices">
+          <div class="choice" onclick="check(this,true,'f2c',5)">Χωρίζει τον κώδικα σε 2 ξεχωριστά σενάρια με δική τους πράσινη σημαία το καθένα</div>
+          <div class="choice" onclick="check(this,false,'f2c',5)">Καταργεί εντελώς τη μουσική από το παιχνίδι</div>
+          <div class="choice" onclick="check(this,false,'f2c',5)">Βάζει 100 εντολές «περίμενε 1 δευτερόλεπτο»</div>
+        </div>
+        <div class="feedback" id="f2c"></div>
       </div>
     </div>
   </div>
@@ -298,39 +324,57 @@
   <div class="activity">
     <div class="act-head" onclick="toggle(this)">
       <div class="act-num">3</div>
-      <div class="act-title">Η εντολή «Εάν... τότε... αλλιώς» (Διπλή Επιλογή)</div>
+      <div class="act-title">Δύο σενάρια στην ίδια πράσινη σημαία</div>
       <div class="arrow">▼</div>
     </div>
     <div class="act-body">
       <div class="phase">
-        <div class="phase-title"><span>Α</span> Η διαφορά με την απλή επιλογή</div>
-        <div style="text-align:center;margin:10px 0">
-          <div class="block block-control">εάν &lt;σκορ &gt; 50&gt; τότε</div><br>
-          <div class="block" style="background:#16a34a">πες «Κέρδισες!»</div><br>
-          <div class="block block-control">αλλιώς</div><br>
-          <div class="block" style="background:#ef4444">πες «Προσπάθησε ξανά!»</div>
+        <div class="phase-title"><span>Α</span> Το 1ο σενάριο: Συνεχής Χορός</div>
+        <div style="text-align:center;margin:8px 0">
+          <div class="block block-event">όταν γίνει κλικ σε 🚩</div><br>
+          <div class="block block-looks">άλλαξε ενδυμασία σε [jo stance]</div><br>
+          <div class="block block-control">για πάντα</div><br>
+          <div class="block block-custom">Χορός</div>
+          <div class="block block-control">περίμενε 1 δευτερόλεπτα</div>
         </div>
+        <p style="margin-bottom:10px;font-weight:600">Γιατί ξεκινάμε με «άλλαξε ενδυμασία σε jo stance»;</p>
         <div class="choices">
-          <div class="choice" onclick="check(this,true,'f3a',5)">Μας δίνει εναλλακτική διαδρομή εντολών όταν η συνθήκη ΔΕΝ ισχύει</div>
-          <div class="choice" onclick="check(this,false,'f3a',5)">Κάνει το πρόγραμμα να τρέχει πιο αργά</div>
-          <div class="choice" onclick="check(this,false,'f3b_fake',5)">Επιτρέπει να εκτελεστούν και οι δύο διαδρομές ταυτόχρονα</div>
+          <div class="choice" onclick="check(this,true,'f3a',5)">Για να ξεκινάει πάντα η Αλεξία από τη βασική αρχική της στάση</div>
+          <div class="choice" onclick="check(this,false,'f3a',5)">Για να αλλάξει το χρώμα του σκηνικού</div>
+          <div class="choice" onclick="check(this,false,'f3a',5)">Για να μηδενιστεί η μουσική</div>
         </div>
         <div class="feedback" id="f3a"></div>
       </div>
       <div class="phase">
-        <div class="phase-title"><span>Β</span> Δοκίμασε το σκορ</div>
-        <div class="slider-box">
-          <input type="range" min="0" max="100" value="40" id="testScore" oninput="simScoreDecision()">
-          <div class="val-display">Σκορ: <span id="testScoreVal">40</span></div>
+        <div class="phase-title"><span>Β</span> Το 2ο σενάριο: Συνεχής Μουσική</div>
+        <div style="text-align:center;margin:8px 0">
+          <div class="block block-event">όταν γίνει κλικ σε 🚩</div><br>
+          <div class="block block-control">για πάντα</div><br>
+          <div class="block block-sound">παίξε ήχο [dance celebrate] μέχρι τέλους</div>
         </div>
-        <div class="stage" style="height:100px;">
-          <div class="sim-status" id="scoreMsg">💬 Προσπάθησε ξανά! (Σκορ &le; 50)</div>
-        </div>
-        <div class="choices" style="margin-top:10px;">
-          <div class="choice" onclick="check(this,true,'f3b',5)">Όταν το σκορ γίνει 51 ή παραπάνω, ενεργοποιείται το «Κέρδισες!»</div>
-          <div class="choice" onclick="check(this,false,'f3b',5)">Όταν το σκορ γίνει 51, εμφανίζονται και τα δύο μηνύματα μαζί</div>
+        <p style="margin-bottom:10px;font-weight:600">Τι πετυχαίνουμε με το δεύτερο αυτό ανεξάρτητο σενάριο;</p>
+        <div class="choices">
+          <div class="choice" onclick="check(this,true,'f3b',5)">Η μουσική επαναλαμβάνεται για πάντα χωρίς να διακόπτει την κίνηση της χορεύτριας</div>
+          <div class="choice" onclick="check(this,false,'f3b',5)">Σταματάει η εκτέλεση του πρώτου σεναρίου</div>
+          <div class="choice" onclick="check(this,false,'f3b',5)">Ο ήχος ακούγεται μόνο για 1 δευτερόλεπτο</div>
         </div>
         <div class="feedback" id="f3b"></div>
+      </div>
+      <div class="phase">
+        <div class="phase-title"><span>Γ</span> Δοκιμή παράλληλης εκτέλεσης</div>
+        <div class="stage">
+          <div class="dancer" id="soloDancer">👧</div>
+          <div class="music-note" id="musicNote" style="display:none;">🎵 🎶 🔊</div>
+        </div>
+        <div style="text-align:center;">
+          <button class="btn btn-green" onclick="startSoloParallel()">🚩 Πράσινη Σημαία (Και τα 2 μαζί)</button>
+          <button class="btn btn-gray" onclick="stopSoloParallel()">⏹️ Στοπ</button>
+        </div>
+        <div class="choices" style="margin-top:10px;">
+          <div class="choice" onclick="check(this,true,'f3c',5)">Επιτρέπεται και είναι πολύ χρήσιμο να έχουμε πολλά σενάρια για το ίδιο συμβάν</div>
+          <div class="choice" onclick="check(this,false,'f3c',5)">Το Scratch επιτρέπει αυστηρά μόνο μία πράσινη σημαία σε ολόκληρο το έργο</div>
+        </div>
+        <div class="feedback" id="f3c"></div>
       </div>
     </div>
   </div>
@@ -339,34 +383,39 @@
   <div class="activity">
     <div class="act-head" onclick="toggle(this)">
       <div class="act-num">4</div>
-      <div class="act-title">Αισθητήρας: «Αγγίζει δείκτη ποντικιού / αντικείμενο;»</div>
+      <div class="act-title">Διπλασιασμός μορφής (Αλεξία & Αλεξία2)</div>
       <div class="arrow">▼</div>
     </div>
     <div class="act-body">
       <div class="phase">
-        <div class="phase-title"><span>Α</span> Σε ποια κατηγορία ανήκει;</div>
-        <p style="margin-bottom:10px;font-weight:600">Το μπλοκ <span class="block block-sensor">αγγίζει το [μήλο];</span> ανήκει στην κατηγορία:</p>
+        <div class="phase-title"><span>Α</span> Πώς δημιουργούμε τη δεύτερη χορεύτρια;</div>
+        <p style="margin-bottom:10px;font-weight:600">Ποιος είναι ο πιο γρήγορος τρόπος για να φτιάξουμε την «Αλεξία2»;</p>
         <div class="choices">
-          <div class="choice" onclick="check(this,true,'f4a',5)">Αισθητήρες (Sensing - γαλάζιο χρώμα)</div>
-          <div class="choice" onclick="check(this,false,'f4a',5)">Έλεγχος (Control)</div>
-          <div class="choice" onclick="check(this,false,'f4a',5)">Μεταβλητές (Variables)</div>
+          <div class="choice" onclick="check(this,true,'f4a',5)">Δεξί κλικ πάνω στην Αλεξία στον χώρο αντικειμένων και επιλογή «διπλασιασμός»</div>
+          <div class="choice" onclick="check(this,false,'f4a',5)">Ζωγραφίζουμε ξανά από την αρχή και τις 13 ενδυμασίες</div>
+          <div class="choice" onclick="check(this,false,'f4a',5)">Κλείνουμε το πρόγραμμα και το ανοίγουμε ξανά</div>
         </div>
         <div class="feedback" id="f4a"></div>
       </div>
       <div class="phase">
-        <div class="phase-title"><span>Β</span> Δοκιμή επαφής</div>
-        <div class="stage">
-          <div class="char" id="charFox" style="position:relative;left:0px;">🦊</div>
-          <div class="item-target">🍎</div>
-        </div>
-        <button class="btn" onclick="moveFoxForward()">➡️ Βήμα μπροστά</button>
-        <button class="btn btn-gray" onclick="resetFox()">↩️ Επαναφορά</button>
-        <div class="sim-status" id="foxStatus" style="margin-top:6px;color:#0f766e;">Η αλεπού δεν αγγίζει το μήλο.</div>
-        <div class="choices" style="margin-top:10px;">
-          <div class="choice" onclick="check(this,true,'f4b',5)">Μόλις η αλεπού αγγίξει το μήλο, η συνθήκη γίνεται Αληθής (True)</div>
-          <div class="choice" onclick="check(this,false,'f4b',5)">Η συνθήκη είναι πάντα Ψευδής</div>
+        <div class="phase-title"><span>Β</span> Τι περιέχει το αντίγραφο;</div>
+        <p style="margin-bottom:10px;font-weight:600">Όταν κάνουμε διπλασιασμό μιας μορφής, τι συμβαίνει με τον κώδικά της;</p>
+        <div class="choices">
+          <div class="choice" onclick="check(this,true,'f4b',5)">Το αντίγραφο περιέχει αυτόματα όλες τις ενδυμασίες, τους ήχους και τα σενάρια του αρχικού αντικειμένου</div>
+          <div class="choice" onclick="check(this,false,'f4b',5)">Αντιγράφεται μόνο η εικόνα αλλά όλα τα σενάρια χάνονται</div>
+          <div class="choice" onclick="check(this,false,'f4b',5)">Δεν περιέχει κανένα σενάριο και καμία ενδυμασία</div>
         </div>
         <div class="feedback" id="f4b"></div>
+      </div>
+      <div class="phase">
+        <div class="phase-title"><span>Γ</span> Τοποθέτηση κάτω από τους προβολείς</div>
+        <p style="margin-bottom:10px;font-weight:600">Πώς τοποθετούμε τις δύο χορεύτριες στη σκηνή Spotlight κάτω από τους προβολείς;</p>
+        <div class="choices">
+          <div class="choice" onclick="check(this,true,'f4c',5)">Τις σύρουμε με το ποντίκι στην κατάλληλη θέση πάνω στη σκηνή</div>
+          <div class="choice" onclick="check(this,false,'f4c',5)">Πατάμε διαγραφή αντικειμένου</div>
+          <div class="choice" onclick="check(this,false,'f4c',5)">Αλλάζουμε το μέγεθος σε 0</div>
+        </div>
+        <div class="feedback" id="f4c"></div>
       </div>
     </div>
   </div>
@@ -375,35 +424,45 @@
   <div class="activity">
     <div class="act-head" onclick="toggle(this)">
       <div class="act-num">5</div>
-      <div class="act-title">Αισθητήρας: «Πατήθηκε πλήκτρο;»</div>
+      <div class="act-title">Αντίθετες κινήσεις: Ρόδα vs Ανάποδη ρόδα</div>
       <div class="arrow">▼</div>
     </div>
     <div class="act-body">
       <div class="phase">
-        <div class="phase-title"><span>Α</span> Έλεγχος πλήκτρων</div>
-        <p style="margin-bottom:10px;font-weight:600">Πώς δημιουργούμε ομαλή κίνηση για παιχνίδι με βελάκια;</p>
+        <div class="phase-title"><span>Α</span> Η πρόκληση του βιβλίου</div>
+        <p style="margin-bottom:10px;font-weight:600">Θέλουμε όταν πατάμε δεξί βέλος, η μία να κάνει απλή ρόδα και η άλλη ανάποδη ρόδα. Τι πρέπει να αλλάξουμε;</p>
         <div class="choices">
-          <div class="choice" onclick="check(this,true,'f5a',5)">Μέσα σε μια συνεχή επανάληψη («για πάντα») ελέγχουμε με «εάν πατήθηκε πλήκτρο»</div>
-          <div class="choice" onclick="check(this,false,'f5a',5)">Βάζουμε μόνο ένα «περίμενε 1 δευτερόλεπτο»</div>
-          <div class="choice" onclick="check(this,false,'f5a',5)">Φτιάχνουμε νέο υπόβαθρο για κάθε πάτημα</div>
+          <div class="choice" onclick="check(this,true,'f5a',5)">Στον κώδικα της Αλεξίας2 αλλάζουμε την κλήση του υποπρογράμματος στα συμβάντα των πλήκτρων</div>
+          <div class="choice" onclick="check(this,false,'f5a',5)">Σβήνουμε το δεξί βέλος από το πληκτρολόγιο</div>
+          <div class="choice" onclick="check(this,false,'f5a',5)">Αλλάζουμε το υπόβαθρο της σκηνής</div>
         </div>
         <div class="feedback" id="f5a"></div>
       </div>
       <div class="phase">
-        <div class="phase-title"><span>Β</span> Δοκίμασε τα κουμπιά</div>
-        <div class="stage">
-          <div class="char" id="charRocket">🚀</div>
-        </div>
-        <div style="text-align:center;">
-          <button class="btn" onclick="boostRocket()">🔼 Προώθηση (Πάνω Βέλος)</button>
-          <button class="btn btn-orange" onclick="tiltRocket()">🔄 Στροφή (Δεξί Βέλος)</button>
-          <button class="btn btn-gray" onclick="resetRocket()">⏹️ Επαναφορά</button>
-        </div>
-        <div class="choices" style="margin-top:10px;">
-          <div class="choice" onclick="check(this,true,'f5b',5)">Ο αισθητήρας ελέγχει άμεσα αν ο χρήστης πατάει το συγκεκριμένο πλήκτρο</div>
-          <div class="choice" onclick="check(this,false,'f5b',5)">Ο αισθητήρας καταγράφει μόνο τη φωνή μας</div>
+        <div class="phase-title"><span>Β</span> Πώς διαφέρουν τα δύο υποπρογράμματα;</div>
+        <p style="margin-bottom:10px;font-weight:600">Ποια είναι η ουσιαστική διαφορά στο εσωτερικό της «Ρόδας» και της «Ανάποδης ρόδας»;</p>
+        <div class="choices">
+          <div class="choice" onclick="check(this,true,'f5b',5)">Στη μία στρίβει 15° δεξιόστροφα (↻), ενώ στην άλλη 15° αριστερόστροφα (↺) 24 φορές</div>
+          <div class="choice" onclick="check(this,false,'f5b',5)">Η μία αλλάζει μέγεθος και η άλλη αλλάζει χρώμα</div>
+          <div class="choice" onclick="check(this,false,'f5b',5)">Η μία παίζει μουσική και η άλλη σταματάει</div>
         </div>
         <div class="feedback" id="f5b"></div>
+      </div>
+      <div class="phase">
+        <div class="phase-title"><span>Γ</span> Δοκίμασε συγχρονισμένη αντίθετη ρόδα</div>
+        <div class="stage">
+          <div style="text-align:center;"><div class="dancer" id="duoAlexia1">👧</div><div style="color:#c7d2fe;font-size:0.85rem;font-weight:700;">Αλεξία</div></div>
+          <div style="text-align:center;"><div class="dancer" id="duoAlexia2">👧</div><div style="color:#c7d2fe;font-size:0.85rem;font-weight:700;">Αλεξία 2</div></div>
+        </div>
+        <div style="text-align:center;">
+          <button class="btn btn-orange" onclick="spinOpposite()">➡️ Δεξί Βέλος (Αντίθετες Ρόδες)</button>
+          <button class="btn btn-gray" onclick="stopSpinOpposite()">⏹️ Στοπ</button>
+        </div>
+        <div class="choices" style="margin-top:10px;">
+          <div class="choice" onclick="check(this,true,'f5c',5)">Το ίδιο πάτημα πλήκτρου μπορεί να προκαλεί ταυτόχρονα διαφορετικές αντιδράσεις σε διαφορετικές μορφές</div>
+          <div class="choice" onclick="check(this,false,'f5c',5)">Όλες οι μορφές πρέπει υποχρεωτικά να κάνουν ακριβώς την ίδια κίνηση</div>
+        </div>
+        <div class="feedback" id="f5c"></div>
       </div>
     </div>
   </div>
@@ -412,29 +471,39 @@
   <div class="activity">
     <div class="act-head" onclick="toggle(this)">
       <div class="act-num">6</div>
-      <div class="act-title">Αισθητήρας: «Αγγίζει το χρώμα;»</div>
+      <div class="act-title">Αντιγραφή κώδικα σε τρίτη μορφή (Ten80)</div>
       <div class="arrow">▼</div>
     </div>
     <div class="act-body">
       <div class="phase">
-        <div class="phase-title"><span>Α</span> Εφαρμογή σε Λαβύρινθο</div>
-        <p style="margin-bottom:10px;font-weight:600">Σε έναν λαβύρινθο, πώς εμποδίζουμε τον χαρακτήρα να περνάει τους τοίχους;</p>
+        <div class="phase-title"><span>Α</span> Επιλογή νέου χορευτή</div>
+        <p style="margin-bottom:10px;font-weight:600">Από ποια κατηγορία της βιβλιοθήκης επιλέγουμε τον τρίτο χορευτή «Ten80»;</p>
         <div class="choices">
-          <div class="choice" onclick="check(this,true,'f6a',5)">Εάν αγγίζει το χρώμα των τοίχων, κάνε πίσω (-10 βήματα)</div>
-          <div class="choice" onclick="check(this,false,'f6a',5)">Σβήνουμε τον τοίχο με τη γόμα</div>
-          <div class="choice" onclick="check(this,false,'f6a',5)">Αλλάζουμε όνομα στο αντικείμενο</div>
+          <div class="choice" onclick="check(this,true,'f6a',5)">Κατηγορία «Χορός» (Dance)</div>
+          <div class="choice" onclick="check(this,false,'f6a',5)">Κατηγορία «Ζώα» (Animals)</div>
+          <div class="choice" onclick="check(this,false,'f6a',5)">Κατηγορία «Φαγητά» (Food)</div>
         </div>
         <div class="feedback" id="f6a"></div>
       </div>
       <div class="phase">
-        <div class="phase-title"><span>Β</span> Χρωματικό σταγονόμετρο</div>
-        <p style="margin-bottom:10px;font-weight:600">Πώς επιλέγουμε το ακριβές χρώμα του τοίχου στο Scratch;</p>
+        <div class="phase-title"><span>Β</span> Πώς μεταφέρουμε κώδικα με «σύρε κι άσε» (Drag & Drop);</div>
+        <p style="margin-bottom:10px;font-weight:600">Πώς αντιγράφουμε εύκολα ένα μπλοκ εντολών από την Αλεξία στον Ten80;</p>
         <div class="choices">
-          <div class="choice" onclick="check(this,true,'f6b',5)">Κάνουμε κλικ στο εργαλείο «σταγονόμετρο» και επιλέγουμε το χρώμα πάνω στη σκηνή</div>
-          <div class="choice" onclick="check(this,false,'f6b',5)">Μαντεύουμε τον αριθμό του χρώματος στην τύχη</div>
-          <div class="choice" onclick="check(this,false,'f6b',5)">Δεν χρειάζεται να είναι το ίδιο χρώμα</div>
+          <div class="choice" onclick="check(this,true,'f6b',5)">Σύρουμε το μπλοκ εντολών με το ποντίκι και το αφήνουμε πάνω στο εικονίδιο του Ten80</div>
+          <div class="choice" onclick="check(this,false,'f6b',5)">Πρέπει υποχρεωτικά να ξανασυναρμολογήσουμε όλες τις εντολές μία-μία από την αρχή</div>
+          <div class="choice" onclick="check(this,false,'f6b',5)">Κάνουμε διαγραφή του Ten80</div>
         </div>
         <div class="feedback" id="f6b"></div>
+      </div>
+      <div class="phase">
+        <div class="phase-title"><span>Γ</span> Γιατί ταιριάζει ο κώδικας χορού;</div>
+        <p style="margin-bottom:10px;font-weight:600">Γιατί ο κώδικας χορού της Αλεξίας («επανάλαβε 13») λειτουργεί άψογα και στον Ten80;</p>
+        <div class="choices">
+          <div class="choice" onclick="check(this,true,'f6c',5)">Επειδή και ο Ten80 έχει ακριβώς 13 χορευτικές στάσεις (ενδυμασίες) στη βιβλιοθήκη</div>
+          <div class="choice" onclick="check(this,false,'f6c',5)">Επειδή έχουν το ίδιο χρώμα μαλλιών</div>
+          <div class="choice" onclick="check(this,false,'f6c',5)">Επειδή είναι φίλοι</div>
+        </div>
+        <div class="feedback" id="f6c"></div>
       </div>
     </div>
   </div>
@@ -443,32 +512,47 @@
   <div class="activity">
     <div class="act-head" onclick="toggle(this)">
       <div class="act-num">7</div>
-      <div class="act-title">Τελεστές Σύγκρισης (&gt;, &lt;, =)</div>
+      <div class="act-title">Εφέ φώτων σκηνής («άλλαξε εφέ χρώματος»)</div>
       <div class="arrow">▼</div>
     </div>
     <div class="act-body">
       <div class="phase">
-        <div class="phase-title"><span>Α</span> Πράσινα μπλοκ Τελεστών</div>
-        <div style="text-align:center;margin:10px 0">
-          <div class="block block-ops">&lt; [Ζωές] = [0] &gt;</div>
+        <div class="phase-title"><span>Α</span> Η εντολή του εφέ</div>
+        <div style="text-align:center;margin:8px 0">
+          <div class="block block-looks">άλλαξε εφέ [χρώμα] κατά (25)</div>
         </div>
-        <p style="margin-bottom:10px;font-weight:600">Πότε γίνεται Αληθής η παραπάνω συνθήκη;</p>
+        <p style="margin-bottom:10px;font-weight:600">Σε ποια κατηγορία ανήκει η εντολή αυτή;</p>
         <div class="choices">
-          <div class="choice" onclick="check(this,true,'f7a',5)">Μόλις η τιμή της μεταβλητής «Ζωές» φτάσει ακριβώς στο 0</div>
-          <div class="choice" onclick="check(this,false,'f7a',5)">Όταν οι ζωές είναι περισσότερες από 0</div>
-          <div class="choice" onclick="check(this,false,'f7a',5)">Όταν ξεκινά το παιχνίδι με 3 ζωές</div>
+          <div class="choice" onclick="check(this,true,'f7a',5)">Όψεις (Looks - μοβ κατηγορία)</div>
+          <div class="choice" onclick="check(this,false,'f7a',5)">Ήχος (Sound)</div>
+          <div class="choice" onclick="check(this,false,'f7a',5)">Αισθητήρες (Sensing)</div>
         </div>
         <div class="feedback" id="f7a"></div>
       </div>
       <div class="phase">
-        <div class="phase-title"><span>Β</span> Αντίστροφη Μέτρηση Χρόνου</div>
-        <p style="margin-bottom:10px;font-weight:600">Όταν κάνουμε αντίστροφη μέτρηση, πότε τελειώνει ο χρόνος;</p>
+        <div class="phase-title"><span>Β</span> Οπτικό αποτέλεσμα στη σκηνή</div>
+        <p style="margin-bottom:10px;font-weight:600">Τι προσομοιώνει αυτό το εφέ σύμφωνα με το σχολικό βιβλίο;</p>
         <div class="choices">
-          <div class="choice" onclick="check(this,true,'f7b',5)">εάν &lt; [Χρόνος] = 0 &gt; τότε πες «Τέλος Χρόνου!»</div>
-          <div class="choice" onclick="check(this,false,'f7b',5)">εάν &lt; [Χρόνος] = 30 &gt;</div>
-          <div class="choice" onclick="check(this,false,'f7b',5)">εάν πατηθεί το πλήκτρο κενό</div>
+          <div class="choice" onclick="check(this,true,'f7b',5)">Κάνει τους χορευτές να μοιάζουν σαν να φωτίζονται από τα χρωματιστά φώτα της σκηνής (disco)</div>
+          <div class="choice" onclick="check(this,false,'f7b',5)">Κάνει τον χαρακτήρα να εξαφανίζεται εντελώς</div>
+          <div class="choice" onclick="check(this,false,'f7b',5)">Χαμηλώνει την ένταση του υπολογιστή</div>
         </div>
         <div class="feedback" id="f7b"></div>
+      </div>
+      <div class="phase">
+        <div class="phase-title"><span>Γ</span> Δοκίμασε τα φώτα disco!</div>
+        <div class="stage">
+          <div class="dancer" id="discoDancer">🕺</div>
+        </div>
+        <div style="text-align:center;">
+          <button class="btn btn-pink" onclick="shiftColorEffect()">✨ Άλλαξε εφέ χρώματος (+25)</button>
+          <button class="btn btn-gray" onclick="resetColorEffect()">🔄 Επαναφορά</button>
+        </div>
+        <div class="choices" style="margin-top:10px;">
+          <div class="choice" onclick="check(this,true,'f7c',5)">Μπορούμε να συνδυάζουμε παράλληλα κίνηση, ήχο και γραφικά εφέ</div>
+          <div class="choice" onclick="check(this,false,'f7c',5)">Τα γραφικά εφέ σταματούν αυτόματα τη μουσική</div>
+        </div>
+        <div class="feedback" id="f7c"></div>
       </div>
     </div>
   </div>
@@ -477,35 +561,48 @@
   <div class="activity">
     <div class="act-head" onclick="toggle(this)">
       <div class="act-num">8</div>
-      <div class="act-title">Σύνθετη Πρόκληση: Έξυπνο Ρομπότ Φύλακας</div>
+      <div class="act-title">Τελική Σύνθεση: Μεγάλο Χορευτικό Σόου (Trio)</div>
       <div class="arrow">▼</div>
     </div>
     <div class="act-body">
       <div class="phase">
-        <div class="phase-title"><span>Α</span> Ανάλυση Αλγορίθμου</div>
-        <p style="margin-bottom:10px;font-weight:600">Ο ρομπότ-φύλακας ανιχνεύει εμπόδιο. Ποιος είναι ο σωστός αλγόριθμος;</p>
+        <div class="phase-title"><span>Α</span> Ολοκληρωμένη αρχιτεκτονική έργου</div>
+        <p style="margin-bottom:10px;font-weight:600">Στο τελικό ολοκληρωμένο έργο του Μαθήματος 9, πόσα πράγματα τρέχουν παράλληλα στην πράσινη σημαία;</p>
         <div class="choices">
-          <div class="choice" onclick="check(this,true,'f8a',5)">Για πάντα: Κινήσου μπροστά. Εάν αγγίζεις εμπόδιο, στρίψε 90° και άλλαξε κατεύθυνση</div>
-          <div class="choice" onclick="check(this,false,'f8a',5)">Κινήσου μόνο μία φορά και σταμάτα χωρίς έλεγχο</div>
-          <div class="choice" onclick="check(this,false,'f8a',5)">Άλλαξε υπόβαθρο χωρίς συνθήκη</div>
+          <div class="choice" onclick="check(this,true,'f8a',5)">Τουλάχιστον 4: Ο χορός των 3 χορευτών και το παράλληλο σενάριο της συνεχούς μουσικής</div>
+          <div class="choice" onclick="check(this,false,'f8a',5)">Μόνο 1 πράγμα κάθε φορά</div>
+          <div class="choice" onclick="check(this,false,'f8a',5)">Κανένα, περιμένουμε να πατηθεί το ποντίκι</div>
         </div>
         <div class="feedback" id="f8a"></div>
       </div>
       <div class="phase">
-        <div class="phase-title"><span>Β</span> Προσομοίωση Ρομπότ</div>
-        <div class="stage" id="robotStage">
-          <div class="char" id="robotChar" style="transform:translateX(-100px);">🤖</div>
-          <div id="obstacleBox" style="font-size:2.6rem;">🧱</div>
-        </div>
-        <div style="text-align:center;">
-          <button class="btn" onclick="startRobotSim()">▶️ Εκτέλεση Αλγορίθμου</button>
-          <button class="btn btn-gray" onclick="resetRobotSim()">⏹️ Επαναφορά</button>
-        </div>
-        <div class="sim-status" id="robotStatus" style="margin-top:6px;color:#0f766e;">Έτοιμο για εκκίνηση.</div>
-        <div class="choices" style="margin-top:10px;">
-          <div class="choice" onclick="check(this,true,'f8b',5)">Συγχαρητήρια! Ολοκλήρωσες και τις 8 δραστηριότητες για τις συνθήκες!</div>
+        <div class="phase-title"><span>Β</span> Έλεγχος Ρυθμού με Γραμμή Κύλισης</div>
+        <p style="margin-bottom:10px;font-weight:600">Πώς επηρεάζει η μεταβλητή «Ρυθμός» όλους τους χορευτές ταυτόχρονα;</p>
+        <div class="choices">
+          <div class="choice" onclick="check(this,true,'f8b',5)">Επειδή είναι κοινή μεταβλητή, αλλάζοντας τον ρυθμό συγχρονίζονται όλοι πιο γρήγορα ή πιο αργά</div>
+          <div class="choice" onclick="check(this,false,'f8b',5)">Επηρεάζει μόνο το υπόβαθρο και κανέναν χορευτή</div>
+          <div class="choice" onclick="check(this,false,'f8b',5)">Σβήνει τα άλλα σενάρια</div>
         </div>
         <div class="feedback" id="f8b"></div>
+      </div>
+      <div class="phase">
+        <div class="phase-title"><span>Γ</span> Προσομοίωση Τελικής Σκηνής (3 Χορευτές + Μουσική)</div>
+        <div class="stage" id="grandStage">
+          <div class="dancer" id="trio1">👧</div>
+          <div class="dancer" id="trio2">🕺</div>
+          <div class="dancer" id="trio3">👧</div>
+        </div>
+        <div class="live-box">
+          <div id="grandStatus">Έτοιμο για το μεγάλο σόου!</div>
+        </div>
+        <div style="text-align:center;">
+          <button class="btn btn-green" onclick="startGrandShow()">🚩 Εκκίνηση Σόου (Παράλληλη Εκτέλεση)</button>
+          <button class="btn btn-gray" onclick="stopGrandShow()">⏹️ Στοπ</button>
+        </div>
+        <div class="choices" style="margin-top:10px;">
+          <div class="choice" onclick="check(this,true,'f8c',5)">Συγχαρητήρια! Ολοκλήρωσες και τις 8 δραστηριότητες (24 φάσεις) του Μαθήματος 9!</div>
+        </div>
+        <div class="feedback" id="f8c"></div>
       </div>
     </div>
   </div>
@@ -558,104 +655,75 @@
     }
   }
 
-  // Act 3: Decision simulation
-  function simScoreDecision() {
-    const val = parseInt(document.getElementById('testScore').value);
-    document.getElementById('testScoreVal').textContent = val;
-    const msg = document.getElementById('scoreMsg');
-    if (val > 50) {
-      msg.textContent = '🎉 Κέρδισες! (Σκορ > 50 -> Συνθήκη ΑΛΗΘΗΣ)';
-      msg.style.color = '#34d399';
-    } else {
-      msg.textContent = '💬 Προσπάθησε ξανά! (Σκορ <= 50 -> Κλάδος ΑΛΛΙΩΣ)';
-      msg.style.color = '#f87171';
-    }
+  // Act 3 Solo demo
+  function startSoloParallel() {
+    document.getElementById('soloDancer').classList.add('dance');
+    document.getElementById('musicNote').style.display = 'block';
+  }
+  function stopSoloParallel() {
+    document.getElementById('soloDancer').classList.remove('dance');
+    document.getElementById('musicNote').style.display = 'none';
   }
 
-  // Act 4: Fox touch simulation
-  let foxPos = 0;
-  function moveFoxForward() {
-    foxPos += 45;
-    const fox = document.getElementById('charFox');
-    fox.style.transform = `translateX(${foxPos}px)`;
-    const status = document.getElementById('foxStatus');
-    if (foxPos >= 135) {
-      status.textContent = '💥 Η αλεπού άγγιξε το μήλο! Συνθήκη: ΑΛΗΘΗΣ (True) -> Εξαφάνισε μήλο!';
-      status.style.color = '#34d399';
-    } else {
-      status.textContent = `Η αλεπού προχωράει... Απόσταση: ${135 - foxPos}px ακόμη.`;
-      status.style.color = '#0f766e';
-    }
+  // Act 5 Duo opposite spin
+  function spinOpposite() {
+    const d1 = document.getElementById('duoAlexia1');
+    const d2 = document.getElementById('duoAlexia2');
+    d1.className = 'dancer spin-right';
+    d2.className = 'dancer spin-left';
   }
-  function resetFox() {
-    foxPos = 0;
-    const fox = document.getElementById('charFox');
-    fox.style.transform = `translateX(0px)`;
-    const status = document.getElementById('foxStatus');
-    status.textContent = 'Η αλεπού δεν αγγίζει το μήλο.';
-    status.style.color = '#0f766e';
+  function stopSpinOpposite() {
+    const d1 = document.getElementById('duoAlexia1');
+    const d2 = document.getElementById('duoAlexia2');
+    d1.className = 'dancer';
+    d2.className = 'dancer';
   }
 
-  // Act 5: Rocket
-  let rocketY = 0;
-  let rocketDeg = 0;
-  function boostRocket() {
-    rocketY -= 20;
-    const r = document.getElementById('charRocket');
-    r.style.transform = `translateY(${rocketY}px) rotate(${rocketDeg}deg)`;
+  // Act 7 Color effect demo
+  let curHue = 0;
+  function shiftColorEffect() {
+    curHue = (curHue + 50) % 360;
+    document.getElementById('discoDancer').style.filter = `hue-rotate(${curHue}deg)`;
   }
-  function tiltRocket() {
-    rocketDeg += 25;
-    const r = document.getElementById('charRocket');
-    r.style.transform = `translateY(${rocketY}px) rotate(${rocketDeg}deg)`;
-  }
-  function resetRocket() {
-    rocketY = 0;
-    rocketDeg = 0;
-    const r = document.getElementById('charRocket');
-    r.style.transform = 'translateY(0px) rotate(0deg)';
+  function resetColorEffect() {
+    curHue = 0;
+    document.getElementById('discoDancer').style.filter = 'none';
   }
 
-  // Act 8: Robot simulation
-  let robotInterval = null;
-  function startRobotSim() {
-    resetRobotSim();
-    const r = document.getElementById('robotChar');
-    const status = document.getElementById('robotStatus');
-    let x = -100;
-    let turned = false;
+  // Act 8 Grand show
+  let grandInterval = null;
+  function startGrandShow() {
+    const t1 = document.getElementById('trio1');
+    const t2 = document.getElementById('trio2');
+    const t3 = document.getElementById('trio3');
+    t1.classList.add('dance');
+    t2.classList.add('dance');
+    t3.classList.add('dance');
+    document.getElementById('grandStatus').textContent = '🎶 Παράλληλη εκτέλεση: 3 Χορευτές χορεύουν + Μουσική παίζει για πάντα!';
+    document.getElementById('grandStatus').style.color = '#38bdf8';
 
-    robotInterval = setInterval(() => {
-      if (!turned) {
-        x += 10;
-        r.style.transform = `translateX(${x}px)`;
-        status.textContent = '🤖 Προχωράει μπροστά...';
-        status.style.color = '#0f766e';
-        if (x >= 40) {
-          // Sensing obstacle!
-          turned = true;
-          status.textContent = '⚠️ Αισθητήρας: ΕΜΠΟΔΙΟ! Εάν αγγίζει τοίχο -> Στρίψε 90° & απόφυγε!';
-          status.style.color = '#fbbf24';
-          r.style.transform = `translateX(${x}px) rotate(-90deg)`;
-        }
-      } else {
-        clearInterval(robotInterval);
-        setTimeout(() => {
-          r.style.transform = `translateX(${x}px) translateY(-50px) rotate(-90deg)`;
-          status.textContent = '✅ Το εμπόδιο αποφεύχθηκε με επιτυχία!';
-          status.style.color = '#34d399';
-        }, 400);
-      }
-    }, 120);
+    if (grandInterval) clearInterval(grandInterval);
+    let h = 0;
+    grandInterval = setInterval(() => {
+      h = (h + 35) % 360;
+      t1.style.filter = `hue-rotate(${h}deg)`;
+      t2.style.filter = `hue-rotate(${h + 90}deg)`;
+      t3.style.filter = `hue-rotate(${h + 180}deg)`;
+    }, 300);
   }
-
-  function resetRobotSim() {
-    if (robotInterval) clearInterval(robotInterval);
-    const r = document.getElementById('robotChar');
-    r.style.transform = 'translateX(-100px) translateY(0px) rotate(0deg)';
-    const status = document.getElementById('robotStatus');
-    status.textContent = 'Έτοιμο για εκκίνηση.';
-    status.style.color = '#0f766e';
+  function stopGrandShow() {
+    if (grandInterval) clearInterval(grandInterval);
+    const t1 = document.getElementById('trio1');
+    const t2 = document.getElementById('trio2');
+    const t3 = document.getElementById('trio3');
+    t1.className = 'dancer';
+    t2.className = 'dancer';
+    t3.className = 'dancer';
+    t1.style.filter = 'none';
+    t2.style.filter = 'none';
+    t3.style.filter = 'none';
+    document.getElementById('grandStatus').textContent = '⏹️ Στάση σόου.';
+    document.getElementById('grandStatus').style.color = '#ffffff';
   }
 </script>
 </body>
