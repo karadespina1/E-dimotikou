@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Μάθημα 8 – Υποπρογράμματα | Ε΄ Δημοτικού</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: linear-gradient(160deg, #4c1d95 0%, #6d28d9 45%, #a78bfa 100%);
+    min-height: 100vh;
+    color: #1e1b4b;
+    padding-bottom: 50px;
+  }
+  .header {
+    text-align: center;
+    color: white;
+    padding: 26px 16px 8px;
+  }
+  .header h1 {
+    font-size: 1.8rem;
+    font-weight: 800;
+    text-shadow: 0 3px 12px rgba(0,0,0,0.25);
+  }
+  .header p {
+    margin-top: 5px;
+    font-weight: 600;
+    opacity: 0.95;
+  }
+  .score {
+    text-align: center;
+    color: white;
+    font-weight: 800;
+    font-size: 1.15rem;
+    margin: 10px 0 18px;
+  }
+  .container {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 0 16px;
+  }
+  .activity {
+    background: white;
+    border-radius: 20px;
+    margin-bottom: 18px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.14);
+    overflow: hidden;
+  }
+  .act-head {
+    background: linear-gradient(90deg, #f5f3ff, #ede9fe);
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .act-num {
+    width: 44px;
+    height: 44px;
+    background: linear-gradient(135deg, #7c3aed, #5b21b6);
+    color: white;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+  }
+  .act-title {
+    flex: 1;
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #5b21b6;
+  }
+  .arrow {
+    font-size: 1.2rem;
+    color: #7c3aed;
+    transition: transform 0.3s;
+  }
+  .activity.open .arrow { transform: rotate(180deg); }
+  .act-body {
+    display: none;
+    padding: 6px 20px 20px;
+  }
+  .activity.open .act-body { display: block; }
+  .phase {
+    background: #f8fafc;
+    border: 2px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 14px 16px;
+    margin-top: 12px;
+  }
+  .phase-title {
+    font-weight: 800;
+    color: #5b21b6;
+    margin-bottom: 10px;
+    font-size: 1.02rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .phase-title span {
+    background: #7c3aed;
+    color: white;
+    width: 26px;
+    height: 26px;
+    border-radius: 7px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+  }
+  .choices { display: flex; flex-direction: column; gap: 9px; }
+  .choice {
+    background: white;
+    border: 2px solid #ddd6fe;
+    border-radius: 11px;
+    padding: 11px 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.2s;
+    font-size: 0.98rem;
+  }
+  .choice:hover { border-color: #7c3aed; background: #f5f3ff; }
+  .choice.ok { border-color: #10b981; background: #d1fae5; }
+  .choice.bad { border-color: #ef4444; background: #fee2e2; }
+  .feedback {
+    margin-top: 10px;
+    padding: 10px 13px;
+    border-radius: 9px;
+    font-weight: 700;
+    display: none;
+  }
+  .feedback.show { display: block; }
+  .feedback.ok { background: #d1fae5; color: #065f46; }
+  .feedback.bad { background: #fee2e2; color: #991b1b; }
+  .stage {
+    background: linear-gradient(135deg, #1e1b4b, #4c1d95);
+    border-radius: 14px;
+    height: 140px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 10px 0;
+  }
+  .char { font-size: 3.8rem; transition: transform 0.3s; }
+  .char.dance { animation: dance 0.55s infinite alternate; }
+  .char.spin { animation: spin 1.1s linear infinite; }
+  @keyframes dance {
+    from { transform: rotate(-10deg) scale(1); }
+    to { transform: rotate(10deg) scale(1.07); }
+  }
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+  .btn {
+    background: linear-gradient(135deg, #7c3aed, #5b21b6);
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 50px;
+    font-weight: 800;
+    font-size: 0.95rem;
+    cursor: pointer;
+    font-family: inherit;
+    margin: 4px 4px 0 0;
+    transition: transform 0.15s;
+  }
+  .btn:hover { transform: scale(1.04); }
+  .btn-orange { background: linear-gradient(135deg, #f59e0b, #d97706); }
+  .btn-gray { background: #64748b; }
+  .slider-box {
+    background: white;
+    border-radius: 11px;
+    padding: 12px;
+    margin-top: 8px;
+  }
+  input[type="range"] {
+    width: 100%;
+    height: 8px;
+    appearance: none;
+    background: #c4b5fd;
+    border-radius: 8px;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    background: #7c3aed;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 3px solid white;
+  }
+  .speed-val {
+    text-align: center;
+    font-weight: 800;
+    color: #5b21b6;
+    margin-top: 5px;
+  }
+  .block {
+    display: inline-block;
+    background: #7c3aed;
+    color: white;
+    padding: 6px 11px;
+    border-radius: 7px;
+    font-weight: 700;
+    font-size: 0.88rem;
+    margin: 2px;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>💃 Υποπρογράμματα</h1>
+  <p>Μάθημα 8ο – 6 Δραστηριότητες (2 φάσεις η καθεμία)</p>
+</div>
+
+<div class="score">⭐ Πόντοι: <span id="score">0</span></div>
+
+<div class="container">
+
+  <!-- 1 -->
+  <div class="activity open">
+    <div class="act-head" onclick="toggle(this)">
+      <div class="act-num">1</div>
+      <div class="act-title">Τι είναι υποπρόγραμμα;</div>
+      <div class="arrow">▼</div>
+    </div>
+    <div class="act-body">
+      <div class="phase">
+        <div class="phase-title"><span>Α</span> Κατανόηση</div>
+        <p style="margin-bottom:10px;font-weight:600">Τι περιγράφει καλύτερα ένα υποπρόγραμμα;</p>
+        <div class="choices">
+          <div class="choice" onclick="check(this,true,'f1a',5)">Μία δική μας εντολή που φτιάχνουμε μία φορά και χρησιμοποιούμε πολλές φορές</div>
+          <div class="choice" onclick="check(this,false,'f1a',5)">Μία μεταβλητή που αλλάζει τιμή</div>
+          <div class="choice" onclick="check(this,false,'f1a',5)">Ένα υπόβαθρο της σκηνής</div>
+        </div>
+        <div class="feedback" id="f1a"></div>
+      </div>
+      <div class="phase">
+        <div class="phase-title"><span>Β</span> Γιατί το χρησιμοποιούμε;</div>
+        <div class="choices">
+          <div class="choice" onclick="check(this,true,'f1b',5)">Για να μην ξαναγράφουμε τις ίδιες εντολές συνέχεια</div>
+          <div class="choice" onclick="check(this,false,'f1b',5)">Για να αλλάζει αυτόματα το υπόβαθρο</div>
+          <div class="choice" onclick="check(this,false,'f1b',5)">Για να μετράει τους πόντους</div>
+        </div>
+        <div class="feedback" id="f1b"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2 -->
+  <div class="activity">
+    <div class="act-head" onclick="toggle(this)">
+      <div class="act-num">2</div>
+      <div class="act-title">Φτιάχνουμε την εντολή «Χορός»</div>
+      <div class="arrow">▼</div>
+    </div>
+    <div class="act-body">
+      <div class="phase">
+        <div class="phase-title"><span>Α</span> Τα βήματα</div>
+        <p style="margin-bottom:10px;font-weight:600">Ποια είναι η σωστή σειρά;</p>
+        <div class="choices">
+          <div class="choice" onclick="check(this,true,'f2a',5)">Δημιουργία Εντολής → Όνομα → Βάζουμε τις εντολές μέσα</div>
+          <div class="choice" onclick="check(this,false,'f2a',5)">Πράσινη σημαία → Μεταβλητή → Υπόβαθρο</div>
+          <div class="choice" onclick="check(this,false,'f2a',5)">Μόνο αλλάζουμε ενδυμασίες χωρίς όνομα</div>
+        </div>
+        <div class="feedback" id="f2a"></div>
+      </div>
+      <div class="phase">
+        <div class="phase-title"><span>Β</span> Τι κάνει ο «Χορός»;</div>
+        <div style="text-align:center;margin:10px 0">
+          <div class="block">ορισμός Χορός</div><br>
+          <div class="block" style="background:#db2777">επανάλαβε 13</div>
+          <div class="block" style="background:#2563eb">επόμενη ενδυμασία</div>
+        </div>
+        <div class="choices">
+          <div class="choice" onclick="check(this,true,'f2b',5)">Αλλάζει γρήγορα τις ενδυμασίες και φαίνεται ότι χορεύει</div>
+          <div class="choice" onclick="check(this,false,'f2b',5)">Αλλάζει το υπόβαθρο σε νίκη</div>
+        </div>
+        <div class="feedback" id="f2b"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3 -->
+  <div class="activity">
+    <div class="act-head" onclick="toggle(this)">
+      <div class="act-num">3</div>
+      <div class="act-title">Η μεταβλητή «Ρυθμός»</div>
+      <div class="arrow">▼</div>
+    </div>
+    <div class="act-body">
+      <div class="phase">
+        <div class="phase-title"><span>Α</span> Δοκίμασε τον ρυθμό</div>
+        <div class="stage"><div class="char dance" id="charSpeed">👧</div></div>
+        <div class="slider-box">
+          <input type="range" min="5" max="35" value="15" id="speed" oninput="changeSpeed()">
+          <div class="speed-val">Ρυθμός: <span id="speedVal">15</span></div>
+        </div>
+        <p style="margin-top:8px;font-weight:600;color:#5b21b6">Όσο μεγαλώνει ο αριθμός → τόσο πιο γρήγορα χορεύει!</p>
+      </div>
+      <div class="phase">
+        <div class="phase-title"><span>Β</span> Ερώτηση</div>
+        <p style="margin-bottom:10px;font-weight:600">Αν μεγαλώσω τον «Ρυθμό», η Αλεξία χορεύει…</p>
+        <div class="choices">
+          <div class="choice" onclick="check(this,true,'f3b',5)">πιο γρήγορα</div>
+          <div class="choice" onclick="check(this,false,'f3b',5)">πιο αργά</div>
+          <div class="choice" onclick="check(this,false,'f3b',5)">σταματάει</div>
+        </div>
+        <div class="feedback" id="f3b"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4 -->
+  <div class="activity">
+    <div class="act-head" onclick="toggle(this)">
+      <div class="act-num">4</div>
+      <div class="act-title">Ρόδα & Ανάποδη Ρόδα</div>
+      <div class="arrow">▼</div>
+    </div>
+    <div class="act-body">
+      <div class="phase">
+        <div class="phase-title"><span>Α</span> Γιατί 24 επαναλήψεις;</div>
+        <p style="margin-bottom:10px;font-weight:600">Στη «Ρόδα» βάζουμε επανάλαβε 24 και στρίψε 15°. Γιατί;</p>
+        <div class="choices">
+          <div class="choice" onclick="check(this,true,'f4a',5)">Γιατί 24 × 15° = 360° (ένας πλήρης κύκλος)</div>
+          <div class="choice" onclick="check(this,false,'f4a',5)">Γιατί είναι τυχερός αριθμός</div>
+          <div class="choice" onclick="check(this,false,'f4a',5)">Γιατί φαίνεται πιο αργό</div>
+        </div>
+        <div class="feedback" id="f4a"></div>
+      </div>
+      <div class="phase">
+        <div class="phase-title"><span>Β</span> Δοκίμασε τις κινήσεις</div>
+        <div class="stage"><div class="char" id="charMove">👧</div></div>
+        <button class="btn" onclick="doDance()">💃 Χορός</button>
+        <button class="btn btn-orange" onclick="doSpin(1)">🔄 Ρόδα</button>
+        <button class="btn btn-orange" onclick="doSpin(-1)">↩️ Ανάποδη</button>
+        <button class="btn btn-gray" onclick="stopMove()">⏹️ Στοπ</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5 -->
+  <div class="activity">
+    <div class="act-head" onclick="toggle(this)">
+      <div class="act-num">5</div>
+      <div class="act-title">Πώς καλούμε ένα υποπρόγραμμα;</div>
+      <div class="arrow">▼</div>
+    </div>
+    <div class="act-body">
+      <div class="phase">
+        <div class="phase-title"><span>Α</span> Κατανόηση</div>
+        <p style="margin-bottom:10px;font-weight:600">Αφού φτιάξουμε το «Χορός», πώς το χρησιμοποιούμε;</p>
+        <div class="choices">
+          <div class="choice" onclick="check(this,true,'f5a',5)">Το βάζουμε σαν κανονική εντολή στο σενάριο</div>
+          <div class="choice" onclick="check(this,false,'f5a',5)">Πρέπει να το ξαναγράψουμε κάθε φορά</div>
+          <div class="choice" onclick="check(this,false,'f5a',5)">Μόνο με την πράσινη σημαία</div>
+        </div>
+        <div class="feedback" id="f5a"></div>
+      </div>
+      <div class="phase">
+        <div class="phase-title"><span>Β</span> Πού το βρίσκουμε;</div>
+        <p style="margin-bottom:10px;font-weight:600">Μετά τη δημιουργία, το υποπρόγραμμα εμφανίζεται στην κατηγορία:</p>
+        <div class="choices">
+          <div class="choice" onclick="check(this,true,'f5b',5)">Οι εντολές μου (ή «More Blocks»)</div>
+          <div class="choice" onclick="check(this,false,'f5b',5)">Κίνηση</div>
+          <div class="choice" onclick="check(this,false,'f5b',5)">Όψεις</div>
+        </div>
+        <div class="feedback" id="f5b"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6 -->
+  <div class="activity">
+    <div class="act-head" onclick="toggle(this)">
+      <div class="act-num">6</div>
+      <div class="act-title">Συνδυασμός υποπρογραμμάτων</div>
+      <div class="arrow">▼</div>
+    </div>
+    <div class="act-body">
+      <div class="phase">
+        <div class="phase-title"><span>Α</span> Σκέψου</div>
+        <p style="margin-bottom:10px;font-weight:600">Μπορεί να βάλουμε πολλά υποπρογράμματα μαζί κάτω από την πράσινη σημαία;</p>
+        <div class="choices">
+          <div class="choice" onclick="check(this,true,'f6a',5)">Ναι, π.χ. Χορός + Ρόδα + μουσική</div>
+          <div class="choice" onclick="check(this,false,'f6a',5)">Όχι, μόνο ένα κάθε φορά</div>
+        </div>
+        <div class="feedback" id="f6a"></div>
+      </div>
+      <div class="phase">
+        <div class="phase-title"><span>Β</span> Τελική δοκιμή</div>
+        <div class="stage"><div class="char" id="charFinal">👧</div></div>
+        <button class="btn" onclick="doDanceFinal()">💃 Χορός</button>
+        <button class="btn btn-orange" onclick="doSpinFinal(1)">🔄 Ρόδα</button>
+        <button class="btn btn-orange" onclick="doSpinFinal(-1)">↩️ Ανάποδη</button>
+        <button class="btn btn-gray" onclick="stopFinal()">⏹️ Στοπ</button>
+        <p style="margin-top:12px;font-weight:600;color:#5b21b6">Μπράβο! Τώρα ξέρεις πώς δουλεύουν τα υποπρογράμματα.</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  let score = 0;
+  const done = new Set();
+
+  function toggle(head) {
+    const act = head.parentElement;
+    document.querySelectorAll('.activity').forEach(a => {
+      if (a !== act) a.classList.remove('open');
+    });
+    act.classList.toggle('open');
+  }
+
+  function check(el, correct, fbId, pts) {
+    const parent = el.parentElement;
+    if (parent.dataset.done) return;
+    parent.dataset.done = '1';
+
+    parent.querySelectorAll('.choice').forEach(c => {
+      c.style.pointerEvents = 'none';
+    });
+
+    const fb = document.getElementById(fbId);
+    if (correct) {
+      el.classList.add('ok');
+      fb.className = 'feedback show ok';
+      fb.textContent = '✅ Σωστά! Μπράβο!';
+      if (!done.has(fbId)) {
+        done.add(fbId);
+        score += pts;
+        document.getElementById('score').textContent = score;
+      }
+    } else {
+      el.classList.add('bad');
+      fb.className = 'feedback show bad';
+      fb.textContent = '❌ Όχι αυτή. Δοκίμασε άλλη!';
+      setTimeout(() => {
+        parent.querySelectorAll('.choice').forEach(c => {
+          c.style.pointerEvents = 'auto';
+          c.classList.remove('bad');
+        });
+        fb.classList.remove('show');
+        parent.dataset.done = '';
+      }, 1100);
+    }
+  }
+
+  function changeSpeed() {
+    const val = document.getElementById('speed').value;
+    document.getElementById('speedVal').textContent = val;
+    const char = document.getElementById('charSpeed');
+    const dur = Math.max(0.18, 0.9 - val / 50);
+    char.style.animationDuration = dur + 's';
+  }
+
+  function doDance() {
+    stopMove();
+    document.getElementById('charMove').classList.add('dance');
+  }
+  function doSpin(dir) {
+    stopMove();
+    const c = document.getElementById('charMove');
+    c.classList.add('spin');
+    c.style.animationDirection = dir === 1 ? 'normal' : 'reverse';
+  }
+  function stopMove() {
+    const c = document.getElementById('charMove');
+    c.classList.remove('dance', 'spin');
+    c.style.transform = '';
+  }
+
+  function doDanceFinal() {
+    stopFinal();
+    document.getElementById('charFinal').classList.add('dance');
+  }
+  function doSpinFinal(dir) {
+    stopFinal();
+    const c = document.getElementById('charFinal');
+    c.classList.add('spin');
+    c.style.animationDirection = dir === 1 ? 'normal' : 'reverse';
+  }
+  function stopFinal() {
+    const c = document.getElementById('charFinal');
+    c.classList.remove('dance', 'spin');
+    c.style.transform = '';
+  }
+</script>
+</body>
+</html>
