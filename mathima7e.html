@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Μάθημα 7 – Νίκη ή ήττα | Προκλήσεις Σκέψης Scratch</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: linear-gradient(160deg, #075985 0%, #0284c7 45%, #38bdf8 100%);
+    min-height: 100vh;
+    color: #0c4a6e;
+    padding-bottom: 50px;
+  }
+  .header {
+    text-align: center;
+    color: white;
+    padding: 24px 16px 12px;
+  }
+  .header h1 {
+    font-size: 1.85rem;
+    font-weight: 900;
+    text-shadow: 0 3px 10px rgba(0,0,0,0.3);
+  }
+  .header p {
+    margin-top: 5px;
+    font-weight: 700;
+    font-size: 1.02rem;
+    opacity: 0.95;
+  }
+  .container {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 0 16px;
+  }
+  .card {
+    background: white;
+    border-radius: 18px;
+    margin-bottom: 20px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.8);
+  }
+  .card-head {
+    background: linear-gradient(90deg, #f0f9ff, #e0f2fe);
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 2px solid #bae6fd;
+    cursor: pointer;
+    user-select: none;
+  }
+  .card-num {
+    width: 42px;
+    height: 42px;
+    background: linear-gradient(135deg, #0284c7, #0369a1);
+    color: white;
+    border-radius: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+  }
+  .card-title {
+    flex: 1;
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #0369a1;
+  }
+  .arrow {
+    font-size: 1.1rem;
+    color: #0284c7;
+    transition: transform 0.3s;
+  }
+  .card.open .arrow { transform: rotate(180deg); }
+  .card-body {
+    display: none;
+    padding: 12px 18px 22px;
+  }
+  .card.open .card-body { display: block; }
+
+  .phase {
+    background: #f8fafc;
+    border: 2px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 14px 16px;
+    margin-top: 14px;
+  }
+  .phase-title {
+    font-weight: 800;
+    color: #0369a1;
+    margin-bottom: 10px;
+    font-size: 1.02rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .phase-title span {
+    background: #0284c7;
+    color: white;
+    width: 26px;
+    height: 26px;
+    border-radius: 7px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.88rem;
+  }
+  .prompt {
+    font-size: 0.98rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: #0c4a6e;
+    line-height: 1.45;
+  }
+  .code-block {
+    background: #1e293b;
+    color: #f8fafc;
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-family: monospace;
+    font-size: 0.92rem;
+    margin: 10px 0;
+    line-height: 1.5;
+  }
+  .block {
+    display: inline-block;
+    padding: 4px 9px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 0.86rem;
+    color: white;
+    margin: 2px;
+  }
+  .block-control { background: #f59e0b; }
+  .block-looks { background: #7c3aed; }
+  .block-event { background: #eab308; color: #1e1b4b; }
+
+  /* Interactive Elements */
+  .btn {
+    background: linear-gradient(135deg, #0284c7, #0369a1);
+    color: white;
+    border: none;
+    padding: 9px 16px;
+    border-radius: 30px;
+    font-weight: 800;
+    font-size: 0.9rem;
+    cursor: pointer;
+    font-family: inherit;
+    margin: 4px 4px 4px 0;
+    transition: transform 0.15s, opacity 0.15s;
+  }
+  .btn:hover { transform: scale(1.03); }
+  .btn-green { background: linear-gradient(135deg, #10b981, #059669); }
+  .btn-red { background: linear-gradient(135deg, #ef4444, #dc2626); }
+  .btn-gray { background: #64748b; }
+  .btn-orange { background: linear-gradient(135deg, #f59e0b, #d97706); }
+  .btn-purple { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
+
+  .feedback {
+    margin-top: 10px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-weight: 800;
+    font-size: 0.92rem;
+    display: none;
+    line-height: 1.4;
+  }
+  .feedback.ok { display: block; background: #d1fae5; color: #065f46; border: 1px solid #10b981; }
+  .feedback.err { display: block; background: #fee2e2; color: #991b1b; border: 1px solid #ef4444; }
+
+  /* Slot Drop Builder */
+  .slot {
+    display: inline-block;
+    min-width: 140px;
+    padding: 5px 12px;
+    background: #334155;
+    border: 2px dashed #94a3b8;
+    border-radius: 8px;
+    text-align: center;
+    color: #f8fafc;
+    font-weight: bold;
+    cursor: pointer;
+    vertical-align: middle;
+  }
+  .slot.filled {
+    background: #0284c7;
+    border: 2px solid #38bdf8;
+    color: white;
+  }
+
+  .options-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 10px 0;
+  }
+  .num-input {
+    width: 70px;
+    padding: 6px 10px;
+    border: 2px solid #0284c7;
+    border-radius: 8px;
+    font-family: inherit;
+    font-weight: 800;
+    font-size: 1.1rem;
+    text-align: center;
+    color: #0369a1;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🧠 Εργαστήριο Σκέψης Scratch: Νίκη ή Ήττα</h1>
+  <p>Μάθημα 7ο – 8 Αληθινές Προκλήσεις (Εντοπισμός Λαθών, Συναρμολόγηση & Πρόβλεψη)</p>
+</div>
+
+<div class="container">
+
+  <!-- ΠΡΟΚΛΗΣΗ 1 -->
+  <div class="card open">
+    <div class="card-head" onclick="toggleCard(this)">
+      <div class="card-num">1</div>
+      <div class="card-title">Συναρμολόγηση με Παγίδες: Στήσε τον Κώδικα της Έλλης</div>
+      <div class="arrow">▼</div>
+    </div>
+    <div class="card-body">
+      <!-- 1Α -->
+      <div class="phase">
+        <div class="phase-title"><span>Α</span> Θέση 1: Τι μπαίνει αμέσως κάτω από την Πράσινη Σημαία;</div>
+        <p class="prompt">Διάλεξε το σωστό τουβλάκι ανάμεσα στα διαθέσιμα (πρόσεξε τις παγίδες!):</p>
+        <div class="code-block">
+          όταν γίνει κλικ σε 🚩<br>
+          ➔ [Θέση 1: <span id="slot1" class="slot" onclick="clearSlot(1)">Κενό</span>]
+        </div>
+        <div class="options-row">
+          <button class="btn btn-purple" onclick="setSlot(1, 'άλλαξε ενδυμασία σε [Βυθός]')">άλλαξε ενδυμασία σε [Βυθός]</button>
+          <button class="btn btn-purple" onclick="setSlot(1, 'άλλαξε υπόβαθρο σε [Βυθός]')">άλλαξε υπόβαθρο σε [Βυθός]</button>
+          <button class="btn btn-purple" onclick="setSlot(1, 'άλλαξε υπόβαθρο σε [Νίκη]')">άλλαξε υπόβαθρο σε [Νίκη]</button>
+        </div>
+        <button class="btn btn-green" onclick="checkSlot1()">Έλεγχος Επιλογής</button>
+        <div id="fb1a" class="feedback"></div>
+      </div>
+
+      <!-- 1Β -->
+      <div class="phase">
+        <div class="phase-title"><span>Β</span> Θέση 2: Τι μπαίνει μέσα στο «τότε» όταν πόντοι = 10;</div>
+        <p class="prompt">Ο παίκτης πέτυχε τον στόχο. Ποια εντολή πρέπει να εκτελεστεί;</p>
+        <div class="code-block">
+          εάν &lt;πόντοι = 10&gt; τότε<br>
+          &nbsp;&nbsp;➔ [Θέση 2: <span id="slot2" class="slot" onclick="clearSlot(2)">Κενό</span>]
+        </div>
+        <div class="options-row">
+          <button class="btn btn-purple" onclick="setSlot(2, 'άλλαξε υπόβαθρο σε [Ήττα]')">άλλαξε υπόβαθρο σε [Ήττα]</button>
+          <button class="btn btn-purple" onclick="setSlot(2, 'άλλαξε υπόβαθρο σε [Νίκη]')">άλλαξε υπόβαθρο σε [Νίκη]</button>
+          <button class="btn btn-orange" onclick="setSlot(2, 'όρισε [πόντοι] σε [0]')">όρισε [πόντοι] σε [0]</button>
+        </div>
+        <button class="btn btn-green" onclick="checkSlot2()">Έλεγχος Επιλογής</button>
+        <div id="fb1b" class="feedback"></div>
+      </div>
+
+      <!-- 1Γ -->
+      <div class="phase">
+        <div class="phase-title"><span>Γ</span> Θέση 3: Τι μπαίνει στο «αλλιώς» όταν δεν έχουμε 10 πόντους;</div>
+        <p class="prompt">Αν το παιχνίδι τελείωσε χωρίς να φτάσουμε 10 πόντους (άρα μηδενίστηκαν οι ζωές):</p>
+        <div class="code-block">
+          αλλιώς<br>
+          &nbsp;&nbsp;➔ [Θέση 3: <span id="slot3" class="slot" onclick="clearSlot(3)">Κενό</span>]
+        </div>
+        <div class="options-row">
+          <button class="btn btn-purple" onclick="setSlot(3, 'άλλαξε υπόβαθρο σε [Ήττα]')">άλλαξε υπόβαθρο σε [Ήττα]</button>
+          <button class="btn btn-purple" onclick="setSlot(3, 'άλλαξε υπόβαθρο σε [Βυθός]')">άλλαξε υπόβαθρο σε [Βυθός]</button>
+          <button class="btn btn-red" onclick="setSlot(3, 'σταμάτησε [όλα]')">σταμάτησε [όλα]</button>
+        </div>
+        <button class="btn btn-green" onclick="checkSlot3()">Έλεγχος Επιλογής</button>
+        <div id="fb1c" class="feedback"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ΠΡΟΚΛΗΣΗ 2 -->
+  <div class="card">
+    <div class="card-head" onclick="toggleCard(this)">
+      <div class="card-num">2</div>
+      <div class="card-title">Bug Hunter: Εντόπισε το Σφάλμα στον Κώδικα</div>
+      <div class="arrow">▼</div>
+    </div>
+    <div class="card-body">
+      <!-- 2Α -->
+      <div class="phase">
+        <div class="phase-title"><span>Α</span> Το παράπονο του παίκτη: «Κερδίζω αλλά μου βγάζει Έχασες!»</div>
+        <p class="prompt">Κοίταξε προσεκτικά το παρακάτω σενάριο. Πού βρίσκεται το λάθος;</p>
+        <div class="code-block">
+          εάν &lt;πόντοι = 10&gt; τότε<br>
+          &nbsp;&nbsp;άλλαξε υπόβαθρο σε [Ήττα]<br>
+          αλλιώς<br>
+          &nbsp;&nbsp;άλλαξε υπόβαθρο σε [Νίκη]
+        </div>
+        <div class="options-row">
+          <button class="btn" onclick="checkBug2A(1)">Ο αριθμός 10 έπρεπε να είναι 100</button>
+          <button class="btn" onclick="checkBug2A(2)">Είναι ανάποδα τα υπόβαθρα στο «τότε» και στο «αλλιώς»</button>
+          <button class="btn" onclick="checkBug2A(3)">Λείπει η πράσινη σημαία</button>
+        </div>
+        <div id="fb2a" class="feedback"></div>
+      </div>
+
+      <!-- 2Β -->
+      <div class="phase">
+        <div class="phase-title"><span>Β</span> Το πρόβλημα του νέου παιχνιδιού: «Ξεκινάω και γράφει ακόμα Έχασες!»</div>
+        <p class="prompt">Γιατί όταν πατάει ο παίκτης την πράσινη σημαία δεν βλέπει καθαρό βυθό;</p>
+        <div class="options-row">
+          <button class="btn" onclick="checkBug2B(1)">Χάλασε το πληκτρολόγιο</button>
+          <button class="btn" onclick="checkBug2B(2)">Έπρεπε να σβήσει το Scratch</button>
+          <button class="btn" onclick="checkBug2B(3)">Ξέχασε να βάλει «άλλαξε υπόβαθρο σε [Βυθός]» κάτω από την πράσινη σημαία</button>
+        </div>
+        <div id="fb2b" class="feedback"></div>
+      </div>
+
+      <!-- 2Γ -->
+      <div class="phase">
+        <div class="phase-title"><span>Γ</span> Το αναβόσβημα της σκηνής: «Η οθόνη τρεμοπαίζει συνεχώς!»</div>
+        <p class="prompt">Ένας μαθητής έβαλε την εντολή <code>άλλαξε υπόβαθρο σε [Βυθός]</code> <strong>μέσα</strong> στην επανάληψη «για πάντα». Τι προκαλείται;</p>
+        <div class="options-row">
+          <button class="btn" onclick="checkBug2C(1)">Οι πόντοι γίνονται διπλάσιοι</button>
+          <button class="btn" onclick="checkBug2C(2)">Η σκηνή εξαναγκάζεται να ξαναφορτώνει τον βυθό χιλιάδες φορές το δευτερόλεπτο</button>
+          <button class="btn" onclick="checkBug2C(3)">Το παιχνίδι τερματίζει αυτόματα</button>
+        </div>
+        <div id="fb2c" class="feedback"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ΠΡΟΚΛΗΣΗ 3 -->
+  <div class="card">
+    <div class="card-head" onclick="toggleCard(this)">
+      <div class="card-num">3</div>
+      <div class="card-title">Γίνε ο Υπολογιστής: Πρόβλεψε το Αποτέλεσμα (Trace)</div>
+      <div class="arrow">▼</div>
+    </div>
+    <div class="card-body">
+      <!-- 3Α -->
+      <div class="phase">
+        <div class="phase-title"><span>Α</span> Σενάριο 1: Πόντοι = 10, Ζωές = 2</div>
+        <p class="prompt">Ο υπολογιστής εκτελεί τον κώδικα: <code>εάν &lt;πόντοι = 10&gt; τότε [Νίκη] αλλιώς [Ήττα]</code>. Ποιο υπόβαθρο θα εμφανιστεί στην οθόνη;</p>
+        <div class="options-row">
+          <button class="btn btn-red" onclick="checkTrace3A('lose')">💀 Ήττα (Έχασες!)</button>
+          <button class="btn btn-green" onclick="checkTrace3A('win')">🎉 Νίκη (Κέρδισες!)</button>
+          <button class="btn" onclick="checkTrace3A('ocean')">🌊 Βυθός</button>
+        </div>
+        <div id="fb3a" class="feedback"></div>
+      </div>
+
+      <!-- 3Β -->
+      <div class="phase">
+        <div class="phase-title"><span>Β</span> Σενάριο 2: Πόντοι = 6, Ζωές = 0</div>
+        <p class="prompt">Το παιχνίδι τερμάτισε επειδή μηδενίστηκαν οι ζωές. Ο υπολογιστής εξετάζει: <code>πόντοι = 10</code>. Τι θα εμφανιστεί;</p>
+        <div class="options-row">
+          <button class="btn btn-green" onclick="checkTrace3B('win')">🎉 Νίκη (Κέρδισες!)</button>
+          <button class="btn btn-red" onclick="checkTrace3B('lose')">💀 Ήττα (Έχασες!)</button>
+          <button class="btn" onclick="checkTrace3B('ocean')">🌊 Βυθός</button>
+        </div>
+        <div id="fb3b" class="feedback"></div>
+      </div>
+
+      <!-- 3Γ -->
+      <div class="phase">
+        <div class="phase-title"><span>Γ</span> Σενάριο 3: Πόντοι = 8, Ζωές = 1</div>
+        <p class="prompt">Η εντολή επανάληψης είναι: <code>επανάλαβε ώσπου &lt;(πόντοι = 10) Ή (ζωές = 0)&gt;</code>. Έχει φτάσει το παιχνίδι στο τέλος του;</p>
+        <div class="options-row">
+          <button class="btn" onclick="checkTrace3C('yes')">Ναι, τερματίζει αμέσως</button>
+          <button class="btn" onclick="checkTrace3C('no')">Όχι, το παιχνίδι συνεχίζεται (καμία συνθήκη δεν ισχύει ακόμα)</button>
+        </div>
+        <div id="fb3c" class="feedback"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ΠΡΟΚΛΗΣΗ 4 -->
+  <div class="card">
+    <div class="card-head" onclick="toggleCard(this)">
+      <div class="card-num">4</div>
+      <div class="card-title">Συμπλήρωσε τις Παραμέτρους (Logic Fill-in)</div>
+      <div class="arrow">▼</div>
+    </div>
+    <div class="card-body">
+      <!-- 4Α -->
+      <div class="phase">
+        <div class="phase-title"><span>Α</span> Στόχος Πόντων</div>
+        <p class="prompt">Πληκτρολόγησε τον αριθμό-στόχο για τους πόντους της Έλλης σύμφωνα με το βιβλίο:</p>
+        <div style="margin:10px 0;">
+          <code>εάν &lt; [πόντοι] = <input type="number" id="inp4a" class="num-input" placeholder="?"> &gt; τότε άλλαξε υπόβαθρο σε [Νίκη]</code>
+        </div>
+        <button class="btn btn-green" onclick="checkInp4A()">Έλεγχος Τιμής</button>
+        <div id="fb4a" class="feedback"></div>
+      </div>
+
+      <!-- 4Β -->
+      <div class="phase">
+        <div class="phase-title"><span>Β</span> Όριο Μηδενισμού Ζωών</div>
+        <p class="prompt">Ποια είναι η τιμή των ζωών στην οποία χάνουμε οριστικά το παιχνίδι;</p>
+        <div style="margin:10px 0;">
+          <code>εάν &lt; [ζωές] = <input type="number" id="inp4b" class="num-input" placeholder="?"> &gt; τότε άλλαξε υπόβαθρο σε [Ήττα]</code>
+        </div>
+        <button class="btn btn-green" onclick="checkInp4B()">Έλεγχος Τιμής</button>
+        <div id="fb4b" class="feedback"></div>
+      </div>
+
+      <!-- 4Γ -->
+      <div class="phase">
+        <div class="phase-title"><span>Γ</span> Αρχικές Ζωές στην Εκκίνηση</div>
+        <p class="prompt">Με πόσες ζωές ξεκινάει η Έλλη στο Μάθημα 5 & 6 όταν πατάμε την πράσινη σημαία;</p>
+        <div style="margin:10px 0;">
+          <code>όρισε [ζωές] σε <input type="number" id="inp4c" class="num-input" placeholder="?"></code>
+        </div>
+        <button class="btn btn-green" onclick="checkInp4C()">Έλεγχος Τιμής</button>
+        <div id="fb4c" class="feedback"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ΠΡΟΚΛΗΣΗ 5 -->
+  <div class="card">
+    <div class="card-head" onclick="toggleCard(this)">
+      <div class="card-num">5</div>
+      <div class="card-title">Ανάλυση Αλγορίθμου Ισοπαλίας (Tie Detective)</div>
+      <div class="arrow">▼</div>
+    </div>
+    <div class="card-body">
+      <!-- 5Α -->
+      <div class="phase">
+        <div class="phase-title"><span>Α</span> Η Υπόθεση Εργασίας</div>
+        <p class="prompt">Η Έλλη φωτογραφίζει τον 10ο αστερία ΚΑΙ ταυτόχρονα την ακουμπάει το τοξικό ψάρι (Ζωές = 0). Έχουμε ταυτόχρονα <code>πόντοι = 10</code> και <code>ζωές = 0</code>.</p>
+        <div class="status-tag ok" style="display:block;">💡 Αυτή είναι η σπάνια περίπτωση που εξετάζει το σχολικό βιβλίο στη σελίδα 29.</div>
+      </div>
+
+      <!-- 5Β -->
+      <div class="phase">
+        <div class="phase-title"><span>Β</span> Ανάλυση Επιλογής 1</div>
+        <div class="code-block">
+          εάν &lt;ζωές = 0&gt; τότε άλλαξε υπόβαθρο σε [Ήττα]<br>
+          αλλιώς άλλαξε υπόβαθρο σε [Νίκη]
+        </div>
+        <p class="prompt">Με αυτόν τον κώδικα, τι θα συμβεί στον παίκτη στην ισοπαλία;</p>
+        <div class="options-row">
+          <button class="btn btn-red" onclick="checkTie5B('lose')">Θα ΧΑΣΕΙ (γιατί ελέγχονται πρώτα οι ζωές και είναι 0)</button>
+          <button class="btn btn-green" onclick="checkTie5B('win')">Θα ΚΕΡΔΙΣΕΙ (αγνοείται ο μηδενισμός)</button>
+        </div>
+        <div id="fb5b" class="feedback"></div>
+      </div>
+
+      <!-- 5Γ -->
+      <div class="phase">
+        <div class="phase-title"><span>Γ</span> Ανάλυση Επιλογής 2</div>
+        <div class="code-block">
+          εάν &lt;πόντοι = 10&gt; τότε άλλαξε υπόβαθρο σε [Νίκη]<br>
+          αλλιώς άλλαξε υπόβαθρο σε [Ήττα]
+        </div>
+        <p class="prompt">Με αυτόν τον κώδικα, τι θα συμβεί στον παίκτη στην ισοπαλία;</p>
+        <div class="options-row">
+          <button class="btn btn-red" onclick="checkTie5C('lose')">Θα ΧΑΣΕΙ</button>
+          <button class="btn btn-green" onclick="checkTie5C('win')">Θα ΚΕΡΔΙΣΕΙ (γιατί ελέγχονται πρώτα οι πόντοι και είναι 10)</button>
+        </div>
+        <div id="fb5c" class="feedback"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ΠΡΟΚΛΗΣΗ 6 -->
+  <div class="card">
+    <div class="card-head" onclick="toggleCard(this)">
+      <div class="card-num">6</div>
+      <div class="card-title">Δομική Σειρά Εντολών (Code Sorter)</div>
+      <div class="arrow">▼</div>
+    </div>
+    <div class="card-body">
+      <!-- 6Α -->
+      <div class="phase">
+        <div class="phase-title"><span>Α</span> Ποια είναι η σωστή ιεραρχία εκτέλεσης;</div>
+        <p class="prompt">Βάλε στη σωστή χρονική σειρά τα 3 μεγάλα μέρη του προγράμματος:</p>
+        <div class="options-row">
+          <button class="btn" onclick="checkSort6A(1)">1. Έλεγχος Νίκης/Ήττας ➔ 2. Επανάληψη ➔ 3. Αρχικοποίηση</button>
+          <button class="btn" onclick="checkSort6A(2)">1. Αρχικοποίηση (Σημαία & Βυθός) ➔ 2. Επανάληψη Παιχνιδιού ➔ 3. Έλεγχος Νίκης/Ήττας</button>
+          <button class="btn" onclick="checkSort6A(3)">1. Επανάληψη ➔ 2. Έλεγχος ➔ 3. Σημαία</button>
+        </div>
+        <div id="fb6a" class="feedback"></div>
+      </div>
+
+      <!-- 6Β -->
+      <div class="phase">
+        <div class="phase-title"><span>Β</span> Γιατί ο έλεγχος μπαίνει ΕΞΩ από την επανάληψη;</div>
+        <p class="prompt">Τι θα συνέβαινε αν βάζαμε το <code>εάν πόντοι = 10...</code> ΜΕΣΑ στην επανάληψη «για πάντα»;</p>
+        <div class="options-row">
+          <button class="btn" onclick="checkSort6B(1)">Δεν θα άλλαζε απολύτως τίποτα</button>
+          <button class="btn" onclick="checkSort6B(2)">Θα έλεγχε από το πρώτο κιόλας δευτερόλεπτο και θα μας έβγαζε αμέσως «Έχασες» αφού πόντοι=0!</button>
+        </div>
+        <div id="fb6b" class="feedback"></div>
+      </div>
+
+      <!-- 6Γ -->
+      <div class="phase">
+        <div class="phase-title"><span>Γ</span> Πότε απελευθερώνεται η ροή;</div>
+        <p class="prompt">Πότε ο υπολογιστής «βγαίνει» από την εντολή <code>επανάλαβε ώσπου</code> για να προχωρήσει στον έλεγχο υποβάθρου;</p>
+        <div class="options-row">
+          <button class="btn" onclick="checkSort6C(1)">Όταν κουνήσουμε το ποντίκι</button>
+          <button class="btn" onclick="checkSort6C(2)">Μόλις η συνθήκη γίνει ΑΛΗΘΗΣ (δηλαδή μόλις πιάσουμε 10 πόντους Ή μηδενιστούν οι ζωές)</button>
+        </div>
+        <div id="fb6c" class="feedback"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ΠΡΟΚΛΗΣΗ 7 -->
+  <div class="card">
+    <div class="card-head" onclick="toggleCard(this)">
+      <div class="card-num">7</div>
+      <div class="card-title">Διάγνωση & Διόρθωση Σεναρίου (Code Doctor)</div>
+      <div class="arrow">▼</div>
+    </div>
+    <div class="card-body">
+      <!-- 7Α -->
+      <div class="phase">
+        <div class="phase-title"><span>Α</span> Το σφάλμα της λάθος κατηγορίας</div>
+        <p class="prompt">Ένας μαθητής έβαλε την εντολή <code>άλλαξε ενδυμασία σε [Βυθός]</code> αντί για <code>υπόβαθρο</code>. Τι πρόβλημα έχει;</p>
+        <div class="options-row">
+          <button class="btn" onclick="checkDoc7A(1)">Δεν υπάρχει καμία διαφορά</button>
+          <button class="btn" onclick="checkDoc7A(2)">Η «ενδυμασία» αλλάζει το ρούχο του δύτη, όχι το σκηνικό ολόκληρης της σκηνής!</button>
+        </div>
+        <div id="fb7a" class="feedback"></div>
+      </div>
+
+      <!-- 7Β -->
+      <div class="phase">
+        <div class="phase-title"><span>Β</span> Το σφάλμα της απλής επιλογής</div>
+        <p class="prompt">Ένας μαθητής έβαλε σκέτο <code>εάν πόντοι = 10 τότε [Νίκη]</code> χωρίς «αλλιώς». Τι θα συμβεί όταν ο παίκτης χάσει τις ζωές του;</p>
+        <div class="options-row">
+          <button class="btn" onclick="checkDoc7B(1)">Ο υπολογιστής θα μαντέψει μόνος του ότι έχασε</button>
+          <button class="btn" onclick="checkDoc7B(2)">Δεν θα εμφανιστεί ποτέ το υπόβαθρο «Ήττα», η σκηνή θα μείνει παγωμένη στον Βυθό!</button>
+        </div>
+        <div id="fb7b" class="feedback"></div>
+      </div>
+
+      <!-- 7Γ -->
+      <div class="phase">
+        <div class="phase-title"><span>Γ</span> Η σωστή επιλογή δομής</div>
+        <p class="prompt">Ποια δομή είναι η μόνη κατάλληλη για να καλύψει και τις δύο περιπτώσεις (νίκη ή ήττα);</p>
+        <div class="options-row">
+          <button class="btn" onclick="checkDoc7C(1)">Η απλή επιλογή: «Εάν... τότε»</button>
+          <button class="btn" onclick="checkDoc7C(2)">Η διπλή επιλογή: «Εάν... τότε... αλλιώς»</button>
+        </div>
+        <div id="fb7c" class="feedback"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ΠΡΟΚΛΗΣΗ 8 -->
+  <div class="card">
+    <div class="card-head" onclick="toggleCard(this)">
+      <div class="card-num">8</div>
+      <div class="card-title">Σχεδιαστής Κανόνων & Δυσκολίας (Game Balance)</div>
+      <div class="arrow">▼</div>
+    </div>
+    <div class="card-body">
+      <!-- 8Α -->
+      <div class="phase">
+        <div class="phase-title"><span>Α</span> Κάνοντας το παιχνίδι πιο προσιτό</div>
+        <p class="prompt">Οι συμμαθητές σου παραπονιούνται ότι χάνουν πολύ γρήγορα από το τοξικό ψάρι. Ποια αλλαγή προτείνεις στον κώδικα;</p>
+        <div class="options-row">
+          <button class="btn" onclick="checkBal8A(1)">Μειώνουμε τα δευτερόλεπτα σε 0.2 για να γίνει αστραπιαίο</button>
+          <button class="btn" onclick="checkBal8A(2)">Αυξάνουμε τα δευτερόλεπτα στην εντολή «ολίσθησε για ___ δευτ. στη θέση Έλλη» (π.χ. από 1 σε 2)</button>
+        </div>
+        <div id="fb8a" class="feedback"></div>
+      </div>
+
+      <!-- 8Β -->
+      <div class="phase">
+        <div class="phase-title"><span>Β</span> Αλλαγή στόχου νίκης</div>
+        <p class="prompt">Αν αλλάξουμε τη συνθήκη σε <code>πόντοι = 15</code>, ποιες άλλες εντολές στο έργο πρέπει να αλλάξουν οπωσδήποτε για να είναι σωστό;</p>
+        <div class="options-row">
+          <button class="btn" onclick="checkBal8B(1)">Μόνο το χρώμα των γραμμάτων</button>
+          <button class="btn" onclick="checkBal8B(2)">Και η συνθήκη στην «επανάλαβε ώσπου» ΚΑΙ ο τελικός έλεγχος στο «εάν πόντοι = 15»</button>
+        </div>
+        <div id="fb8b" class="feedback"></div>
+      </div>
+
+      <!-- 8Γ -->
+      <div class="phase">
+        <div class="phase-title"><span>Γ</span> Τελική Αξιολόγηση Προγραμματιστή</div>
+        <p class="prompt">Γιατί ο προγραμματισμός ενός παιχνιδιού γίνεται πάντα «σε στάδια» όπως αναφέρει το βιβλίο;</p>
+        <div class="options-row">
+          <button class="btn" onclick="checkBal8C(1)">Για να κουραζόμαστε λιγότερο</button>
+          <button class="btn" onclick="checkBal8C(2)">Για να ελέγχουμε και να διορθώνουμε κάθε εντολή πριν προχωρήσουμε στην επόμενη</button>
+        </div>
+        <div id="fb8c" class="feedback"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  function toggleCard(head) {
+    head.parentElement.classList.toggle('open');
+  }
+
+  // ΠΡΟΚΛΗΣΗ 1: Builder
+  let slotVals = { 1: '', 2: '', 3: '' };
+  function setSlot(num, val) {
+    slotVals[num] = val;
+    const el = document.getElementById('slot' + num);
+    el.textContent = val;
+    el.classList.add('filled');
+  }
+  function clearSlot(num) {
+    slotVals[num] = '';
+    const el = document.getElementById('slot' + num);
+    el.textContent = 'Κενό';
+    el.classList.remove('filled');
+  }
+  function checkSlot1() {
+    const fb = document.getElementById('fb1a');
+    if (slotVals[1] === 'άλλαξε υπόβαθρο σε [Βυθός]') {
+      fb.className = 'feedback ok';
+      fb.innerHTML = '✅ <strong>Μπράβο!</strong> Στην πράσινη σημαία ξεκινάμε πάντα με το σκηνικό [Βυθός] και όχι με ενδυμασία μορφής!';
+    } else {
+      fb.className = 'feedback err';
+      fb.innerHTML = '❌ <strong>Σκέψου ξανά:</strong> Το «ενδυμασία» αλλάζει το ρούχο του χαρακτήρα. Εμείς θέλουμε να αλλάξει το σκηνικό ολόκληρης της οθόνης!';
+    }
+  }
+  function checkSlot2() {
+    const fb = document.getElementById('fb1b');
+    if (slotVals[2] === 'άλλαξε υπόβαθρο σε [Νίκη]') {
+      fb.className = 'feedback ok';
+      fb.innerHTML = '✅ <strong>Σωστά!</strong> Μόλις πιάσουμε 10 πόντους, ο κλάδος «τότε» εμφανίζει το υπόβαθρο «Κέρδισες!».';
+    } else {
+      fb.className = 'feedback err';
+      fb.innerHTML = '❌ <strong>Λάθος:</strong> Αν μαζέψαμε 10 πόντους δεν χάσαμε, κερδίσαμε!';
+    }
+  }
+  function checkSlot3() {
+    const fb = document.getElementById('fb1c');
+    if (slotVals[3] === 'άλλαξε υπόβαθρο σε [Ήττα]') {
+      fb.className = 'feedback ok';
+      fb.innerHTML = '✅ <strong>Άριστα!</strong> Αν δεν ισχύει ότι έχουμε 10 πόντους, τότε εκτελείται το «αλλιώς» και εμφανίζει «Έχασες!».';
+    } else {
+      fb.className = 'feedback err';
+      fb.innerHTML = '❌ <strong>Πρόσεξε:</strong> Στο «αλλιώς» οδηγούμαστε όταν μηδενίστηκαν οι ζωές, άρα χάσαμε!';
+    }
+  }
+
+  // ΠΡΟΚΛΗΣΗ 2: Bug Hunter
+  function checkBug2A(choice) {
+    const fb = document.getElementById('fb2a');
+    if (choice === 2) {
+      fb.className = 'feedback ok';
+      fb.innerHTML = '🎯 <strong>Μπράβο ντετέκτιβ!</strong> Είχαν μπει ανάποδα: όταν πόντοι=10 πρέπει να αλλάζει σε Νίκη και στο αλλιώς σε Ήττα!';
+    } else {
+      fb.className = 'feedback err';
+      fb.innerHTML = '❌ Όχι, κοίταξε ποιο υπόβαθρο εκτελείται ακριβώς κάτω από το «τότε»!';
+    }
+  }
+  function checkBug2B(choice) {
+    const fb = document.getElementById('fb2b');
+    if (choice === 3) {
+      fb.className = 'feedback ok';
+      fb.innerHTML = '🎯 <strong>Σωστά!</strong> Αν δεν βάλουμε εντολή αρχικοποίησης στην πράσινη σημαία, η σκηνή μένει κολλημένη στο προηγούμενο αποτέλεσμα!';
+    } else {
+      fb.className = 'feedback err';
+      fb.innerHTML = '❌ Όχι, ο υπολογιστής απλά εκτελεί ό,τι του λέμε. Αν δεν του πούμε να καθαρίσει τη σκηνή, δεν θα το κάνει μόνος του!';
+    }
+  }
+  function checkBug2C(choice) {
+    const fb = document.getElementById('fb2c');
+    if (choice === 2) {
+      fb.className = 'feedback ok';
+      fb.innerHTML = '🎯 <strong>Ακριβώς!</strong> Η αρχικοποίηση μπαίνει ΜΙΑ φορά στην αρχή, ΠΟΤΕ μέσα σε συνεχή επανάληψη!';
+    } else {
+      fb.className = 'feedback err';
+      fb.innerHTML = '❌ Σκέψου: η «για πάντα» τρέχει ασταμάτητα. Αν της βάλεις να αλλάζει σκηνικό, θα το αλλάζει 30 φορές το δευτερόλεπτο!';
+    }
+  }
+
+  // ΠΡΟΚΛΗΣΗ 3: Trace
+  function checkTrace3A(res) {
+    const fb = document.getElementById('fb3a');
+    if (res === 'win') {
+      fb.className = 'feedback ok';
+      fb.innerHTML = '✅ <strong>Σωστά σκέφτηκες!</strong> Η συνθήκη <code>πόντοι = 10</code> είναι Αληθής, άρα ο υπολογιστής μπαίνει στο «τότε» ➔ Νίκη!';
+    } else {
+      fb.className = 'feedback err';
+      fb.innerHTML = '❌ Λάθος. Αφού πόντοι = 10, η συνθήκη ισχύει!';
+    }
+  }
+  function checkTrace3B(res) {
+    const fb = document.getElementById('fb3b');
+    if (res === 'lose') {
+      fb.className = 'feedback ok';
+      fb.innerHTML = '✅ <strong>Σωστά!</strong> Η συνθήκη <code>πόντοι = 10</code> είναι Ψευδής (αφού έχουμε 6). Ο υπολογιστής πάει στο «αλλιώς» ➔ Ήττα!';
+    } else {
+      fb.className = 'feedback err';
+      fb.innerHTML = '❌ Λάθος. Οι πόντοι είναι 6 (όχι 10), άρα ο υπολογιστής πάει κατευθείαν στο «αλλιώς»!';
+    }
+  }
+  function checkTrace3C(res) {
+    const fb = document.getElementById('fb3c');
+    if (res === 'no') {
+      fb.className = 'feedback ok';
+      fb.innerHTML = '✅ <strong>Εξαιρετική ανάλυση!</strong> Ούτε οι πόντοι είναι 10, ούτε οι ζωές είναι 0. Άρα η επανάληψη συνεχίζεται κανονικά!';
+    } else {
+      fb.className = 'feedback err';
+      fb.innerHTML = '❌ Πρόσεξε: η επανάληψη σταματάει ΜΟΝΟ αν πόντοι=10 Ή αν ζωές=0. Εδώ έχουμε 8 πόντους και 1 ζωή!';
+    }
+  }
+
+  // ΠΡΟΚΛΗΣΗ 4: Fill-in
+  function checkInp4A() {
+    const val = parseInt(document.getElementById('inp4a').value);
+    const fb = document.getElementById('fb4a');
+    if (val === 10) {
+      fb.className = 'feedback ok';
+      fb.innerHTML = '✅ <strong>Σωστά!</strong> Ο στόχος που ορίζει το βιβλίο είναι ακριβώς 10 φωτογραφίες αστερία!';
+    } else {
+      fb.className = 'feedback err';
+      fb.innerHTML = '❌ Λάθος τιμή. Θυμήσου πόσες φωτογραφίες θέλει να τραβήξει η Έλλη!';
+    }
+  }
+  function checkInp4B() {
+    const val = parseInt(document.getElementById('inp4b').value);
+    const fb = document.getElementById('fb4b');
+    if (val === 0) {
+      fb.className = 'feedback ok';
+      fb.innerHTML = '✅ <strong>Σωστά!</strong> Όταν οι ζωές μηδενιστούν (φτάσουν στο 0), ο παίκτης χάνει!';
+    } else {
+      fb.className = 'feedback err';
+      fb.innerHTML = '❌ Όχι. Το παιχνίδι τελειώνει όταν εξαντληθούν ΟΛΕΣ οι ζωές (ποιος αριθμός το δείχνει;)!';
+    }
+  }
+  function checkInp4C() {
+    const val = parseInt(document.getElementById('inp4c').value);
+    const fb = document.getElementById('fb4c');
+    if (val === 3) {
+      fb.className = 'feedback ok';
+      fb.innerHTML = '✅ <strong>Σωστά!</strong> Στην αρχή δίνουμε στην Έλλη 3 ζωές!';
+    } else {
+      fb.className = 'feedback err';
+      fb.innerHTML = '❌ Λάθος. Στο Μάθημα 5 αναφέρεται καθαρά: «Η Έλλη αρχικά έχει τρεις ζωές».';
+    }
+  }
+
+  // ΠΡΟΚΛΗΣΗ 5: Tie Detective
+  function checkTie5B(choice) {
+    const fb = document.getElementById('fb5b');
+    if (choice === 'lose') {
+      fb.className = 'feedback ok';
+      fb.innerHTML = '🎯 <strong>Ακριβώς!</strong> Ο υπολογιστής διαβάζει γραμμή-γραμμή. Βλέπει πρώτα <code>ζωές = 0</code> (που ισχύει), μπαίνει στο τότε και βγάζει [Ήττα]!';
+    } else {
+      fb.className = 'feedback err';
+      fb.innerHTML = '❌ Όχι! Επειδή ο έλεγχος ζωών είναι πρώτος, ο υπολογιστής δεν κοιτάζει καν τους πόντους!';
+    }
+  }
+  function checkTie5C(choice) {
+    const fb = document.getElementById('fb5c');
+    if (choice === 'win') {
+      fb.className = 'feedback ok';
+      fb.innerHTML = '🎯 <strong>Ακριβώς!</strong> Εδώ εξετάζει πρώτα <code>πόντοι = 10</code> (που ισχύει), οπότε αλλάζει σε [Νίκη]!';
+    } else {
+      fb.className = 'feedback err';
+      fb.innerHTML = '❌ Όχι! Εδώ προηγείται ο έλεγχος των πόντων, οπότε κατοχυρώνεται η νίκη!';
+    }
+  }
+
+  // ΠΡΟΚΛΗΣΗ 6: Sorter
+  function checkSort6A(choice) {
+    const fb = document.getElementById('fb6a');
+    if (choice === 2) {
+      fb.className = 'feedback ok';
+      fb.innerHTML = '✅ <strong>Σωστά!</strong> Πρώτα ετοιμάζουμε τη σκηνή, μετά παίζουμε στην επανάληψη και στο τέλος βγάζουμε αποτέλεσμα!';
+    } else {
+      fb.className = 'feedback err';
+      fb.innerHTML = '❌ Λάθος σειρά. Πώς μπορείς να ελέγξεις ποιος κέρδισε πριν καν παιχτεί το παιχνίδι;';
+    }
+  }
+  function checkSort6B(choice) {
+    const fb = document.getElementById('fb6b');
+    if (choice === 2) {
+      fb.className = 'feedback ok';
+      fb.innerHTML = '✅ <strong>Πολύ σωστή παρατήρηση!</strong> Στην αρχή έχουμε 0 πόντους, οπότε θα μας έβγαζε αμέσως «Έχασες» πριν καν κουνηθούμε!';
+    } else {
+      fb.className = 'feedback err';
+      fb.innerHTML = '❌ Σκέψου: αν ελέγχεις συνεχώς μέσα στο παιχνίδι, τι θα γίνει στο 1ο δευτερόλεπτο που έχεις 0 πόντους;';
+    }
+  }
+  function checkSort6C(choice) {
+    const fb = document.getElementById('fb6c');
+    if (choice === 2) {
+      fb.className = 'feedback ok';
+      fb.innerHTML = '✅ <strong>Σωστά!</strong> Η εντολή «επανάλαβε ώσπου» κρατάει τον έλεγχο μέχρι να γίνει αληθής η συνθήκη της!';
+    } else {
+      fb.className = 'feedback err';
+      fb.innerHTML = '❌ Όχι, ο υπολογιστής υπακούει αυστηρά στη λογική συνθήκη τερματισμού.';
+    }
+  }
+
+  // ΠΡΟΚΛΗΣΗ 7: Code Doctor
+  function checkDoc7A(choice) {
+    const fb = document.getElementById('fb7a');
+    if (choice === 2) {
+      fb.className = 'feedback ok';
+      fb.innerHTML = '✅ <strong>Μπράβο!</strong> Οι ενδυμασίες ανήκουν στις μορφές, ενώ τα υπόβαθρα ανήκουν στη Σκηνή!';
+    } else {
+      fb.className = 'feedback err';
+      fb.innerHTML = '❌ Υπάρχει τεράστια διαφορά ανάμεσα στην ενδυμασία μιας μορφής και στο σκηνικό της οθόνης!';
+    }
+  }
+  function checkDoc7B(choice) {
+    const fb = document.getElementById('fb7b');
+    if (choice === 2) {
+      fb.className = 'feedback ok';
+      fb.innerHTML = '✅ <strong>Σωστά!</strong> Χωρίς το «αλλιώς», δεν υπάρχει καμία εντολή για την ήττα!';
+    } else {
+      fb.className = 'feedback err';
+      fb.innerHTML = '❌ Ο υπολογιστής δεν μαντεύει ποτέ. Εκτελεί ΜΟΝΟ ό,τι του έχουμε προγραμματίσει!';
+    }
+  }
+  function checkDoc7C(choice) {
+    const fb = document.getElementById('fb7c');
+    if (choice === 2) {
+      fb.className = 'feedback ok';
+      fb.innerHTML = '✅ <strong>Άριστα!</strong> Η διπλή επιλογή είναι φτιαγμένη για αποφάσεις 2 κατευθύνσεων: ή το ένα ή το άλλο!';
+    } else {
+      fb.className = 'feedback err';
+      fb.innerHTML = '❌ Η απλή επιλογή κάνει κάτι μόνο αν ισχύει η συνθήκη, δεν έχει εναλλακτικό δρόμο.';
+    }
+  }
+
+  // ΠΡΟΚΛΗΣΗ 8: Balance
+  function checkBal8A(choice) {
+    const fb = document.getElementById('fb8a');
+    if (choice === 2) {
+      fb.className = 'feedback ok';
+      fb.innerHTML = '✅ <strong>Σωστά!</strong> Όσο περισσότερα δευτερόλεπτα κάνει για να φτάσει, τόσο πιο αργά κινείται το ψάρι!';
+    } else {
+      fb.className = 'feedback err';
+      fb.innerHTML = '❌ Αν βάλεις 0.2 δευτερόλεπτα, το ψάρι θα γίνει υπερηχητικό και δεν θα μπορεί να ξεφύγει κανείς!';
+    }
+  }
+  function checkBal8B(choice) {
+    const fb = document.getElementById('fb8b');
+    if (choice === 2) {
+      fb.className = 'feedback ok';
+      fb.innerHTML = '✅ <strong>Σωστά!</strong> Πρέπει να αλλάξει ΚΑΙ η συνθήκη τερματισμού της επανάληψης ΚΑΙ ο έλεγχος νίκης ώστε να συμφωνούν!';
+    } else {
+      fb.className = 'feedback err';
+      fb.innerHTML = '❌ Αν αλλάξεις μόνο το ένα, το παιχνίδι δεν θα τελειώνει ποτέ ή θα βγάζει λάθος αποτέλεσμα!';
+    }
+  }
+  function checkBal8C(choice) {
+    const fb = document.getElementById('fb8c');
+    if (choice === 2) {
+      fb.className = 'feedback ok';
+      fb.innerHTML = '🌟 <strong>Συγχαρητήρια!</strong> Ολοκλήρωσες όλες τις προκλήσεις σκέψης και κατανόησες πλήρως τη δομή του Scratch!';
+    } else {
+      fb.className = 'feedback err';
+      fb.innerHTML = '❌ Ο προγραμματισμός σε στάδια είναι ο μόνος τρόπος για να μη γεμίζει ένα πρόγραμμα ανεξέλεγκτα λάθη!';
+    }
+  }
+</script>
+</body>
+</html>
