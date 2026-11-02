@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Μάθημα 10 – Μηνύματα | Scratch για Παιδιά</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Nunito', sans-serif;
+    /* Νέο χαλαρωτικό και φιλικό χρώμα: Απαλό Τυρκουάζ / Σμαραγδί */
+    background: linear-gradient(160deg, #065f46 0%, #059669 45%, #10b981 75%, #6ee7b7 100%);
+    min-height: 100vh;
+    color: #064e3b;
+    padding-bottom: 50px;
+  }
+  .header {
+    text-align: center;
+    color: white;
+    padding: 24px 16px 12px;
+  }
+  .header h1 {
+    font-size: 1.85rem;
+    font-weight: 900;
+    text-shadow: 0 3px 10px rgba(0,0,0,0.25);
+  }
+  .header p {
+    margin-top: 5px;
+    font-weight: 700;
+    font-size: 1.05rem;
+    opacity: 0.95;
+  }
+  .container {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 0 16px;
+  }
+  .card {
+    background: white;
+    border-radius: 18px;
+    margin-bottom: 20px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+    overflow: hidden;
+    border: 2px solid #a7f3d0;
+  }
+  .card-head {
+    background: linear-gradient(90deg, #ecfdf5, #d1fae5);
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 2px solid #a7f3d0;
+    cursor: pointer;
+    user-select: none;
+  }
+  .card-num {
+    width: 42px;
+    height: 42px;
+    background: linear-gradient(135deg, #059669, #047857);
+    color: white;
+    border-radius: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+  }
+  .card-title {
+    flex: 1;
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #065f46;
+  }
+  .arrow {
+    font-size: 1.1rem;
+    color: #059669;
+    transition: transform 0.3s;
+  }
+  .card.open .arrow { transform: rotate(180deg); }
+  .card-body {
+    display: none;
+    padding: 12px 18px 22px;
+  }
+  .card.open .card-body { display: block; }
+
+  .phase {
+    background: #f0fdf4;
+    border: 2px solid #bbf7d0;
+    border-radius: 14px;
+    padding: 14px 16px;
+    margin-top: 14px;
+  }
+  .phase-title {
+    font-weight: 800;
+    color: #047857;
+    margin-bottom: 10px;
+    font-size: 1.02rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .phase-title span {
+    background: #059669;
+    color: white;
+    width: 26px;
+    height: 26px;
+    border-radius: 7px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.88rem;
+  }
+  .prompt {
+    font-size: 0.98rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: #064e3b;
+    line-height: 1.5;
+  }
+  .code-block {
+    background: #1e293b;
+    color: #f8fafc;
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-family: monospace;
+    font-size: 0.92rem;
+    margin: 10px 0;
+    line-height: 1.5;
+  }
+
+  .btn {
+    background: linear-gradient(135deg, #059669, #047857);
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 30px;
+    font-weight: 800;
+    font-size: 0.92rem;
+    cursor: pointer;
+    font-family: inherit;
+    margin: 4px 4px 4px 0;
+    transition: transform 0.15s;
+  }
+  .btn:hover { transform: scale(1.03); }
+  .btn-check { background: linear-gradient(135deg, #0284c7, #0369a1); }
+
+  .feedback {
+    margin-top: 10px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-weight: 800;
+    font-size: 0.94rem;
+    display: none;
+    line-height: 1.45;
+  }
+  .feedback.ok { display: block; background: #d1fae5; color: #065f46; border: 2px solid #10b981; }
+  .feedback.err { display: block; background: #fee2e2; color: #991b1b; border: 2px solid #ef4444; }
+
+  .slot {
+    display: inline-block;
+    min-width: 140px;
+    padding: 5px 12px;
+    background: #334155;
+    border: 2px dashed #6ee7b7;
+    border-radius: 8px;
+    text-align: center;
+    color: #f8fafc;
+    font-weight: bold;
+    cursor: pointer;
+    vertical-align: middle;
+  }
+  .slot.filled {
+    background: #059669;
+    border: 2px solid #6ee7b7;
+    color: white;
+  }
+
+  .options-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 10px 0;
+  }
+  .text-input {
+    padding: 7px 12px;
+    border: 2px solid #059669;
+    border-radius: 8px;
+    font-family: inherit;
+    font-weight: 800;
+    font-size: 1rem;
+    color: #065f46;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🏀 Μάθημα 10: Μηνύματα στο Scratch</h1>
+  <p>Απλές και Διασκεδαστικές Δραστηριότητες Σκέψης (8 Προκλήσεις)</p>
+</div>
+
+<div class="container">
+
+  <!-- ΠΡΟΚΛΗΣΗ 1 -->
+  <div class="card open">
+    <div class="card-head" onclick="toggleCard(this)">
+      <div class="card-num">1</div>
+      <div class="card-title">Τι είναι το «Μήνυμα» στο Scratch;</div>
+      <div class="arrow">▼</div>
+    </div>
+    <div class="card-body">
+      <!-- 1Α -->
+      <div class="phase">
+        <div class="phase-title"><span>Α</span> Τι σημαίνει «μήνυμα» στον υπολογιστή;</div>
+        <p class="prompt">Όταν ένας ήρωας στέλνει μήνυμα σε έναν άλλον, τι κάνει;</p>
+        <div class="options-row">
+          <button class="btn" onclick="check1A(1)">Του στέλνει γράμμα στο ταχυδρομείο</button>
+          <button class="btn" onclick="check1A(2)">Του δίνει ένα κρυφό σινιάλο (σύνθημα) για να ξεκινήσει κι εκείνος!</button>
+          <button class="btn" onclick="check1A(3)">Σβήνει την οθόνη του υπολογιστή</button>
+        </div>
+        <div id="fb1a" class="feedback"></div>
+      </div>
+      <!-- 1Β -->
+      <div class="phase">
+        <div class="phase-title"><span>Β</span> Πού βρίσκονται τα μηνύματα;</div>
+        <p class="prompt">Σε ποια ομάδα εντολών βρίσκουμε τα μπλοκ των μηνυμάτων;</p>
+        <div class="options-row">
+          <button class="btn" onclick="check1B(1)">Στους Ήχους (ροζ χρώμα)</button>
+          <button class="btn" onclick="check1B(2)">Στις Όψεις (μοβ χρώμα)</button>
+          <button class="btn" onclick="check1B(3)">Στα Συμβάντα (κίτρινο χρώμα, εκεί που είναι και η σημαία)</button>
+        </div>
+        <div id="fb1b" class="feedback"></div>
+      </div>
+      <!-- 1Γ -->
+      <div class="phase">
+        <div class="phase-title"><span>Γ</span> Ποιος δίνει το σύνθημα;</div>
+        <p class="prompt">Στο μπάσκετ, ποιος αποφασίζει πότε θα φύγει η μπάλα προς το καλάθι;</p>
+        <div class="options-row">
+          <button class="btn" onclick="check1C(1)">Ο Αντρέας κάνει το σουτ και δίνει το σύνθημα στη Μπάλα</button>
+          <button class="btn" onclick="check1C(2)">Το καλάθι φωνάζει στην μπάλα να έρθει</button>
+          <button class="btn" onclick="check1C(3)">Η μπάλα κινείται μόνη της στην τύχη</button>
+        </div>
+        <div id="fb1c" class="feedback"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ΠΡΟΚΛΗΣΗ 2 -->
+  <div class="card">
+    <div class="card-head" onclick="toggleCard(this)">
+      <div class="card-num">2</div>
+      <div class="card-title">Γιατί δεν κουνιέται η Μπάλα; (Βρες το λάθος)</div>
+      <div class="arrow">▼</div>
+    </div>
+    <div class="card-body">
+      <!-- 2Α -->
+      <div class="phase">
+        <div class="phase-title"><span>Α</span> Το παράπονο: «Πατάω σουτ αλλά η μπάλα δεν φεύγει!»</div>
+        <p class="prompt">Ο Αντρέας στέλνει το μήνυμα <strong>«βολή»</strong>. Τι πρέπει να έχει η Μπάλα πάνω-πάνω για να ξεκινήσει;</p>
+        <div class="options-row">
+          <button class="btn" onclick="check2A(1)">Το καπέλο: «όταν λάβω [βολή]»</button>
+          <button class="btn" onclick="check2A(2)">Μία εντολή «περίμενε 100 ώρες»</button>
+          <button class="btn" onclick="check2A(3)">Τίποτα, πρέπει να την κουνήσουμε με το χέρι</button>
+        </div>
+        <div id="fb2a" class="feedback"></div>
+      </div>
+      <!-- 2Β -->
+      <div class="phase">
+        <div class="phase-title"><span>Β</span> Το όνομα του μηνύματος</div>
+        <p class="prompt">Αν ο Αντρέας στείλει το μήνυμα <strong>«σουτ»</strong>, αλλά η μπάλα περιμένει το μήνυμα <strong>«βολή»</strong>, τι θα γίνει;</p>
+        <div class="options-row">
+          <button class="btn" onclick="check2B(1)">Η μπάλα θα μαντέψει τι θέλει ο Αντρέας</button>
+          <button class="btn" onclick="check2B(2)">Δεν θα γίνει τίποτα! Το όνομα πρέπει να είναι ολόιδιο!</button>
+          <button class="btn" onclick="check2B(3)">Θα αλλάξει το χρώμα του γηπέδου</button>
+        </div>
+        <div id="fb2b" class="feedback"></div>
+      </div>
+      <!-- 2Γ -->
+      <div class="phase">
+        <div class="phase-title"><span>Γ</span> Πότε φεύγει η μπάλα;</div>
+        <p class="prompt">Πότε πρέπει να φύγει η μπάλα από τα χέρια του Αντρέα;</p>
+        <div class="options-row">
+          <button class="btn" onclick="check2C(1)">Πριν καν σηκώσει τα χέρια του</button>
+          <button class="btn" onclick="check2C(2)">Μόλις σηκώσει τα χέρια ψηλά για να σουτάρει!</button>
+          <button class="btn" onclick="check2C(3)">Αφού έχει τελειώσει το παιχνίδι</button>
+        </div>
+        <div id="fb2c" class="feedback"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ΠΡΟΚΛΗΣΗ 3 -->
+  <div class="card">
+    <div class="card-head" onclick="toggleCard(this)">
+      <div class="card-num">3</div>
+      <div class="card-title">Βάλε τα Τουβλάκια στη Σειρά (Κώδικας Μπάλας)</div>
+      <div class="arrow">▼</div>
+    </div>
+    <div class="card-body">
+      <!-- 3Α -->
+      <div class="phase">
+        <div class="phase-title"><span>Α</span> Ποιο τουβλάκι μπαίνει στην αρχή;</div>
+        <p class="prompt">Διάλεξε ποια εντολή ξεκινάει την πτήση της μπάλας:</p>
+        <div class="code-block">
+          ➔ [Θέση 1: <span id="slotBall1" class="slot" onclick="clearBallSlot(1)">Πάτησε εδώ</span>]<br>
+          εμφανίσου<br>
+          πήγαινε σε [Αντρέας]
+        </div>
+        <div class="options-row">
+          <button class="btn" onclick="setBallSlot(1, 'όταν γίνει κλικ σε 🚩')">όταν γίνει κλικ σε 🚩</button>
+          <button class="btn" onclick="setBallSlot(1, 'όταν λάβω [βολή]')">όταν λάβω [βολή]</button>
+          <button class="btn" onclick="setBallSlot(1, 'μετάδωσε [βολή]')">μετάδωσε [βολή]</button>
+        </div>
+        <button class="btn btn-check" onclick="checkBallSlot1()">Έλεγχος</button>
+        <div id="fb3a" class="feedback"></div>
+      </div>
+      <!-- 3Β -->
+      <div class="phase">
+        <div class="phase-title"><span>Β</span> Πώς πετάει προς το καλάθι;</div>
+        <p class="prompt">Ποια εντολή κάνει την μπάλα να γλιστρήσει όμορφα στο καλάθι;</p>
+        <div class="code-block">
+          πήγαινε σε [Αντρέας]<br>
+          ➔ [Θέση 2: <span id="slotBall2" class="slot" onclick="clearBallSlot(2)">Πάτησε εδώ</span>]<br>
+          εξαφανίσου
+        </div>
+        <div class="options-row">
+          <button class="btn" onclick="setBallSlot(2, 'κινήσου 10 βήματα')">κινήσου 10 βήματα</button>
+          <button class="btn" onclick="setBallSlot(2, 'πήγαινε σε τυχαία θέση')">πήγαινε σε τυχαία θέση</button>
+          <button class="btn" onclick="setBallSlot(2, 'ολίσθησε για 1 δευτ. στη θέση [Καλάθι]')">ολίσθησε για 1 δευτ. στη θέση [Καλάθι]</button>
+        </div>
+        <button class="btn btn-check" onclick="checkBallSlot2()">Έλεγχος</button>
+        <div id="fb3b" class="feedback"></div>
+      </div>
+      <!-- 3Γ -->
+      <div class="phase">
+        <div class="phase-title"><span>Γ</span> Τι κάνουμε μόλις μπει το καλάθι;</div>
+        <p class="prompt">Αφού η μπάλα φτάσει στο καλάθι, ποια εντολή βάζουμε για να κρυφτεί;</p>
+        <div class="options-row">
+          <button class="btn" onclick="check3C(1)">Την εντολή: «εξαφανίσου»</button>
+          <button class="btn" onclick="check3C(2)">Την εντολή: «στρίψε δεξιά»</button>
+          <button class="btn" onclick="check3C(3)">Την εντολή: «άλλαξε μέγεθος»</button>
+        </div>
+        <div id="fb3c" class="feedback"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ΠΡΟΚΛΗΣΗ 4 -->
+  <div class="card">
+    <div class="card-head" onclick="toggleCard(this)">
+      <div class="card-num">4</div>
+      <div class="card-title">Από πού ξεκινάει η Μπάλα; (Σκέψου)</div>
+      <div class="arrow">▼</div>
+    </div>
+    <div class="card-body">
+      <!-- 4Α -->
+      <div class="phase">
+        <div class="phase-title"><span>Α</span> Η θέση του Αντρέα</div>
+        <p class="prompt">Αν μετακινήσουμε τον Αντρέα τέρμα αριστερά και σουτάρουμε, από πού θα φύγει η μπάλα;</p>
+        <div class="options-row">
+          <button class="btn" onclick="check4A(1)">Από τη μέση του γηπέδου</button>
+          <button class="btn" onclick="check4A(2)">Από τα χέρια του Αντρέα, γιατί του βάλαμε «πήγαινε σε [Αντρέας]»!</button>
+          <button class="btn" onclick="check4A(3)">Από τον ουρανό</button>
+        </div>
+        <div id="fb4a" class="feedback"></div>
+      </div>
+      <!-- 4Β -->
+      <div class="phase">
+        <div class="phase-title"><span>Β</span> Γιατί την κρύβουμε στην αρχή;</div>
+        <p class="prompt">Γιατί πατάμε το κουμπί να μην φαίνεται η μπάλα όταν δεν σουτάρουμε;</p>
+        <div class="options-row">
+          <button class="btn" onclick="check4B(1)">Για να μην μένει ακίνητη και κολλημένη πάνω στο καλάθι</button>
+          <button class="btn" onclick="check4B(2)">Επειδή φοβάται το σκοτάδι</button>
+          <button class="btn" onclick="check4B(3)">Για να μην μπορεί να παίξει κανείς</button>
+        </div>
+        <div id="fb4b" class="feedback"></div>
+      </div>
+      <!-- 4Γ -->
+      <div class="phase">
+        <div class="phase-title"><span>Γ</span> Πότε πανηγυρίζουμε;</div>
+        <p class="prompt">Πότε πρέπει να ακουστεί ο ήχος με τα χειροκροτήματα (Cheer);</p>
+        <div class="options-row">
+          <button class="btn" onclick="check4C(1)">Στο τέλος, μόλις η μπάλα μπει στο καλάθι!</button>
+          <button class="btn" onclick="check4C(2)">Πριν καν ξεκινήσει το παιχνίδι</button>
+          <button class="btn" onclick="check4C(3)">Όταν ο Αντρέας κάθεται ακίνητος</button>
+        </div>
+        <div id="fb4c" class="feedback"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ΠΡΟΚΛΗΣΗ 5 -->
+  <div class="card">
+    <div class="card-head" onclick="toggleCard(this)">
+      <div class="card-num">5</div>
+      <div class="card-title">Πώς γράφουμε ένα Νέο Μήνυμα;</div>
+      <div class="arrow">▼</div>
+    </div>
+    <div class="card-body">
+      <!-- 5Α -->
+      <div class="phase">
+        <div class="phase-title"><span>Α</span> Πού πατάμε για νέο όνομα;</div>
+        <p class="prompt">Πού κάνουμε κλικ για να φτιάξουμε ένα νέο μήνυμα;</p>
+        <div class="options-row">
+          <button class="btn" onclick="check5A(1)">Στο άσπρο τριγωνάκι της εντολής «μετάδωσε μήνυμα»</button>
+          <button class="btn" onclick="check5A(2)">Στη γόμα ζωγραφικής</button>
+          <button class="btn" onclick="check5A(3)">Στο ρολόι του υπολογιστή</button>
+        </div>
+        <div id="fb5a" class="feedback"></div>
+      </div>
+      <!-- 5Β -->
+      <div class="phase">
+        <div class="phase-title"><span>Β</span> Γράψε τη λέξη</div>
+        <p class="prompt">Γράψε στο παρακάτω κουτάκι τη λέξη <strong>βολή</strong> όπως λέει το βιβλίο:</p>
+        <div style="margin:10px 0;">
+          Όνομα μηνύματος: <input type="text" id="msgNameInp" class="text-input" placeholder="γράψε: βολή">
+        </div>
+        <button class="btn btn-check" onclick="checkMsgName()">Έλεγχος</button>
+        <div id="fb5b" class="feedback"></div>
+      </div>
+      <!-- 5Γ -->
+      <div class="phase">
+        <div class="phase-title"><span>Γ</span> Γιατί διαλέγουμε καλές λέξεις;</div>
+        <p class="prompt">Γιατί γράφουμε «βολή» και όχι ένα τυχαίο γράμμα όπως «ααα»;</p>
+        <div class="options-row">
+          <button class="btn" onclick="check5C(1)">Για να θυμόμαστε αμέσως τι δουλειά κάνει αυτό το μήνυμα!</button>
+          <button class="btn" onclick="check5C(2)">Για να γίνει πιο γρήγορο το ποντίκι</button>
+          <button class="btn" onclick="check5C(3)">Επειδή απαγορεύονται άλλα γράμματα</button>
+        </div>
+        <div id="fb5c" class="feedback"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ΠΡΟΚΛΗΣΗ 6 -->
+  <div class="card">
+    <div class="card-head" onclick="toggleCard(this)">
+      <div class="card-num">6</div>
+      <div class="card-title">Διάλογος: Πώς μιλάνε δύο Ήρωες με τη σειρά;</div>
+      <div class="arrow">▼</div>
+    </div>
+    <div class="card-body">
+      <!-- 6Α -->
+      <div class="phase">
+        <div class="phase-title"><span>Α</span> Πώς δεν μιλάνε ταυτόχρονα;</div>
+        <p class="prompt">Πώς κάνουμε δύο ήρωες να μιλάνε όμορφα με τη σειρά χωρίς να διακόπτει ο ένας τον άλλον;</p>
+        <div class="options-row">
+          <button class="btn" onclick="check6A(1)">Μόλις τελειώσει ο πρώτος, στέλνει μήνυμα στον δεύτερο για να πάρει τον λόγο!</button>
+          <button class="btn" onclick="check6A(2)">Φωνάζουμε δυνατά στον υπολογιστή</button>
+          <button class="btn" onclick="check6A(3)">Τους κρύβουμε και τους δύο</button>
+        </div>
+        <div id="fb6a" class="feedback"></div>
+      </div>
+      <!-- 6Β -->
+      <div class="phase">
+        <div class="phase-title"><span>Β</span> Πώς απαντάει ο δεύτερος;</div>
+        <p class="prompt">Μόλις τελειώσει ο δεύτερος ήρωας, πώς συνεχίζεται η κουβέντα;</p>
+        <div class="options-row">
+          <button class="btn" onclick="check6B(1)">Πρέπει να κλείσουμε το παράθυρο</button>
+          <button class="btn" onclick="check6B(2)">Στέλνει κι εκείνος ένα νέο μήνυμα πίσω στον πρώτο!</button>
+          <button class="btn" onclick="check6B(3)">Σβήνουμε τα λόγια του</button>
+        </div>
+        <div id="fb6b" class="feedback"></div>
+      </div>
+      <!-- 6Γ -->
+      <div class="phase">
+        <div class="phase-title"><span>Γ</span> Πόσοι ακούνε το μήνυμα;</div>
+        <p class="prompt">Όταν στέλνουμε ένα μήνυμα στο Scratch, ποιοι μπορούν να το ακούσουν;</p>
+        <div class="options-row">
+          <button class="btn" onclick="check6C(1)">Μόνο ένα αντικείμενο και κανένα άλλο</button>
+          <button class="btn" onclick="check6C(2)">Όλα τα αντικείμενα που έχουν το τουβλάκι «όταν λάβω»!</button>
+          <button class="btn" onclick="check6C(3)">Κανένας ήρωας</button>
+        </div>
+        <div id="fb6c" class="feedback"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ΠΡΟΚΛΗΣΗ 7 -->
+  <div class="card">
+    <div class="card-head" onclick="toggleCard(this)">
+      <div class="card-num">7</div>
+      <div class="card-title">Η Κίνηση του Αντρέα στο Γήπεδο</div>
+      <div class="arrow">▼</div>
+    </div>
+    <div class="card-body">
+      <!-- 7Α -->
+      <div class="phase">
+        <div class="phase-title"><span>Α</span> Η στολή για το τρέξιμο</div>
+        <p class="prompt">Ποια ενδυμασία δείχνει τον Αντρέα να κινεί το αμαξίδιό του στο παρκέ;</p>
+        <div class="options-row">
+          <button class="btn" onclick="check7A(1)">andie-a</button>
+          <button class="btn" onclick="check7A(2)">andie-c (η ενδυμασία οδήγησης με τα χέρια στους τροχούς)</button>
+          <button class="btn" onclick="check7A(3)">andie-d</button>
+        </div>
+        <div id="fb7a" class="feedback"></div>
+      </div>
+      <!-- 7Β -->
+      <div class="phase">
+        <div class="phase-title"><span>Β</span> Πώς πάει προς τα πίσω;</div>
+        <p class="prompt">Όταν πατάμε το αριστερό βέλος, πώς κάνουμε τον Αντρέα να πάει πίσω;</p>
+        <div class="options-row">
+          <button class="btn" onclick="check7B(1)">Βάζουμε: «κινήσου -10 βήματα» (με μείον μπροστά)</button>
+          <button class="btn" onclick="check7B(2)">Του αλλάζουμε καπέλο</button>
+          <button class="btn" onclick="check7B(3)">Τον γυρίζουμε ανάποδα</button>
+        </div>
+        <div id="fb7b" class="feedback"></div>
+      </div>
+      <!-- 7Γ -->
+      <div class="phase">
+        <div class="phase-title"><span>Γ</span> Γιατί περιμένει λίγο ανάμεσα στα χέρια;</div>
+        <p class="prompt">Στο σενάριο του σουτ, γιατί βάλαμε «περίμενε 0.1 δευτερόλεπτα» ανάμεσα στις στάσεις;</p>
+        <div class="options-row">
+          <button class="btn" onclick="check7C(1)">Για να προλαβαίνουμε να δούμε την κίνηση σαν αληθινό κινούμενο σχέδιο!</button>
+          <button class="btn" onclick="check7C(2)">Γιατί κουράστηκαν τα χέρια του</button>
+        </div>
+        <div id="fb7c" class="feedback"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ΠΡΟΚΛΗΣΗ 8 -->
+  <div class="card">
+    <div class="card-head" onclick="toggleCard(this)">
+      <div class="card-num">8</div>
+      <div class="card-title">Όλο το Παιχνίδι στη Σειρά (Τελικό Τεστ)</div>
+      <div class="arrow">▼</div>
+    </div>
+    <div class="card-body">
+      <!-- 8Α -->
+      <div class="phase">
+        <div class="phase-title"><span>Α</span> Ποια είναι η σωστή σειρά των γεγονότων;</div>
+        <p class="prompt">Τι γίνεται πρώτο, τι δεύτερο και τι στο τέλος;</p>
+        <div class="options-row">
+          <button class="btn" onclick="check8A(1)">1. Πατάμε διάστημα ➔ 2. Ο Αντρέας σηκώνει χέρια ➔ 3. Στέλνει μήνυμα ➔ 4. Η μπάλα πάει στο καλάθι ➔ 5. Χειροκροτήματα!</button>
+          <button class="btn" onclick="check8A(2)">1. Χειροκροτήματα ➔ 2. Μπάλα ➔ 3. Πατάμε διάστημα</button>
+          <button class="btn" onclick="check8A(3)">1. Η μπάλα μπαίνει ➔ 2. Μετά σουτάρουμε</button>
+        </div>
+        <div id="fb8a" class="feedback"></div>
+      </div>
+      <!-- 8Β -->
+      <div class="phase">
+        <div class="phase-title"><span>Β</span> Το κρυφό κουμπί στο καλάθι</div>
+        <p class="prompt">Γιατί βάλαμε ένα κρυφό αντικείμενο πάνω στο καλάθι;</p>
+        <div class="options-row">
+          <button class="btn" onclick="check8B(1)">Για να ξέρει η μπάλα πού ακριβώς να πετάξει (σαν μαγνήτης/στόχος)!</button>
+          <button class="btn" onclick="check8B(2)">Για να κρύψουμε το ταμπλό</button>
+        </div>
+        <div id="fb8b" class="feedback"></div>
+      </div>
+      <!-- 8Γ -->
+      <div class="phase">
+        <div class="phase-title"><span>Γ</span> Τι μάθαμε σήμερα;</div>
+        <p class="prompt">Ποιο είναι το μεγάλο μυστικό των μηνυμάτων;</p>
+        <div class="options-row">
+          <button class="btn" onclick="check8C(1)">Ότι κάνουν τους ήρωες να συνεργάζονται και να βοηθούν ο ένας τον άλλον!</button>
+          <button class="btn" onclick="check8C(2)">Ότι αλλάζουν μόνο το χρώμα των γραμμάτων</button>
+        </div>
+        <div id="fb8c" class="feedback"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  function toggleCard(head) {
+    head.parentElement.classList.toggle('open');
+  }
+
+  // 1
+  function check1A(c) {
+    const fb = document.getElementById('fb1a');
+    if (c === 2) {
+      fb.className = 'feedback ok';
+      fb.innerHTML = '✅ <strong>Μπράβο!</strong> Το μήνυμα είναι ένα σύνθημα για να ξέρει ο άλλος ήρωας πότε να ξεκινήσει!';
+    } else {
+      fb.className = 'feedback err';
+      fb.innerHTML = '❌ Όχι. Το μήνυμα στο Scratch είναι ένα κρυφό σήμα μέσα στο παιχνίδι!';
+    }
+  }
+  function check1B(c) {
+    const fb = document.getElementById('fb1b');
+    if (c === 3) {
+      fb.className = 'feedback ok';
+      fb.innerHTML = '✅ <strong>Σωστά!</strong> Είναι στα κίτρινα Συμβάντα, γιατί όταν φτάνει το μήνυμα αρχίζει δράση!';
+    } else {
+      fb.className = 'feedback err';
+      fb.innerHTML = '❌ Ψάξε στα κίτρινα μπλοκ (εκεί που είναι και η πράσινη σημαία)!';
+    }
+  }
+  function check1C(c) {
+    const fb = document.getElementById('fb1c');
+    if (c === 1) {
+      fb.className = 'feedback ok';
+      fb.innerHTML = '✅ <strong>Ακριβώς!</strong> Ο Αντρέας κάνει το σουτ και λέει στην μπάλα να πετάξει!';
+    } else {
+      fb.className = 'feedback err';
+      fb.innerHTML = '❌ Σκέψου: ποιος κρατάει την μπάλα και σουτάρει; Ο Αντρέας!';
+    }
+  }
+
+  // 2
+  function check2A(c) {
+    const fb = document.getElementById('fb2a');
+    if (c === 1) {
+      fb.className = 'feedback ok';
+      fb.innerHTML = '🎯 <strong>Μπράβο ντετέκτιβ!</strong> Χωρίς το «όταν λάβω [βολή]», η μπάλα δεν ξέρει πότε έγινε το σουτ!';
+    } else {
+      fb.className = 'feedback err';
+      fb.innerHTML = '❌ Η μπάλα χρειάζεται το τουβλάκι που περιμένει το μήνυμα!';
+    }
+  }
+  function check2B(c) {
+    const fb = document.getElementById('fb2b');
+    if (c === 2) {
+      fb.className = 'feedback ok';
+      fb.innerHTML = '🎯 <strong>Σωστά!</strong> Ο υπολογιστής θέλει την ίδια ακριβώς λεξούλα και στα δύο τουβλάκια!';
+    } else {
+      fb.className = 'feedback err';
+      fb.innerHTML = '❌ Ο υπολογιστής δεν καταλαβαίνει συνώνυμα. Πρέπει να γράφουν το ίδιο όνομα!';
+    }
+  }
+  function check2C(c) {
+    const fb = document.getElementById('fb2c');
+    if (c === 2) {
+      fb.className = 'feedback ok';
+      fb.innerHTML = '🎯 <strong>Ακριβώς!</strong> Μόλις σηκώσει ψηλά τα χέρια του, τότε αφήνει την μπάλα να φύγει!';
+    } else {
+      fb.className = 'feedback err';
+      fb.innerHTML = '❌ Σκέψου: πότε πετάμε την μπάλα στο μπάσκετ; Όταν σηκώνουμε τα χέρια!';
+    }
+  }
+
+  // 3
+  let bSlots = { 1: '', 2: '' };
+  function setBallSlot(num, val) {
+    bSlots[num] = val;
+    const el = document.getElementById('slotBall' + num);
+    el.textContent = val;
+    el.classList.add('filled');
+  }
+  function clearBallSlot(num) {
+    bSlots[num] = '';
+    const el = document.getElementById('slotBall' + num);
+    el.textContent = 'Πάτησε εδώ';
+    el.classList.remove('filled');
+  }
+  function checkBallSlot1() {
+    const fb = document.getElementById('fb3a');
+    if (bSlots[1] === 'όταν λάβω [βολή]') {
+      fb.className = 'feedback ok';
+      fb.innerHTML = '✅ <strong>Τέλεια!</strong> Αυτό είναι το σωστό καπέλο για να περιμένει το σουτ.';
+    } else {
+      fb.className = 'feedback err';
+      fb.innerHTML = '❌ Διάλεξε το τουβλάκι που λέει: «όταν λάβω [βολή]»!';
+    }
+  }
+  function checkBallSlot2() {
+    const fb = document.getElementById('fb3b');
+    if (bSlots[2] === 'ολίσθησε για 1 δευτ. στη θέση [Καλάθι]') {
+      fb.className = 'feedback ok';
+      fb.innerHTML = '✅ <strong>Μπράβο!</strong> Έτσι η μπάλα θα πετάξει ομαλά προς το καλάθι!';
+    } else {
+      fb.className = 'feedback err';
+      fb.innerHTML = '❌ Χρειαζόμαστε την εντολή που λέει «ολίσθησε στη θέση [Καλάθι]»!';
+    }
+  }
+  function check3C(c) {
+    const fb = document.getElementById('fb3c');
+    if (c === 1) {
+      fb.className = 'feedback ok';
+      fb.innerHTML = '✅ <strong>Σωστά!</strong> Μόλις μπει το καλάθι, κρύβεται με το «εξαφανίσου»!';
+    } else {
+      fb.className = 'feedback err';
+      fb.innerHTML = '❌ Για να μην μείνει κολλημένη στο στεφάνι, πρέπει να εξαφανιστεί!';
+    }
+  }
+
+  // 4
+  function check4A(c) {
+    const fb = document.getElementById('fb4a');
+    if (c === 2) {
+      fb.className = 'feedback ok';
+      fb.innerHTML = '✅ <strong>Πολύ σωστά!</strong> Επειδή του βάλαμε «πήγαινε σε [Αντρέας]», ξεκινάει πάντα από τα χέρια του!';
+    } else {
+      fb.className = 'feedback err';
+      fb.innerHTML = '❌ Η μπάλα πάει πρώτα στον Αντρέα, άρα φεύγει από εκεί που κάθεται!';
+    }
+  }
+  function check4B(c) {
+    const fb = document.getElementById('fb4b');
+    if (c === 1) {
+      fb.className = 'feedback ok';
+      fb.innerHTML = '✅ <strong>Ακριβώς!</strong> Την κρύβουμε για να φαίνεται μόνο όταν πετάει!';
+    } else {
+      fb.className = 'feedback err';
+      fb.innerHTML = '❌ Αν δεν την κρύψουμε, θα φαίνεται μόνιμα πάνω στο καλάθι!';
+    }
+  }
+  function check4C(c) {
+    const fb = document.getElementById('fb4c');
+    if (c === 1) {
+      fb.className = 'feedback ok';
+      fb.innerHTML = '✅ <strong>Μπράβο!</strong> Πανηγυρίζουμε στο τέλος αφού μπει το καλάθι!';
+    } else {
+      fb.className = 'feedback err';
+      fb.innerHTML = '❌ Δεν χειροκροτούμε πριν καν σουτάρουμε!';
+    }
+  }
+
+  // 5
+  function check5A(c) {
+    const fb = document.getElementById('fb5a');
+    if (c === 1) {
+      fb.className = 'feedback ok';
+      fb.innerHTML = '✅ <strong>Σωστά!</strong> Πατάμε στο μικρό τρίγωνο και γράφουμε το νέο όνομα.';
+    } else {
+      fb.className = 'feedback err';
+      fb.innerHTML = '❌ Πατάμε στο άσπρο τριγωνάκι πάνω στο τουβλάκι του μηνύματος!';
+    }
+  }
+  function checkMsgName() {
+    const v = document.getElementById('msgNameInp').value.trim().toLowerCase();
+    const fb = document.getElementById('fb5b');
+    if (v === 'βολή' || v === 'βολη') {
+      fb.className = 'feedback ok';
+      fb.innerHTML = '✅ <strong>Άριστα!</strong> Έγραψες ακριβώς τη λέξη «βολή»!';
+    } else {
+      fb.className = 'feedback err';
+      fb.innerHTML = '❌ Γράψε απλά τη λέξη: <strong>βολή</strong>';
+    }
+  }
+  function check5C(c) {
+    const fb = document.getElementById('fb5c');
+    if (c === 1) {
+      fb.className = 'feedback ok';
+      fb.innerHTML = '✅ <strong>Πολύ σωστά!</strong> Με καθαρές λέξεις καταλαβαίνουμε αμέσως τι κάνει το πρόγραμμα!';
+    } else {
+      fb.className = 'feedback err';
+      fb.innerHTML = '❌ Βάζουμε ωραίες λέξεις για να μην μπερδευόμαστε!';
+    }
+  }
+
+  // 6
+  function check6A(c) {
+    const fb = document.getElementById('fb6a');
+    if (c === 1) {
+      fb.className = 'feedback ok';
+      fb.innerHTML = '✅ <strong>Έτσι μπράβο!</strong> Μόλις τελειώσει ο ένας, στέλνει σινιάλο στον άλλον και μιλάνε όμορφα με τη σειρά!';
+    } else {
+      fb.className = 'feedback err';
+      fb.innerHTML = '❌ Με τα μηνύματα κανένας ήρωας δεν μιλάει πάνω στα λόγια του άλλου!';
+    }
+  }
+  function check6B(c) {
+    const fb = document.getElementById('fb6b');
+    if (c === 2) {
+      fb.className = 'feedback ok';
+      fb.innerHTML = '✅ <strong>Σωστά!</strong> Σαν μπαλάκι του πινγκ-πονγκ, στέλνει κι αυτός μήνυμα πίσω!';
+    } else {
+      fb.className = 'feedback err';
+      fb.innerHTML = '❌ Στέλνει ένα νέο μήνυμα πίσω για να συνεχιστεί η κουβέντα!';
+    }
+  }
+  function check6C(c) {
+    const fb = document.getElementById('fb6c');
+    if (c === 2) {
+      fb.className = 'feedback ok';
+      fb.innerHTML = '✅ <strong>Μπράβο!</strong> Το μήνυμα ακούγεται σε όλη τη σκηνή, σαν ανακοίνωση από μεγάφωνο!';
+    } else {
+      fb.className = 'feedback err';
+      fb.innerHTML = '❌ Όποιος έχει το τουβλάκι «όταν λάβω», ακούει το μήνυμα!';
+    }
+  }
+
+  // 7
+  function check7A(c) {
+    const fb = document.getElementById('fb7a');
+    if (c === 2) {
+      fb.className = 'feedback ok';
+      fb.innerHTML = '✅ <strong>Σωστά!</strong> Η ενδυμασία andie-c έχει τα χέρια στους τροχούς για να τρέχει!';
+    } else {
+      fb.className = 'feedback err';
+      fb.innerHTML = '❌ Διάλεξε την ενδυμασία andie-c που είναι για την οδήγηση!';
+    }
+  }
+  function check7B(c) {
+    const fb = document.getElementById('fb7b');
+    if (c === 1) {
+      fb.className = 'feedback ok';
+      fb.innerHTML = '✅ <strong>Μπράβο!</strong> Με το μείον (-10) ο ήρωας κάνει όπισθεν!';
+    } else {
+      fb.className = 'feedback err';
+      fb.innerHTML = '❌ Στο Scratch τα αρνητικά βήματα (-10) πάνε προς τα πίσω!';
+    }
+  }
+  function check7C(c) {
+    const fb = document.getElementById('fb7c');
+    if (c === 1) {
+      fb.className = 'feedback ok';
+      fb.innerHTML = '✅ <strong>Ακριβώς!</strong> Χωρίς τη μικρή παύση, τα χέρια θα κινούνταν τόσο γρήγορα που δεν θα βλέπαμε τίποτα!';
+    } else {
+      fb.className = 'feedback err';
+      fb.innerHTML = '❌ Βάζουμε λίγο χρόνο για να φαίνεται καθαρά το σουτ στα μάτια μας!';
+    }
+  }
+
+  // 8
+  function check8A(c) {
+    const fb = document.getElementById('fb8a');
+    if (c === 1) {
+      fb.className = 'feedback ok';
+      fb.innerHTML = '✅ <strong>Άριστα!</strong> Αυτή είναι η σωστή σειρά από το πάτημα μέχρι το καλάθι!';
+    } else {
+      fb.className = 'feedback err';
+      fb.innerHTML = '❌ Σκέψου: πρώτα σουτάρουμε, μετά πετάει η μπάλα και στο τέλος μπαίνει!';
+    }
+  }
+  function check8B(c) {
+    const fb = document.getElementById('fb8b');
+    if (c === 1) {
+      fb.className = 'feedback ok';
+      fb.innerHTML = '✅ <strong>Πολύ έξυπνο!</strong> Το κρυφό κουμπί είναι ο στόχος για να ξέρει η μπάλα πού να πάει!';
+    } else {
+      fb.className = 'feedback err';
+      fb.innerHTML = '❌ Το κουμπί λειτουργεί σαν στόχος για να πετύχει το καλάθι η μπάλα!';
+    }
+  }
+  function check8C(c) {
+    const fb = document.getElementById('fb8c');
+    if (c === 1) {
+      fb.className = 'feedback ok';
+      fb.innerHTML = '🌟 <strong>ΜΠΡΑΒΟ!</strong> Έμαθες τέλεια πώς επικοινωνούν και συνεργάζονται οι ήρωες στο Scratch!';
+    } else {
+      fb.className = 'feedback err';
+      fb.innerHTML = '❌ Τα μηνύματα βοηθούν τους ήρωες να συνεργάζονται σαν ομάδα!';
+    }
+  }
+</script>
+</body>
+</html>
